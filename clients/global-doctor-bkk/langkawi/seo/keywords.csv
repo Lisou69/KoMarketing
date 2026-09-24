@@ -1,0 +1,56 @@
+priority,keyword,lang,page,intent,why,title_tag_suggestion
+H,Global Doctors Langkawi,EN,Home + About,brand,"Must-win. Official name on the draft and listings.",Global Doctors Langkawi | Clinic in Pantai Cenang (Pelangi Beach Resort)
+H,Global Doctor Langkawi,EN,Home,brand,People search the singular form too. Use in title/body once.
+H,Global Doctors Clinic Langkawi,EN,Home + Contact,brand,Matches Google Business style name.
+H,clinic Pantai Cenang,EN,Home,local,"Best non-brand money phrase. Clinic is IN Cenang. Chenang Clinic is the only real rival.",
+H,doctor Pantai Cenang,EN,Home,local,Tourists say doctor more than GP or clinic.
+H,Pantai Cenang clinic,EN,Home,local,Word-order variant. Same page.
+H,walk-in clinic Langkawi,EN,Home,transactional,Draft already says walk-ins. Almost nobody titles for this.
+H,walk-in clinic Pantai Cenang,EN,Home,transactional,More winnable than island-wide clinic.
+H,English speaking doctor Langkawi,EN,Home + About,transactional,High tourist intent. Almost no clinic titles this.
+H,Pelangi Beach Resort clinic,EN,Home + Contact,navigational,Hotel guests search the landmark. Put Pelangi in title.
+H,clinic inside Pelangi Langkawi,EN,Contact,navigational,Grab/hotel-staff phrasing.
+H,hotel doctor Langkawi,EN,/hotel-yacht,transactional,Matches the page. Chenang and iCARE have weaker copy.
+H,doctor to hotel Langkawi,EN,/hotel-yacht,transactional,Same page.
+H,house call doctor Langkawi,EN,/hotel-yacht,transactional,Same page.
+H,villa doctor Langkawi,EN,/hotel-yacht,transactional,Same page.
+H,yacht doctor Langkawi,EN,/hotel-yacht,transactional,Almost empty SERP. Unique to this site.
+H,marina doctor Langkawi,EN,/hotel-yacht,transactional,Telaga / Rebak / RLYC mentions on the page.
+H,travel clinic Langkawi,EN,/travelclinic,transactional,Dedicated page already exists. Competitors have vaccines only.
+H,travel vaccinations Langkawi,EN,/travelclinic,transactional,Support term on the same page.
+H,clinic accepts travel insurance Langkawi,EN,/travel-insurance,transactional,Strongest differentiator. Almost nobody owns this.
+H,travel insurance clinic Langkawi,EN,/travel-insurance,transactional,Same page. Direct billing.
+H,jellyfish sting Langkawi,EN,/jellyfish,informational>transactional,No clinic owns this. Travel blogs rank today.
+H,jellyfish Langkawi treatment,EN,/jellyfish,informational>transactional,Same page.
+H,clinic Langkawi,EN,Home,local,"Big term. Maps pack is the real battle. Realistic with GBP + Cenang content.",
+H,Langkawi clinic,EN,Home,local,Word-order variant.
+H,doctor Langkawi,EN,Home,local,Tourist phrasing. Homepage H1 territory.
+H,medical clinic Langkawi,EN,/services,local,Full clinic (lab + pharmacy + ambulance) not a kiosk.
+M,klinik Langkawi,MS,GBP + short BM snippet,local,Locals search this. Do not build a thin Malay homepage.
+M,doktor Langkawi,MS,GBP,local,Secondary to klinik.
+M,klinik Pantai Cenang,MS,GBP + Home,local,Place name not Chenang Clinic brand.
+M,24/7 doctor Langkawi,EN,/hotel-yacht,transactional,ONLY as 24/7 line / hotel call. Not 24-hour walk-in.
+M,24 hour doctor Langkawi,EN,/hotel-yacht,transactional,Same honesty rule.
+M,emergency clinic Langkawi,EN,Home FAQ,mixed,Often hospital intent. Explain 999 vs walk-in vs hotel call.
+M,dengue test Langkawi,EN,/services,transactional,Same-day dengue testing is on the services page.
+M,food poisoning Langkawi,EN,/services,transactional,Stomach bugs block already exists.
+M,stomach bug Langkawi doctor,EN,/services,transactional,Same cluster.
+M,wound care Langkawi,EN,/services,transactional,Scooter / road rash demand.
+M,scooter accident clinic Langkawi,EN,/services,transactional,Support H2 on services.
+M,fit to fly certificate Langkawi,EN,/travelclinic + /services,transactional,Easy win. Few dedicated pages.
+M,medical certificate Langkawi,EN,/services,transactional,Visa / employment / fit-to-fly.
+M,diving medical Langkawi,EN,/services,transactional,Fit-to-dive is listed. Add a short H2.
+M,vaccination Langkawi,EN,/travelclinic,transactional,Support term not a new page.
+M,vaksin Langkawi,MS,/travelclinic,transactional,Mention once if you add a BM sentence.
+M,private ambulance Langkawi,EN,/services + /hotel-yacht,transactional,Real differentiator. Say when to use 999 instead.
+M,sick in Langkawi,EN,/blog,informational,Travelfish-style queries. One guide post.
+M,hospital vs clinic Langkawi,EN,/blog,informational,Cannot outrank Hospital Sultanah Maliha. Intercept tourists.
+M,ambulance Langkawi,EN,/blog + Contact,emergency,Private vs 999 / HSM.
+L,hospital Langkawi,EN/MS,do not primary-target,emergency,Government hospital owns this.
+L,klinik 24 jam Langkawi,MS,do not target,transactional,You are not a 24-hour walk-in. Mahsuri and Mediklinik Rakyat own it.
+L,24 hour clinic Langkawi,EN,do not target,transactional,Same honesty problem.
+L,klinik Kuah,MS,do not target,local,Clinic is in Cenang not Kuah.
+L,farmasi Langkawi,MS,mention only,local,Retail chains win. On-site pharmacy is a feature.
+L,GP Langkawi,EN,mention on /services,local,Weak vs clinic/doctor.
+L,klinik kesihatan Langkawi,MS,do not target,informational,Government intent.
+L,兰卡威诊所,ZH,skip until CN page,local,No Chinese page on the draft.
