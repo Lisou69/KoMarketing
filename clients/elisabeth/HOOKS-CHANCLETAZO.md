@@ -38,3 +38,31 @@ Lisa feedback 2026-09-24: prior 4–7 word bank was too short. These are full sp
 ## Archive (too short — do not post as main bank)
 
 Chancletazo. End the point. / Easy ball. Don't caress it. / Near the net. Flat finish. / etc.
+
+## Extended bank (Lisa: propose more)
+
+21. POV: you’re stuck at the net and the ball finally sits up for once.
+22. This isn’t a soft volley with attitude — it’s the finish.
+23. Floaty ball, forward step, flat contact… and they don’t even move.
+24. I fear people still caress this when it’s literally free.
+25. Green light at the net and I’m going through the body, not the lines.
+26. When you stop “keeping the point alive” and just end it.
+27. Collé au filet energy but make it flat and mean.
+28. The quiet flex of taking the easy one hard.
+29. Not a bandeja. Not a vibora. Just a clean chancletazo.
+30. POV: practice feed looks mid until that flat slap lands.
+31. Shoulder-height sit-up and suddenly everyone’s late.
+32. You can hear when it’s the right ball — then you don’t hesitate.
+33. Me acting calm after ending the rally in one flat swing.
+34. If the defender’s deep and the ball’s up… that’s your shot.
+35. Soft hands get you here. Flat hands finish it.
+36. Be so for real… half these “volleys” should’ve been chancletazos.
+37. Close enough to smell the net and the ball still floats — take it.
+38. Wrong ball? Reset. Right ball? Flat through the gap.
+39. This is the part where you stop being nice at the net.
+40. POV: Tuesday drill and the chancletazo actually looks clean.
+
+### Optional Trials D/E/F
+- D: #21
+- E: #29
+- F: #36
