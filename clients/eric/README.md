@@ -7,6 +7,7 @@ Focus: padel coaching content — Instagram Trial Reels / Reels hooks and playbo
 | File | Role |
 |------|------|
 | [TRIALS-REELS.md](./TRIALS-REELS.md) | Instagram Trials + padel hooks brief (SoT for posting) |
+| [50-VIBORA-PRACTICE-HOOKS.md](./50-VIBORA-PRACTICE-HOOKS.md) | 50 written vibora-practice hooks for Trials / Reels |
 
 **Status:** Active content ops — Trial Reels A/B for new coaching clips.  
 **Owner:** Marketing Bot / Lisa · Research input: Market Researcher (2026-09-24)
