@@ -11,6 +11,11 @@ Focus: padel technique Reels — glass defense / double glass, captions and hook
 | [CAPTION-FR.md](./CAPTION-FR.md) | FR rewrite (`vitre` / `double vitre`) |
 | [NOTES.md](./NOTES.md) | Rationale, vocab watch-outs, hashtags |
 | [2026-09-16-padel-reel-caption.md](./2026-09-16-padel-reel-caption.md) | Dated reel caption pack |
+| [HOOKS-CHANCLETAZO.md](./HOOKS-CHANCLETAZO.md) | Chancletazo reel pack — on-screen + line-1 hooks |
+| [CAPTION-CHANCLETAZO.md](./CAPTION-CHANCLETAZO.md) | Chancletazo reel pack — EN caption |
+| [CAPTION-FR-CHANCLETAZO.md](./CAPTION-FR-CHANCLETAZO.md) | Chancletazo reel pack — FR caption |
+| [NOTES-CHANCLETAZO.md](./NOTES-CHANCLETAZO.md) | Chancletazo reel pack — rationale, vocab, hashtags |
+| [2026-09-24-chancletazo-reel-caption.md](./2026-09-24-chancletazo-reel-caption.md) | Chancletazo reel pack — dated caption (2026-09-24) |
 
 **Status:** Client folder seeded from prior glass-defense deliverable (2026-09-16).  
 **Owner:** Marketing Bot / Lisa  
