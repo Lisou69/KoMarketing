@@ -117,6 +117,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    justify-content: center;
   }
   .fill > .grid-2,
   .fill > .grid-3,
@@ -125,16 +126,9 @@
   .fill > .steps,
   .fill > .ads-split,
   .fill > .cover,
-  .fill > .week,
-  .fill > .film { flex: 1; min-height: 0; }
-  .fill > .grid-2,
-  .fill > .grid-3,
-  .fill > .grid-4 { grid-auto-rows: 1fr; }
-  .fill > .grid-2.tight,
-  .fill > .grid-3.tight,
-  .fill > .grid-4.tight { flex: 0 0 auto; grid-auto-rows: auto; }
+  .fill > .week { flex: 0 0 auto; }
   .footer {
-    margin-top: 8px;
+    margin-top: auto;
     padding-top: 6px;
     display: flex;
     justify-content: space-between;
@@ -153,16 +147,11 @@
     background: var(--soft);
     border: 1px solid var(--line);
     border-radius: 12px;
-    padding: 8px 10px 8px;
+    padding: 10px 12px;
     display: flex;
     flex-direction: column;
     min-height: 0;
-    height: auto;
   }
-  .grid-2 > .card,
-  .grid-3 > .card,
-  .grid-4 > .card { height: 100%; }
-  .ads-split .stack > .ph { flex: 1; min-height: 88px; }
   .card.green { background: var(--green-soft); border-color: rgba(127,176,154,0.35); }
   .card.blue { background: var(--blue-soft); border-color: rgba(143,176,199,0.35); }
   .card.coral { background: var(--coral-soft); border-color: rgba(226,148,136,0.45); }
@@ -378,15 +367,11 @@
     background: var(--soft);
     border: 1px solid var(--line);
     border-radius: 12px;
-    padding: 0 0 8px;
+    padding: 10px 10px 10px;
     min-height: 0;
-    height: 100%;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
   }
-  .step .ph { flex: 1; min-height: 52px; border-radius: 11px 11px 0 0; margin-bottom: 6px; }
-  .step h3, .step p, .step .n { padding-left: 8px; padding-right: 8px; }
   .step .n {
     font-family: "Cormorant Garamond", Georgia, serif;
     color: var(--gold);
@@ -416,7 +401,7 @@
   .fbar strong { margin-right: 8px; }
   .fbar span { color: var(--muted); }
   .frow b { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
-  /* Photos */
+  /* Photos — only used on cover */
   .ph {
     position: relative;
     overflow: hidden;
@@ -424,13 +409,13 @@
     min-height: 0;
     background: #111;
   }
-  .ph img, .film img {
+  .ph img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
   }
-  .ph span, .film span {
+  .ph span {
     position: absolute;
     left: 7px;
     bottom: 5px;
@@ -440,88 +425,13 @@
     color: #fff;
     text-shadow: 0 1px 3px rgba(0,0,0,.75);
   }
-  .film {
+  /* Ads layout */
+  .ads-grid {
     display: grid;
-    gap: 6px;
-    min-height: 0;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
   }
-  .film.g2 { grid-template-columns: 1fr 1fr; }
-  .film.g4 { grid-template-columns: repeat(4, 1fr); }
-  .film .ph { height: 100%; border-radius: 8px; }
-  .ads-split {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 10px;
-    min-height: 0;
-  }
-  .ads-split .stack { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
-  .week { display: grid; grid-template-columns: 1.15fr .85fr; gap: 10px; min-height: 0; }
-  .week .side { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
-  .card .ph { flex: 1; min-height: 64px; }
-  .lock .ph { flex: 1; min-height: 64px; margin: 0 -12px 6px; border-radius: 13px 13px 0 0; }
-  .week .side > .ph { flex: 1; min-height: 72px; }
-  .lock .big { margin-top: 2px; }
-  /* Budget */
-  .giant {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-weight: 500;
-    font-size: 78px;
-    line-height: .86;
-    color: var(--gold);
-    letter-spacing: -0.03em;
-  }
-  .eq { color: var(--muted); font-size: 14px; margin: 6px 0 10px; }
-  .eq b { color: var(--cream); font-weight: 500; }
-  .money {
-    background: rgba(245,244,241,0.03);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 10px 12px;
-  }
-  .money .v {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: 28px;
-    color: var(--gold);
-    line-height: 1;
-  }
-  .money h3 { font-size: 13px; margin: 3px 0; }
-  .money p { color: var(--muted); font-size: 11.5px; line-height: 1.35; }
-  .split {
-    display: grid;
-    grid-template-columns: 1.4fr 1fr;
-    gap: 8px;
-    margin-top: 8px;
-  }
-  .split .bit {
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 7px 10px;
-    font-size: 11.5px;
-    color: var(--muted);
-    line-height: 1.35;
-  }
-  .split .bit b { color: var(--cream); font-weight: 500; }
-  /* Lock close */
-  .locks { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; min-height: 0; }
-  .lock {
-    border-radius: 14px;
-    padding: 0 12px 10px;
-    display: flex;
-    flex-direction: column;
-    border: 1px solid var(--line);
-    background: rgba(230,192,116,0.06);
-  }
-  .lock .big {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: 40px;
-    color: var(--gold);
-    line-height: .9;
-  }
-  .lock h3 { font-size: 16px; margin: 8px 0 6px; }
-  .lock p { color: var(--muted); font-size: 12.5px; line-height: 1.4; }
-  .lock .own { margin-top: auto; padding-top: 10px; font-size: 12px; }
-  .lock .own b { display: block; font-weight: 600; }
-  .lock .own span { color: var(--coral); font-size: 11px; letter-spacing: .04em; }
+  .ads-grid .stack { display: flex; flex-direction: column; gap: 8px; }
   /* Week blocks */
   .band {
     display: grid;
@@ -617,6 +527,95 @@
   @media print {
     .nav, .hit, .bar, .hint { display: none !important; }
   }
+  /* Budget */
+  .giant {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-weight: 500;
+    font-size: 78px;
+    line-height: .86;
+    color: var(--gold);
+    letter-spacing: -0.03em;
+  }
+  .eq { color: var(--muted); font-size: 14px; margin: 6px 0 10px; }
+  .eq b { color: var(--cream); font-weight: 500; }
+  .money {
+    background: rgba(245,244,241,0.03);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 12px;
+  }
+  .money .v {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 28px;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .money h3 { font-size: 13px; margin: 3px 0; }
+  .money p { color: var(--muted); font-size: 11.5px; line-height: 1.35; }
+  .split {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .split .bit {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 7px 10px;
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.35;
+  }
+  .split .bit b { color: var(--cream); font-weight: 500; }
+  /* Lock close */
+  .locks { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .lock {
+    border-radius: 14px;
+    padding: 12px 14px 12px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--line);
+    background: rgba(230,192,116,0.06);
+  }
+  .lock .big {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 40px;
+    color: var(--gold);
+    line-height: .9;
+    margin-bottom: 4px;
+  }
+  .lock h3 { font-size: 16px; margin: 8px 0 6px; }
+  .lock p { color: var(--muted); font-size: 12.5px; line-height: 1.4; }
+  .lock .own { margin-top: auto; padding-top: 10px; font-size: 12px; }
+  .lock .own b { display: block; font-weight: 600; }
+  .lock .own span { color: var(--coral); font-size: 11px; letter-spacing: .04em; }
+  /* Callout note bar — matches Asian Gala style */
+  .note-bar {
+    background: rgba(230,192,116,0.07);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 12.5px;
+    line-height: 1.4;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .note-bar .label {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    flex: 0 0 auto;
+    margin-top: 2px;
+  }
+  .note-bar .label.gold { background: var(--gold); color: var(--ink); }
+  .note-bar .label.coral { background: var(--coral); color: var(--ink); }
+  .note-bar .label.green { background: var(--green); color: var(--ink); }
+  /* Export */
   body.export {
     overflow: visible;
     height: auto;
@@ -652,7 +651,7 @@
   <!-- 01 COVER -->
   <section class="slide active" data-tone="hero" data-title="Cover">
     <div class="eyebrow">KO Marketing · Execution plan · Draft for decision</div>
-    <div class="cover fill">
+    <div class="cover fill" style="justify-content:stretch">
       <div class="cover-copy">
         <h1>Fairway Golf<br/><em>and City Club</em></h1>
         <p class="plus">+ Mandrake Cafe</p>
@@ -714,12 +713,6 @@
         <button class="jump" type="button" data-go="23"><span>23</span> Appendix</button>
       </div>
     </div>
-    <div class="film g4">
-      <div class="ph"><img src="assets/golf-swing.jpg" alt="Golfer mid-swing"><span>Unsplash</span></div>
-      <div class="ph"><img src="assets/golf-green.jpg" alt="Flag on a golf green"><span>Unsplash</span></div>
-      <div class="ph"><img src="assets/cafe-latte.jpg" alt="Latte on a cafe table"><span>Unsplash</span></div>
-      <div class="ph"><img src="assets/cafe-brunch.jpg" alt="Brunch plate"><span>Unsplash</span></div>
-    </div>
     </div>
     <div class="footer"><span class="ko">KO</span><span>Fairway Golf and City Club + Mandrake Cafe</span><span>02 / 23</span></div>
   </section>
@@ -731,8 +724,7 @@
     <div class="fill">
     <div class="grid-2">
       <div class="card">
-        <div class="ph"><img src="assets/golf-drive.jpg" alt="Golf course fairway and green"><span>Unsplash</span></div>
-        <div class="kicker" style="margin-top:6px">Fairway Golf and City Club</div>
+        <div class="kicker">Fairway Golf and City Club</div>
         <h3>Bookings, memberships, events, coaching</h3>
         <ul class="clean">
           <li>More bookings and memberships</li>
@@ -741,8 +733,7 @@
         </ul>
       </div>
       <div class="card green">
-        <div class="ph"><img src="assets/cafe-brunch.jpg" alt="Brunch on a table"><span>Rachel Park · Unsplash</span></div>
-        <div class="kicker green" style="margin-top:6px">Mandrake Cafe</div>
+        <div class="kicker green">Mandrake Cafe</div>
         <h3>Local visitors and the new menu</h3>
         <ul class="clean green">
           <li>More local visitors</li>
@@ -763,19 +754,16 @@
     <div class="fill">
     <div class="grid-3">
       <div class="card">
-        <div class="ph"><img src="assets/golf-green.jpg" alt="Close view of a golf green and flag"><span>Unsplash</span></div>
         <div class="num">2</div>
         <h3>Venues in one package</h3>
         <p>Fairway Golf and City Club and Mandrake Cafe. Production, posting, and paid ads.</p>
       </div>
       <div class="card blue">
-        <div class="ph"><img src="assets/golfers.jpg" alt="Two golfers together on the course"><span>Unsplash</span></div>
         <div class="num blue">KO</div>
         <h3>KO posts everything</h3>
         <p>Instagram, TikTok repost, and the ads. No handoff of the content calendar to the venues.</p>
       </div>
       <div class="card coral">
-        <div class="ph"><img src="assets/cafe-table.jpg" alt="Coffee on a wooden cafe table"><span>Unsplash</span></div>
         <div class="num coral">—</div>
         <h3>Out of scope</h3>
         <p>Website build or redesign. Email marketing. Influencers — paid models only.</p>
@@ -811,9 +799,9 @@
       <div class="node"><i></i><b>End of month</b><span>Report each month. Contract closes ~31 Dec.</span><small>KO</small></div>
     </div>
     <div class="grid-3">
-      <div class="card"><div class="ph"><img src="assets/golf-swing.jpg" alt="Golfer swinging on the course"><span>Unsplash</span></div><div class="kicker" style="margin-top:6px">Oct</div><h3>Launch</h3><p>Week 1 live. Full monthly quotas. ฿82,000.</p></div>
-      <div class="card"><div class="ph"><img src="assets/golf-green.jpg" alt="Golf green"><span>Unsplash</span></div><div class="kicker" style="margin-top:6px">Nov</div><h3>Optimize</h3><p>Winning angles. Reallocate ads inside the budget.</p></div>
-      <div class="card"><div class="ph"><img src="assets/cafe-latte.jpg" alt="Cafe latte"><span>Unsplash</span></div><div class="kicker" style="margin-top:6px">Dec</div><h3>Scale</h3><p>Double down. Renewal view for months 4–6.</p></div>
+      <div class="card"><div class="kicker">Oct</div><h3>Launch</h3><p>Week 1 live. Full monthly quotas. ฿82,000.</p></div>
+      <div class="card blue"><div class="kicker blue">Nov</div><h3>Optimize</h3><p>Winning angles. Reallocate ads inside the budget.</p></div>
+      <div class="card green"><div class="kicker green">Dec</div><h3>Scale</h3><p>Double down. Renewal view for months 4–6.</p></div>
     </div>
     </div>
     <div class="footer"><span class="ko">KO</span><span>05 · Timeline</span><span>05 / 23</span></div>
@@ -826,8 +814,7 @@
     <div class="fill">
     <div class="grid-3">
       <div class="card">
-        <div class="ph"><img src="assets/golf-drive.jpg" alt="Fairway and green"><span>Unsplash</span></div>
-        <div class="kicker" style="margin-top:6px">Month 1 · October</div>
+        <div class="kicker">Month 1 · October</div>
         <h3>Launch</h3>
         <ul class="clean">
           <li>Week 1 shoot, edit, ads, go-live 4 Oct</li>
@@ -838,8 +825,7 @@
         </ul>
       </div>
       <div class="card blue">
-        <div class="ph"><img src="assets/golfers.jpg" alt="Golfers on the course"><span>Unsplash</span></div>
-        <div class="kicker blue" style="margin-top:6px">Month 2 · November</div>
+        <div class="kicker blue">Month 2 · November</div>
         <h3>Optimize</h3>
         <ul class="clean blue">
           <li>Iterate angles that moved bookings, menu, local</li>
@@ -850,8 +836,7 @@
         </ul>
       </div>
       <div class="card green">
-        <div class="ph"><img src="assets/cafe-interior.jpg" alt="Cafe interior"><span>Unsplash</span></div>
-        <div class="kicker green" style="margin-top:6px">Month 3 · December</div>
+        <div class="kicker green">Month 3 · December</div>
         <h3>Scale what works</h3>
         <ul class="clean green">
           <li>Fairway: booking and membership angles</li>
@@ -871,7 +856,7 @@
     <div class="eyebrow">07 · Week 1 · 1–4 Oct</div>
     <h2>Four days to <em>go live.</em></h2>
     <div class="fill">
-    <div class="week">
+    <div class="grid-2">
       <div>
         <div class="band">
           <div class="d"><small>Thu</small>1 Oct</div>
@@ -886,8 +871,6 @@
           <p><strong>Go-live.</strong> <span>Start posting both venues. Ads can start as soon as creatives are ready. Owner: KO.</span></p>
         </div>
       </div>
-      <div class="side">
-        <div class="ph"><img src="assets/golf-swing.jpg" alt="Golfer on the course, the week-1 shoot"><span>Unsplash</span></div>
       <div class="card coral">
         <div class="kicker coral">Owner brings · 1 Oct</div>
         <h3>Week 1 does not start without these</h3>
@@ -900,7 +883,6 @@
           <li>Model approval: yes or no, and lead time</li>
         </ul>
       </div>
-      </div>
     </div>
     </div>
     <div class="footer"><span class="ko">KO</span><span>Shoot clock time is set at kickoff · not pinned yet</span><span>07 / 23</span></div>
@@ -912,13 +894,13 @@
     <h2>Same machine. <em>Oct, Nov, Dec.</em></h2>
     <div class="fill">
     <div class="steps">
-      <div class="step"><div class="ph"><img src="assets/golfers.jpg" alt="Golfers, the shared shoot"><span>Unsplash</span></div><div class="n">01</div><h3>Shoot day</h3><p>3 models. Shared by both venues. Cast by KO.</p></div>
-      <div class="step"><div class="ph"><img src="assets/golf-green.jpg" alt="Golf green detail"><span>Unsplash</span></div><div class="n">02</div><h3>Edit</h3><p>Videos, graphics, and AI ad variants from the shoot plus existing footage.</p></div>
-      <div class="step"><div class="ph"><img src="assets/cafe-latte.jpg" alt="Cafe coffee"><span>Unsplash</span></div><div class="n">03</div><h3>Post</h3><p>KO posts Instagram. TikTok is a repost. Fairway inquiries go to LINE.</p></div>
-      <div class="step"><div class="ph"><img src="assets/golf-drive.jpg" alt="Fairway"><span>Unsplash</span></div><div class="n">04</div><h3>Paid</h3><p>KO runs and optimizes. Month 1 budgets are the baseline.</p></div>
-      <div class="step"><div class="ph"><img src="assets/cafe-table.jpg" alt="Coffee on the table"><span>Unsplash</span></div><div class="n">05</div><h3>Report</h3><p>End of month. Contents proposed — not agreed yet.</p></div>
+      <div class="step"><div class="n">01</div><h3>Shoot day</h3><p>3 models. Shared by both venues. Cast by KO.</p></div>
+      <div class="step"><div class="n">02</div><h3>Edit</h3><p>Videos, graphics, and AI ad variants from the shoot plus existing footage.</p></div>
+      <div class="step"><div class="n">03</div><h3>Post</h3><p>KO posts Instagram. TikTok is a repost. Fairway inquiries go to LINE.</p></div>
+      <div class="step"><div class="n">04</div><h3>Paid</h3><p>KO runs and optimizes. Month 1 budgets are the baseline.</p></div>
+      <div class="step"><div class="n">05</div><h3>Report</h3><p>End of month. Contents proposed — not agreed yet.</p></div>
     </div>
-    <div class="grid-3 tight">
+    <div class="grid-3">
       <div class="card"><div class="kicker">Fairway / month</div><h3>10 videos · 5 graphics</h3><p>AI promo included.</p></div>
       <div class="card green"><div class="kicker green">Mandrake / month</div><h3>15 videos · menu</h3><p>Photo shoot and menu graphics included.</p></div>
       <div class="card blue"><div class="kicker blue">Shared / month</div><h3>1 shoot · 3 models</h3><p>฿7,000. KO posts all platforms in scope.</p></div>
@@ -932,16 +914,14 @@
     <div class="eyebrow">09 · Fairway Golf and City Club · monthly</div>
     <h2>10 videos. 5 graphics. <em>AI included.</em></h2>
     <div class="fill">
-    <div class="grid-4 tight">
+    <div class="grid-4">
       <div class="card"><div class="num">10</div><h3>Videos / month</h3><p>With and without models.</p></div>
       <div class="card"><div class="num">5</div><h3>Graphics / month</h3><p>Promos, sales, ads.</p></div>
       <div class="card"><div class="num">AI</div><h3>Promo / ad cuts</h3><p>Included. Supports ads and organic.</p></div>
       <div class="card blue"><div class="num blue">KO</div><h3>Posted by KO</h3><p>Not left in a shared folder.</p></div>
     </div>
     <div class="grid-2">
-      <div class="card" style="padding:0; overflow:hidden; display:grid; grid-template-columns: 148px 1fr;">
-        <div class="ph" style="border-radius:0; min-height:100%"><img src="assets/golf-swing.jpg" alt="Golfer swinging a club"><span>Unsplash</span></div>
-        <div style="padding:8px 10px">
+      <div class="card">
         <div class="kicker" style="margin-bottom:4px">Themes on the must list</div>
         <ul class="clean">
           <li>How to get here</li>
@@ -949,13 +929,11 @@
           <li>Why Fairway</li>
           <li>Re-edits of existing footage</li>
         </ul>
-        </div>
       </div>
       <div class="card">
         <div class="kicker">Nice — not a miss if skipped</div>
         <h3>Coaching and events</h3>
         <p>Coaching videos only if convenient. Event videos only if there are events that month. Events calendar Oct–Dec is still TBD with the owner.</p>
-        <div class="ph"><img src="assets/golf-green.jpg" alt="Golf green and flag"><span>Unsplash</span></div>
       </div>
     </div>
     </div>
@@ -967,28 +945,25 @@
     <div class="eyebrow">10 · Mandrake Cafe · monthly</div>
     <h2>15 videos. Menu shoot. <em>Menu graphics.</em></h2>
     <div class="fill">
-    <div class="grid-3 tight">
+    <div class="grid-3">
       <div class="card green"><div class="num green">15</div><h3>Videos / month</h3><p>Menu making, BTS, with models, atmosphere.</p></div>
       <div class="card green"><div class="num green">1</div><h3>New-menu photo shoot</h3><p>Included in the package. Not a separate fee.</p></div>
       <div class="card green"><div class="num green">+</div><h3>Menu graphics</h3><p>Included with the shoot.</p></div>
     </div>
     <div class="grid-2">
-      <div class="card green" style="padding:0; overflow:hidden; display:grid; grid-template-columns: 160px 1fr;">
-        <div class="ph" style="border-radius:0"><img src="assets/cafe-brunch.jpg" alt="Brunch plate at a cafe"><span>Rachel Park · Unsplash</span></div>
-        <div style="padding:8px 10px">
+      <div class="card green">
+        <div class="kicker green" style="margin-bottom:4px">Content themes</div>
         <ul class="clean green">
           <li>Menu making — the new menu, on camera</li>
           <li>Behind the scenes</li>
           <li>With the shared models</li>
           <li>Atmosphere that feels local, not stock</li>
         </ul>
-        </div>
       </div>
       <div class="card coral">
         <div class="kicker coral">Date not locked</div>
         <h3>New-menu launch</h3>
         <p>If Mandrake has a launch date, it sets shoot priority. Owner / Mandrake to confirm. Until then, menu content still ships inside the monthly 15.</p>
-        <div class="ph"><img src="assets/cafe-interior.jpg" alt="Cafe interior"><span>Unsplash</span></div>
       </div>
     </div>
     </div>
@@ -1022,7 +997,6 @@
           <li>Event videos — only if there are events that month</li>
         </ul>
         <p class="lede" style="margin-top:6px">Skipping nice items is not a missed deliverable. Adding them does not add a fee inside this package.</p>
-        <div class="ph"><img src="assets/cafe-table.jpg" alt="Coffee and pastries"><span>Unsplash</span></div>
       </div>
     </div>
     </div>
@@ -1034,28 +1008,22 @@
     <div class="eyebrow">12 · Shared production</div>
     <h2>One shoot day. <em>Three models.</em> No influencers.</h2>
     <div class="fill">
-    <div class="grid-4 tight">
+    <div class="grid-4">
       <div class="card"><div class="num">1</div><h3>Shoot day / month</h3><p>Shared by both venues.</p></div>
       <div class="card"><div class="num">3</div><h3>Models / month</h3><p>Cast by KO. Not influencers.</p></div>
       <div class="card"><div class="num">฿7,000</div><h3>Model fee / month</h3><p>Month-1 figure. Same baseline in Nov and Dec.</p></div>
       <div class="card coral"><div class="num coral">TBD</div><h3>Owner approval</h3><p>Process and lead time. Lock before the shoot day.</p></div>
     </div>
     <div class="grid-2">
-      <div class="card blue" style="padding:0; overflow:hidden; display:grid; grid-template-columns: 120px 1fr;">
-        <div class="ph" style="border-radius:0"><img src="assets/golfers.jpg" alt="Two golfers, stand-in for the model shoot"><span>Unsplash</span></div>
-        <div style="padding:8px 10px">
+      <div class="card blue">
         <div class="kicker blue">KO casts</div>
         <h3>Shortlist at kickoff 1 Oct</h3>
         <p>If the first shoot sits inside 1–4 Oct, approval has to be decided on kickoff day. A slow yes pushes the shoot and the 4 Oct creative.</p>
-        </div>
       </div>
-      <div class="card" style="padding:0; overflow:hidden; display:grid; grid-template-columns: 120px 1fr;">
-        <div class="ph" style="border-radius:0"><img src="assets/cafe-latte.jpg" alt="Cafe coffee, not an influencer post"><span>Unsplash</span></div>
-        <div style="padding:8px 10px">
+      <div class="card">
         <div class="kicker">Hard no</div>
         <h3>Influencers are not in this plan</h3>
         <p>Paid models only. No creator roster, no influencer line in the ฿82,000.</p>
-        </div>
       </div>
     </div>
     </div>
@@ -1067,9 +1035,8 @@
     <div class="eyebrow">13 · Paid · Fairway Golf and City Club · month 1</div>
     <h2>฿35,000. KO runs the <em>3-step funnel.</em></h2>
     <div class="fill">
-    <div class="ads-split">
+    <div class="ads-grid">
       <div class="stack">
-        <div class="ph" style="flex:1; min-height:90px"><img src="assets/golf-drive.jpg" alt="Golf course the Fairway ads point at"><span>Unsplash</span></div>
         <div class="funnel">
           <div class="frow"><b>01 Reach</b><div class="fbar" style="width:100%"><strong>Why Fairway</strong><span>What we have</span></div></div>
           <div class="frow"><b>02 Consider</b><div class="fbar" style="width:86%"><strong>How to get here</strong><span>Memberships, offers</span></div></div>
@@ -1087,9 +1054,9 @@
           </tbody>
         </table>
         <p class="lede">KO fee is separate. Media is not a percent on top.</p>
-        <div class="ph" style="flex:1; min-height:72px"><img src="assets/golf-swing.jpg" alt="Golfer, the lifestyle the funnel sells"><span>Unsplash</span></div>
       </div>
     </div>
+    <div class="note-bar"><span class="label gold">Note</span> Ad spend is funded by the client. KO manages all campaign setup, creative, and optimisation. Monthly budget reconfirm from month 2.</div>
     </div>
     <div class="footer"><span class="ko">KO</span><span>13 · Fairway ads</span><span>13 / 23</span></div>
   </section>
@@ -1099,11 +1066,7 @@
     <div class="eyebrow">14 · Paid · Mandrake Cafe · month 1</div>
     <h2>฿10,000. <em>Nearby</em> only.</h2>
     <div class="fill">
-    <div class="ads-split">
-      <div class="ph">
-        <img src="assets/cafe-interior.jpg" alt="Cafe interior. Nearby ads send people here.">
-        <span>Cafe · Unsplash</span>
-      </div>
+    <div class="ads-grid">
       <div class="stack">
         <table class="phase">
           <thead><tr><th>Channel</th><th>Month 1</th><th>Target</th></tr></thead>
@@ -1113,13 +1076,20 @@
             <tr><td><strong>Mandrake subtotal</strong></td><td><strong>฿10,000</strong></td><td class="who">KO runs</td></tr>
           </tbody>
         </table>
+      </div>
+      <div class="stack">
         <div class="card coral">
           <div class="kicker coral">Radius not locked</div>
           <p>Kilometres around the cafe are set when ads are built in week 1. No radius is assumed in this deck.</p>
         </div>
-        <div class="ph" style="flex:1; min-height:70px"><img src="assets/cafe-brunch.jpg" alt="Brunch, the menu Mandrake ads promote"><span>Rachel Park · Unsplash</span></div>
+        <div class="card green">
+          <div class="kicker green">Objective</div>
+          <h3>Nearby foot traffic</h3>
+          <p>Atmosphere and food content aimed at people who are close enough to walk in. Google catches search intent.</p>
+        </div>
       </div>
     </div>
+    <div class="note-bar"><span class="label green">Combined</span> Both venues · ad spend month 1 = <strong>฿45,000</strong>. Fairway ฿35,000 + Mandrake ฿10,000. KO runs all campaigns.</div>
     </div>
     <div class="footer"><span class="ko">KO</span><span>Both venues · ad spend month 1 = ฿45,000</span><span>14 / 23</span></div>
   </section>
@@ -1129,7 +1099,7 @@
     <div class="eyebrow">15 · Owned channels</div>
     <h2>Instagram. TikTok repost. <em>LINE @fairwaygolf.</em></h2>
     <div class="fill">
-    <div class="grid-3 tight">
+    <div class="grid-3">
       <div class="card"><div class="kicker">Instagram</div><h3>Home for organic</h3><p>KO posts. Inquiries also arrive as DMs.</p></div>
       <div class="card blue"><div class="kicker blue">TikTok</div><h3>Repost</h3><p>Not a separate production line. Repost from Instagram where it fits.</p></div>
       <div class="card"><div class="kicker">LINE @fairwaygolf</div><h3>Likely primary inquiry</h3><p>Fairway already has the handle. Tracking needs LINE admin.</p></div>
@@ -1144,10 +1114,6 @@
       <div class="p"><b>4 · Booking</b><span>Fairway ops. Mandrake: visit.</span></div>
     </div>
     <p class="lede">Website visits can be a demand signal if analytics exist. Building or redesigning the site is out of scope. Email is out of scope.</p>
-    <div class="film g2">
-      <div class="ph"><img src="assets/golf-drive.jpg" alt="Golf course for the Instagram feed"><span>Fairway · Unsplash</span></div>
-      <div class="ph"><img src="assets/cafe-latte.jpg" alt="Cafe coffee for the feed"><span>Mandrake · Unsplash</span></div>
-    </div>
     </div>
     <div class="footer"><span class="ko">KO</span><span>15 · Channels</span><span>15 / 23</span></div>
   </section>
@@ -1166,7 +1132,7 @@
         <div style="font-size:13px;margin-top:4px">Both venues<br/>Not a % of media</div>
       </div>
     </div>
-    <div class="grid-3 tight">
+    <div class="grid-3">
       <div class="money">
         <div class="v">฿30,000</div>
         <h3>KO package</h3>
@@ -1186,10 +1152,6 @@
     <div class="split">
       <div class="bit"><b>Fairway ads ฿35,000</b> — Facebook / Instagram ฿20,000 (3-step) + Google ฿15,000</div>
       <div class="bit"><b>Mandrake ads ฿10,000</b> — Facebook ฿5,000 + Google ฿5,000, nearby</div>
-    </div>
-    <div class="film g2" style="flex:1; min-height:72px">
-      <div class="ph"><img src="assets/golf-green.jpg" alt="Golf green"><span>Fairway · Unsplash</span></div>
-      <div class="ph"><img src="assets/cafe-interior.jpg" alt="Cafe interior"><span>Mandrake · Unsplash</span></div>
     </div>
     </div>
     <div class="footer"><span class="ko">KO</span><span>Payee company KO · THB assumed · billing terms TBD</span><span>16 / 23</span></div>
@@ -1228,7 +1190,7 @@
         </tr>
       </tbody>
     </table>
-    <div class="grid-2 tight">
+    <div class="grid-2">
       <div class="card">
         <div class="kicker">If the baseline holds</div>
         <h3>฿246,000 across three months</h3>
@@ -1240,10 +1202,6 @@
         <p>Owner can change the media number. KO fee and the model baseline do not float with that change. Fee is not a percent of media.</p>
       </div>
     </div>
-    <div class="film g2">
-      <div class="ph"><img src="assets/golf-drive.jpg" alt="Golf course"><span>Fairway · Unsplash</span></div>
-      <div class="ph"><img src="assets/cafe-latte.jpg" alt="Cafe latte"><span>Mandrake · Unsplash</span></div>
-    </div>
     </div>
     <div class="footer"><span class="ko">KO</span><span>17 · Months 2–3</span><span>17 / 23</span></div>
   </section>
@@ -1253,7 +1211,7 @@
     <div class="eyebrow">18 · KPIs · propose, then agree</div>
     <h2>No targets yet. <em>Four to lock.</em></h2>
     <div class="fill">
-    <div class="grid-4 tight">
+    <div class="grid-4">
       <div class="card coral">
         <span class="pill coral">Propose / agree</span>
         <h3>Bookings / month</h3>
@@ -1276,21 +1234,15 @@
       </div>
     </div>
     <div class="grid-2">
-      <div class="card" style="padding:0; overflow:hidden; display:grid; grid-template-columns: 110px 1fr;">
-        <div class="ph" style="border-radius:0"><img src="assets/golf-drive.jpg" alt="Golf course"><span>Unsplash</span></div>
-        <div style="padding:8px 10px">
+      <div class="card">
         <div class="kicker">Owner</div>
         <h3>Fairway owner + KO</h3>
         <p>KO will not invent the targets in the first report.</p>
-        </div>
       </div>
-      <div class="card" style="padding:0; overflow:hidden; display:grid; grid-template-columns: 110px 1fr;">
-        <div class="ph" style="border-radius:0"><img src="assets/cafe-brunch.jpg" alt="Brunch"><span>Rachel Park · Unsplash</span></div>
-        <div style="padding:8px 10px">
+      <div class="card">
         <div class="kicker coral">By</div>
         <h3>4 Oct ideal</h3>
         <p>End of week 1. Hard stop: the first monthly report, end of October.</p>
-        </div>
       </div>
     </div>
     </div>
@@ -1302,7 +1254,7 @@
     <div class="eyebrow">19 · Monthly report · proposed, not agreed</div>
     <h2>What the end-of-month <em>note contains.</em></h2>
     <div class="fill">
-    <div class="grid-2 tight">
+    <div class="grid-2">
       <table class="phase">
         <thead><tr><th>#</th><th>Section</th><th>Source</th></tr></thead>
         <tbody>
@@ -1322,14 +1274,7 @@
         </tbody>
       </table>
     </div>
-    <div class="card coral">
-      <strong style="font-size:13px">Status: proposed, not agreed.</strong>
-      <span style="color:var(--muted);font-size:12.5px"> Owner + KO sign the contents before the first report (end of October). Until then this list is the working draft, not the template.</span>
-    </div>
-    <div class="film g2">
-      <div class="ph"><img src="assets/golf-green.jpg" alt="Golf green"><span>Unsplash</span></div>
-      <div class="ph"><img src="assets/cafe-table.jpg" alt="Coffee on a table"><span>Unsplash</span></div>
-    </div>
+    <div class="note-bar"><span class="label coral">Status</span> <strong>Proposed, not agreed.</strong> Owner + KO sign the contents before the first report (end of October). Until then this list is the working draft, not the template.</div>
     </div>
     <div class="footer"><span class="ko">KO</span><span>One report per month · both venues</span><span>19 / 23</span></div>
   </section>
@@ -1338,8 +1283,7 @@
   <section class="slide" data-tone="alert" data-title="Billing TBD">
     <div class="eyebrow">20 · Billing · open on purpose</div>
     <h2>Pay company KO. <em>Terms are TBD.</em></h2>
-    <div class="fill" style="display:grid; grid-template-columns: 1fr 210px; gap:10px;">
-    <div style="display:flex; flex-direction:column; gap:8px; min-height:0;">
+    <div class="fill">
     <table class="phase">
       <thead><tr><th>Item</th><th>Status</th><th>Note</th></tr></thead>
       <tbody>
@@ -1352,11 +1296,6 @@
       </tbody>
     </table>
     <p class="lede">The ฿82,000 is the month-1 amount. It is not a payment schedule. Lock terms before the first invoice. Owner + KO.</p>
-    </div>
-    <div class="film" style="grid-template-rows: 1fr 1fr;">
-      <div class="ph"><img src="assets/golf-swing.jpg" alt="Golfer"><span>Unsplash</span></div>
-      <div class="ph"><img src="assets/cafe-interior.jpg" alt="Cafe"><span>Unsplash</span></div>
-    </div>
     </div>
     <div class="footer"><span class="ko">KO</span><span>20 · Billing · TBD</span><span>20 / 23</span></div>
   </section>
@@ -1378,10 +1317,7 @@
         <tr><td>7</td><td>Go-live posting</td><td class="who">KO</td><td class="when">4 Oct</td></tr>
       </tbody>
     </table>
-    <div class="film g2">
-      <div class="ph"><img src="assets/golf-drive.jpg" alt="Golf course"><span>Unsplash</span></div>
-      <div class="ph"><img src="assets/cafe-brunch.jpg" alt="Brunch"><span>Rachel Park · Unsplash</span></div>
-    </div>
+    <div class="note-bar"><span class="label gold">Kickoff</span> 1 Oct is a Thursday. Week 1 runs Thu–Sun (1–4 Oct). The first creatives go live on the 4th.</div>
     </div>
     <div class="footer"><span class="ko">KO</span><span>21 · Next steps</span><span>21 / 23</span></div>
   </section>
@@ -1393,7 +1329,6 @@
     <div class="fill">
     <div class="locks">
       <div class="lock">
-        <div class="ph"><img src="assets/golf-green.jpg" alt="Golf green"><span>Unsplash</span></div>
         <div class="big">01</div>
         <span class="pill coral">To lock</span>
         <h3>KPI targets</h3>
@@ -1401,7 +1336,6 @@
         <div class="own"><b>Fairway owner + KO</b><span>4 Oct ideal · hard stop: end of October report</span></div>
       </div>
       <div class="lock">
-        <div class="ph"><img src="assets/golfers.jpg" alt="Golfers on the course"><span>Unsplash</span></div>
         <div class="big">02</div>
         <span class="pill coral">To lock</span>
         <h3>Model approval</h3>
@@ -1409,7 +1343,6 @@
         <div class="own"><b>Owner</b><span>Before the first shoot day · kickoff if that day is inside 1–4 Oct</span></div>
       </div>
       <div class="lock">
-        <div class="ph"><img src="assets/cafe-table.jpg" alt="Coffee on a cafe table"><span>Unsplash</span></div>
         <div class="big">03</div>
         <span class="pill coral">To lock</span>
         <h3>Billing terms</h3>
@@ -1426,13 +1359,7 @@
     <div class="eyebrow">23 · Appendix</div>
     <h2>Quotas, out of scope, <em>still open.</em></h2>
     <div class="fill">
-    <div class="film g4" style="flex:1; min-height:88px">
-      <div class="ph"><img src="assets/golf-drive.jpg" alt="Golf course"><span>Unsplash</span></div>
-      <div class="ph"><img src="assets/golf-swing.jpg" alt="Golfer"><span>Unsplash</span></div>
-      <div class="ph"><img src="assets/cafe-interior.jpg" alt="Cafe interior"><span>Unsplash</span></div>
-      <div class="ph"><img src="assets/cafe-brunch.jpg" alt="Brunch"><span>Rachel Park · Unsplash</span></div>
-    </div>
-    <div class="grid-3 tight">
+    <div class="grid-3">
       <div class="card">
         <div class="kicker">Fairway / month</div>
         <p>10 videos · 5 graphics · AI promo included · themes: how to get here, what we have, why Fairway, re-edits</p>
@@ -1446,7 +1373,7 @@
         <p>1 shoot day · 3 models · ฿7,000 · KO posts everything · report end of month</p>
       </div>
     </div>
-    <div class="grid-2 tight">
+    <div class="grid-2">
       <div>
         <div class="kicker" style="margin-bottom:4px">Out of scope · all 90 days</div>
         <ul class="clean coral">
@@ -1466,7 +1393,7 @@
       </div>
     </div>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>Photos · Unsplash License · deck/assets/CREDITS.md</span><span>23 / 23</span></div>
+    <div class="footer"><span class="ko">KO</span><span>Fairway Golf and City Club + Mandrake Cafe</span><span>23 / 23</span></div>
   </section>
 
 </div>
