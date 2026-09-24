@@ -6,15 +6,21 @@ Focus: padel coaching content — Instagram Trial Reels / Reels hooks and playbo
 
 | File | Role |
 |------|------|
-| [TRIALS-REELS.md](./TRIALS-REELS.md) | Instagram Trials + padel hooks brief (SoT for posting) |
-| [HOOKS-SEND-SAVE.md](./HOOKS-SEND-SAVE.md) | SoT vibora practice hooks — send / save / relate (club language) |
+| [HOOKS-GENZ.md](./HOOKS-GENZ.md) | Posting SoT — Gen Z vibora practice hooks |
+| [TRIALS-REELS.md](./TRIALS-REELS.md) | Instagram Trials + padel hooks brief |
+| [HOOKS-SEND-SAVE.md](./HOOKS-SEND-SAVE.md) | Archive — send / save / relate (not posting SoT) |
 
-**First Trials trio** (same practice body):
-- A: Send this to the partner who always floats the vibora.
-- B: Save this before your next vibora practice.
-- C: I look powerful… and lose the point.
+**First Trials trio** (same body, opener only — [HOOKS-GENZ.md](./HOOKS-GENZ.md)):
+- **#2** POV: your vibora looks this clean on a random Tuesday practice.
+- **#6** Feels illegal how clean this vibora looks in slow mo.
+- **#11** Be so for real… I could watch this contact all day.
 
-**Shared caption:**
+**Status:** Active content ops — Trial Reels A/B for new coaching clips.  
+**Owner:** Marketing Bot / Lisa · Research input: Market Researcher (2026-09-24)
+
+## Archive
+
+Send/save/relate stays in [HOOKS-SEND-SAVE.md](./HOOKS-SEND-SAVE.md). Shared caption from that pack (not the Gen Z posting SoT):
 
 ```
 This is the vibora that looks big and still sits up.
@@ -30,6 +36,3 @@ Send this to your partner. Or save it for practice.
 Eric @[handle]
 #padel #vibora #padeltips #padeltraining
 ```
-
-**Status:** Active content ops — Trial Reels A/B for new coaching clips.  
-**Owner:** Marketing Bot / Lisa · Research input: Market Researcher (2026-09-24)
