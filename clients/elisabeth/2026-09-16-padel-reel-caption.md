@@ -3,7 +3,7 @@
 - **Date:** 2026-09-16
 - **Classification:** new-skill
 - **Target:** new: padel-reel-caption
-- **Job / surface:** Social reel copy — Elisabeth glass defense / double glass for Proof of Padel
+- **Job / surface:** Social reel copy — Elisabeth glass defense / double glass (solo padel creator)
 
 ## Context
 
@@ -19,4 +19,4 @@ Direct. No bullshit. Punchy. Padel vocabulary: glass, double glass, bounce, rese
 
 ## Notes for the agent
 
-Keep the skill generic. Elisabeth, `@[handle]`, and `@proofofpadel` stay in the deliverable, not as invented client lore in the skill.
+Keep the skill generic. Elisabeth and `@[handle]` stay in the deliverable, not as invented client lore in the skill. She posts solo — no partner credit.

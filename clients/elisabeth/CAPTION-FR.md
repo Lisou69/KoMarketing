@@ -13,7 +13,6 @@ Enregistre. Prochaine balle dans le coin, tu as un plan.
 Fond ou double vitre — lequel te piège encore ?
 
 Elisabeth @[handle]
-@proofofpadel
 
 ---
 

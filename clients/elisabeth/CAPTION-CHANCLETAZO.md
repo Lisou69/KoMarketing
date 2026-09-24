@@ -9,4 +9,3 @@ Elisabeth on the chancletazo — the flat forehand finish when you’re glued to
 Easy sit-up or forced reach — which one are you still soft-volleying?
 
 Elisabeth @[handle]
-@proofofpadel

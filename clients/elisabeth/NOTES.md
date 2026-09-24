@@ -5,8 +5,7 @@
 - **Topic:** glass defense (`défense vitre`) and double glass (`double vitre` = corner, two walls). Not ice. FR padel slang `glace` means the glass wall; the EN hook “Glass is not ice.” exists if Lisa wants to kill that mix-up on screen. The shipped caption hook is the court command instead: **Double glass. Don't panic.**
 - **Why this hook:** double glass is the panic bounce. Players run into the corner and get jammed. The line names the problem and the fix in four words.
 - **Keys are reads, not vibes:** (1) back glass vs corner, (2) time / space, (3) reset before attack. Matches what the clip is for — stay in the rally off the glass.
-- **Voice:** Proof of Padel fallback — direct, no fluff, no “In this video”. Elisabeth is the demonstrator; brand is the credit, not the hero of the first line.
-- **Handles:** Elisabeth’s handle is a placeholder (`@[handle]`). Do not invent one. `@proofofpadel` is ready to paste.
+- **Voice:** direct, no fluff, no “In this video”. Elisabeth is the demonstrator; she posts solo — no brand partner credit.
 - **FR:** rewrite, not a calque. `vitre` / `double vitre` so “ice” cannot land. Swap to `glace` / `double glace` only for a FR padel audience that already owns the slang.
 
 ## Vocab watch-outs
@@ -22,7 +21,7 @@
 Paste after credits if the post needs tags in-caption. Keep them off the first screen.
 
 **Core**
-`#padel` `#padeltennis` `#padeltips` `#padeltraining` `#proofofpadel`
+`#padel` `#padeltennis` `#padeltips` `#padeltraining`
 
 **Topic**
 `#glassdefense` `#doubleglass` `#padeltechnique` `#padeldrill`
@@ -33,5 +32,5 @@ Paste after credits if the post needs tags in-caption. Keep them off the first s
 **Suggested in-caption block (EN post)**
 
 ```
-#padel #padeltennis #padeltips #glassdefense #doubleglass #proofofpadel #padeltraining #padeltechnique
+#padel #padeltennis #padeltips #glassdefense #doubleglass #padeltraining #padeltechnique
 ```

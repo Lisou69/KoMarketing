@@ -11,7 +11,6 @@ Elisabeth sur le chancletazo — la volée coup droit plate, collée au filet, s
 Balle facile ou en extension — laquelle tu caressais encore ?
 
 Elisabeth @[handle]
-@proofofpadel
 
 ---
 

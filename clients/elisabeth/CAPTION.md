@@ -11,4 +11,3 @@ Save this for the next corner ball.
 Back glass or double glass — which bounce still gets you?
 
 Elisabeth @[handle]
-@proofofpadel

@@ -2,11 +2,11 @@
 
 - **Date:** 2026-09-24
 - **Client:** `clients/elisabeth`
-- **Surface:** Proof of Padel technique Reel — chancletazo
+- **Surface:** Elisabeth solo technique Reel — chancletazo
 
 ## Pattern
 
-Longer spoken / POV opener (Lisa: ultra-short was trop court) → 1 context line → 3 numbered keys → engagement question → credits (`@[handle]` + `@proofofpadel`). No command save/send CTA.
+Longer spoken / POV opener (Lisa: ultra-short was trop court) → 1 context line → 3 numbered keys → engagement question → credit (`@[handle]` only). No command save/send CTA. No partner credit.
 
 ## Shipped
 
