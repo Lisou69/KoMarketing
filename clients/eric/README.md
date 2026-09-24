@@ -11,6 +11,8 @@ Focus: padel coaching content — Instagram Trial Reels / Reels hooks and playbo
 | [HOOKS-GENZ.md](./HOOKS-GENZ.md) | Archive — full Gen Z bank (not posting SoT) |
 | [HOOKS-SEND-SAVE.md](./HOOKS-SEND-SAVE.md) | Archive — send / save / relate (not posting SoT) |
 
+Extended (23–35) and the wet-court bank (36–45) live in [HOOKS-LISA-PICKS.md](./HOOKS-LISA-PICKS.md).
+
 **First Trials trio** (same body — [HOOKS-LISA-PICKS.md](./HOOKS-LISA-PICKS.md)):
 - **A #2** POV: your vibora looks this clean on a random Tuesday practice.
 - **B #9** Soft power. Heavy spin. Zero rush.
