@@ -9,14 +9,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,500;1,8..60,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
-/* ═══ KO DECK v11 — glass site-style, all opaque for print ═══ */
+/* ═══ KO DECK v13 — strong glass, matching komarketingagency.com ═══ */
 :root {
   --ink:#110300;--ink-deep:#0d0200;--wine:#4c050c;--ember:#611609;
   --brown:#62483e;--steel:#94b1c8;--steel-dim:#84a0b6;
   --warm:#f6f0e9;--cream:#e3dfce;--muted:#8b8480;--white:#ffffff;
   --d-bg:#110300;
-  /* glass card: warm-tinted surface with top-edge highlight gradient */
-  --g-card:#1c120e;--g-card-top:#261c18;--g-border:#2f211e;--g-border-hi:#3a2e28;
+  /* VISIBLE glass: opaque equiv of rgba(255,255,255,.08/.32/.15) on #110300 */
+  --g-card:#251e1b;--g-card-top:#362f2c;--g-border:#5a4e4a;--g-border-hi:#6e6058;
   --s4:4px;--s8:8px;--s12:12px;--s16:16px;--s24:24px;--s32:32px;--s48:48px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -27,11 +27,12 @@ body{overflow:hidden} button,a{font-family:inherit}
 /* ─── Slide with ambient glow ─── */
 .slide{position:absolute;inset:0;width:960px;height:540px;display:none;flex-direction:column;padding:24px 40px 10px;overflow:hidden;background:var(--d-bg);color:var(--white)}
 .slide.active{display:flex}
-/* ambient glow orbs — varied per slide via nth-child, all opaque radial-gradients */
+/* strong ambient glow orbs — clearly visible wine/ember/steel washes */
 .slide::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0}
-.slide:nth-child(odd)::after{background:radial-gradient(ellipse 420px 320px at 85% 75%,#1a0808,transparent 70%),radial-gradient(ellipse 300px 260px at 10% 20%,#120a14,transparent 70%)}
-.slide:nth-child(even)::after{background:radial-gradient(ellipse 380px 300px at 15% 80%,#180a06,transparent 70%),radial-gradient(ellipse 350px 280px at 90% 15%,#0e0e18,transparent 70%)}
-.slide:nth-child(3n)::after{background:radial-gradient(ellipse 400px 340px at 80% 25%,#1a0a0a,transparent 65%),radial-gradient(ellipse 320px 300px at 20% 70%,#0c0c16,transparent 70%)}
+.slide:nth-child(odd)::after{background:radial-gradient(ellipse 500px 400px at 82% 72%,#2e0a0c,#110300 72%),radial-gradient(ellipse 400px 350px at 8% 25%,#141828,#110300 70%)}
+.slide:nth-child(even)::after{background:radial-gradient(ellipse 480px 380px at 12% 78%,#2a0e08,#110300 70%),radial-gradient(ellipse 420px 340px at 88% 18%,#121622,#110300 70%)}
+.slide:nth-child(3n)::after{background:radial-gradient(ellipse 520px 420px at 78% 30%,#2c0c0e,#110300 68%),radial-gradient(ellipse 400px 360px at 15% 68%,#0e1420,#110300 70%)}
+.slide:nth-child(5n)::after{background:radial-gradient(ellipse 460px 360px at 20% 30%,#2a0808,#110300 65%),radial-gradient(ellipse 440px 380px at 85% 70%,#141620,#110300 68%)}
 .slide>*{position:relative;z-index:1}
 
 /* ─── Typography ─── */
@@ -59,13 +60,13 @@ h3{font-size:13px;font-weight:600;margin:var(--s4) 0 var(--s4);letter-spacing:.0
 
 /* ─── Glass cards (opaque fake glass: gradient top highlight + warm tint + inner border) ─── */
 .card{
-  background:linear-gradient(180deg,var(--g-card-top) 0%,var(--g-card) 28%);
+  background:linear-gradient(180deg,var(--g-card-top) 0%,var(--g-card) 35%);
   border:1px solid var(--g-border);
   border-top-color:var(--g-border-hi);
   border-radius:20px;
   padding:14px 16px;
   display:flex;flex-direction:column;
-  box-shadow:0 2px 8px #0a020066,inset 0 1px 0 #3a2e2833;
+  box-shadow:0 8px 24px #06010088,0 2px 6px #08020044;
 }
 .card h3{color:var(--white)} .card p,.card li{color:var(--muted);font-size:12px;line-height:1.4}
 
@@ -98,7 +99,7 @@ table.phase th{color:var(--steel-dim);font-weight:600;font-size:9px;letter-spaci
 table.phase td.who{color:var(--muted);white-space:nowrap}
 
 /* ─── Glass pills ─── */
-.pill{display:inline-block;background:linear-gradient(180deg,#261c18,#1c120e);border:1px solid var(--g-border);border-top-color:var(--g-border-hi);color:var(--steel-dim);border-radius:999px;padding:3px 9px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin:0 4px 4px 0}
+.pill{display:inline-block;background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:1px solid var(--g-border);border-top-color:var(--g-border-hi);color:var(--steel);border-radius:999px;padding:3px 9px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin:0 4px 4px 0}
 .pill.solid{background:linear-gradient(135deg,var(--wine),var(--ember));color:var(--white);border-color:var(--ember);font-weight:600}
 
 /* ─── Cover ─── */
@@ -123,7 +124,7 @@ button.jump:hover{color:var(--steel)}
 /* ─── Budget ─── */
 .giant{font-family:"Source Serif 4",Georgia,serif;font-weight:400;font-style:italic;font-size:78px;line-height:.86;letter-spacing:-0.03em}
 .eq{color:var(--muted);font-size:14px;margin:4px 0 var(--s8)} .eq b{color:var(--white);font-weight:500}
-.money{background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:1px solid var(--g-border);border-top-color:var(--g-border-hi);border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;box-shadow:0 2px 8px #0a020066}
+.money{background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:1px solid var(--g-border);border-top-color:var(--g-border-hi);border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;box-shadow:0 8px 24px #06010088,0 2px 6px #08020044}
 .money .v{font-family:"Source Serif 4",Georgia,serif;font-size:48px;font-style:italic;color:var(--steel);line-height:1}
 .money h3{font-size:13px;margin:4px 0 2px} .money p{color:var(--muted);font-size:11.5px;line-height:1.35}
 
@@ -132,7 +133,7 @@ button.jump:hover{color:var(--steel)}
 
 /* ─── Funnel ─── */
 .frow{display:grid;grid-template-columns:100px 1fr;gap:var(--s8);align-items:center}
-.fbar{height:38px;border-radius:12px;display:flex;align-items:center;padding:0 12px;background:linear-gradient(90deg,#2a1510,#1a0a08);border:1px solid var(--g-border);border-top-color:var(--g-border-hi);font-size:12.5px}
+.fbar{height:38px;border-radius:12px;display:flex;align-items:center;padding:0 12px;background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:1px solid var(--g-border);border-top-color:var(--g-border-hi);font-size:12.5px;box-shadow:0 4px 12px #06010066}
 .fbar strong{margin-right:8px} .fbar span{color:var(--muted)}
 .frow b{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel-dim)}
 .ads-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s12)}
@@ -357,18 +358,16 @@ body.export .nav,body.export .hit,body.export .bar,body.export .hint{display:non
     <div class="eyebrow">09 · Fairway Golf and City Club · ads</div>
     <h2>Running ads <em>strategy.</em></h2>
     <div class="fill">
-    <div class="ads-grid">
-      <div class="stack">
-        <div style="display:grid;gap:6px">
-          <div class="frow"><b>Stage 1<br/>Reach</b><div class="fbar" style="width:100%"><strong>฿10,000</strong><span>Golfers, expats, office teams</span></div></div>
-          <div class="frow"><b>Stage 2<br/>Retarget</b><div class="fbar" style="width:72%"><strong>฿6,000</strong><span>Watched, engaged, visited</span></div></div>
-          <div class="frow"><b>Stage 3<br/>Announce</b><div class="fbar" style="width:48%"><strong>฿4,000</strong><span>Clients, past guests</span></div></div>
-        </div>
-        <p class="lede">50 / 30 / 20 split. Budget moves weekly toward whatever brings bookings.</p>
+    <div class="ads-grid" style="align-items:stretch">
+      <div style="display:flex;flex-direction:column;gap:var(--s8)">
+        <div class="card"><div class="num lg">฿10,000</div><div class="kicker" style="margin-top:var(--s4)">Stage 1 · Reach</div><h3>Golfers, expats, office teams</h3><p>Our most engaging videos: room reveals, ball tracking, bar and karaoke energy. Maximum reach inside our target.</p></div>
+        <div class="card"><div class="num">฿6,000</div><div class="kicker" style="margin-top:var(--s4)">Stage 2 · Retarget</div><h3>Watched, engaged, visited</h3><p>Short promo videos and graphic designs with a clear offer. First visit or booking.</p></div>
+        <div class="card"><div class="num">฿4,000</div><div class="kicker" style="margin-top:var(--s4)">Stage 3 · Announce</div><h3>Clients, past guests</h3><p>Special announcements: memberships, events and coaching. Repeat visits.</p></div>
       </div>
-      <div class="stack">
+      <div style="display:flex;flex-direction:column;gap:var(--s8)">
         <table class="phase"><thead><tr><th>Channel</th><th>Month 1</th></tr></thead><tbody><tr><td>Facebook / Instagram</td><td><strong>฿20,000</strong></td></tr><tr><td>Google search ads</td><td><strong>฿15,000</strong></td></tr><tr><td><strong>Fairway total</strong></td><td><strong>฿35,000</strong></td></tr></tbody></table>
-        <div class="card" style="margin-top:var(--s8)"><div class="kicker">Google searches</div><p>indoor golf Bangkok · golf simulator Sukhumvit · TrackMan Bangkok · private golf rooms Bangkok</p><p style="margin-top:var(--s4)">Clicks go to booking, LINE and directions.</p></div>
+        <div class="card"><div class="kicker">Google searches</div><p>indoor golf Bangkok · golf simulator Sukhumvit · TrackMan Bangkok · private golf rooms Bangkok</p><p style="margin-top:var(--s4)">Clicks go to booking, LINE and directions.</p></div>
+        <p class="lede">50 / 30 / 20 split. Budget moves weekly toward whatever brings bookings.</p>
       </div>
     </div>
     </div>
