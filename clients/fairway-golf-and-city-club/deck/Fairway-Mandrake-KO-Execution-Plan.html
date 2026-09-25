@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,500;1,8..60,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
-/* ═══ KO DECK v13 — strong glass, matching komarketingagency.com ═══ */
+/* ═══ KO DECK v21 — dark with client silk + venue photos, no outlines ═══ */
 :root {
   --ink:#110300;--ink-deep:#0d0200;--wine:#4c050c;--ember:#611609;
   --brown:#62483e;--steel:#94b1c8;--steel-dim:#84a0b6;
@@ -24,26 +24,33 @@ html,body{height:100%;background:var(--ink-deep);color:var(--white);font-family:
 body{overflow:hidden} button,a{font-family:inherit}
 #stage{position:absolute;width:960px;height:540px;left:0;top:0;transform-origin:top left;z-index:1}
 
-/* ─── Slide with ambient glow ─── */
+/* ─── Slide ─── */
 .slide{position:absolute;inset:0;width:960px;height:540px;display:none;flex-direction:column;padding:24px 40px 10px;overflow:hidden;background:var(--d-bg);color:var(--white)}
 .slide.active{display:flex}
-/* ─── SVG wave ribbons + soft glow behind glass ─── */
+/* silk image — low opacity on dark creates soft light shapes */
 .slide::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 960 540'%3E%3Cpath d='M0 380Q240 320 480 360T960 300V540H0Z' fill='%234c050c'/%3E%3Cpath d='M0 420Q300 360 600 400T960 350V540H0Z' fill='%23611609'/%3E%3Cpath d='M0 460Q200 430 500 450T960 410V540H0Z' fill='%23190604'/%3E%3C/svg%3E");
-  background-size:cover;background-position:center}
+  background:url('assets/white-silk-wave.png') center/cover no-repeat;opacity:0.07}
 .slide::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0}
-/* varied wave positions via transform + glow accents */
-.slide:nth-child(odd)::before{transform:scaleX(-1)}
-.slide:nth-child(3n)::before{transform:scaleY(-1)}
-.slide:nth-child(3n+1)::before{transform:rotate(0deg)}
-.slide:nth-child(even)::before{transform:scaleX(-1) translateY(-60px)}
-.slide:nth-child(5n)::before{transform:scaleY(-1) scaleX(-1)}
-/* glow accents per slide */
-.slide:nth-child(odd)::after{background:radial-gradient(ellipse 500px 350px at 80% 60%,#2e0a0c,transparent 60%),radial-gradient(ellipse 400px 300px at 10% 30%,#141828,transparent 55%)}
-.slide:nth-child(even)::after{background:radial-gradient(ellipse 450px 350px at 15% 65%,#300c10,transparent 55%),radial-gradient(ellipse 500px 300px at 85% 25%,#121620,transparent 55%)}
-.slide:nth-child(3n)::after{background:radial-gradient(ellipse 550px 300px at 70% 40%,#2c0a0e,transparent 55%),radial-gradient(ellipse 400px 350px at 20% 70%,#101624,transparent 55%)}
-.slide:nth-child(1)::before{transform:none}
-.slide:nth-child(1)::after{background:radial-gradient(ellipse 500px 400px at 30% 70%,#3a0a10,transparent 60%),radial-gradient(ellipse 400px 300px at 80% 20%,#141828,transparent 55%)}
+/* cover: full-bleed group photo with uniform dark veil */
+.slide:nth-child(1)::before{
+  background:url('assets/fairway-trackman-group.jpg') right center/cover no-repeat;opacity:1}
+.slide:nth-child(1)::after{background:#110300db}
+/* slide 13: full-bleed putting photo with uniform dark veil */
+.slide:nth-child(13)::before{
+  background:url('assets/fairway-trackman-putting.jpg') center 55%/cover no-repeat;opacity:1}
+.slide:nth-child(13)::after{background:#110300db}
+/* vary silk framing per slide so it doesn't look copy-pasted */
+.slide:nth-child(2)::before{background-position:right center;transform:scaleX(-1)}
+.slide:nth-child(3)::before{background-position:left 40%;background-size:110%}
+.slide:nth-child(4)::before{background-position:center bottom;transform:scaleX(-1)}
+.slide:nth-child(5)::before{background-position:right bottom;background-size:120%}
+.slide:nth-child(6)::before{background-position:left center;transform:scaleX(-1)}
+.slide:nth-child(7)::before{background-position:center 30%;background-size:115%}
+.slide:nth-child(8)::before{background-position:right 40%}
+.slide:nth-child(9)::before{background-position:left bottom;transform:scaleX(-1);background-size:110%}
+.slide:nth-child(10)::before{background-position:center center;transform:scaleX(-1)}
+.slide:nth-child(11)::before{background-position:right 30%;background-size:120%}
+.slide:nth-child(12)::before{background-position:left 60%;transform:scaleX(-1)}
 .slide>*{position:relative;z-index:1}
 
 /* ─── Typography ─── */
@@ -60,7 +67,7 @@ h3{font-size:13px;font-weight:600;margin:var(--s4) 0 var(--s4);letter-spacing:.0
 .fill{flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--s12);justify-content:center}
 
 /* ─── Footer ─── */
-.footer{flex:0 0 auto;margin-top:var(--s8);padding-top:6px;display:flex;justify-content:space-between;align-items:center;gap:var(--s12);border-top:1px solid var(--g-border);color:var(--muted);font-size:10px;letter-spacing:.04em}
+.footer{flex:0 0 auto;margin-top:var(--s8);padding-top:6px;display:flex;justify-content:space-between;align-items:center;gap:var(--s12);border-top:none;color:var(--muted);font-size:10px;letter-spacing:.04em}
 .footer .ko-mark{display:flex;align-items:center;gap:6px}
 .footer .ko-mark img{height:14px}
 
@@ -69,11 +76,10 @@ h3{font-size:13px;font-weight:600;margin:var(--s4) 0 var(--s4);letter-spacing:.0
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-items:stretch}
 .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s8);align-items:stretch}
 
-/* ─── Glass cards (opaque fake glass: gradient top highlight + warm tint + inner border) ─── */
+/* ─── Glass cards: dark translucent, no outline, soft diffuse shadow ─── */
 .card{
   background:linear-gradient(180deg,var(--g-card-top) 0%,var(--g-card) 35%);
-  border:1px solid var(--g-border);
-  border-top-color:var(--g-border-hi);
+  border:none;
   border-radius:20px;
   padding:14px 16px;
   display:flex;flex-direction:column;
@@ -105,13 +111,13 @@ ul.clean li::before{content:"";width:6px;height:6px;border-radius:50%;background
 
 /* ─── Tables (glass cells) ─── */
 table.phase{width:100%;border-collapse:collapse;font-size:12px}
-table.phase th,table.phase td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--g-border);vertical-align:top}
+table.phase th,table.phase td{text-align:left;padding:6px 8px;border-bottom:none;vertical-align:top}
 table.phase th{color:var(--steel-dim);font-weight:600;font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding-top:0}
 table.phase td.who{color:var(--muted);white-space:nowrap}
 
 /* ─── Glass pills ─── */
-.pill{display:inline-block;background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:1px solid var(--g-border);border-top-color:var(--g-border-hi);color:var(--steel);border-radius:999px;padding:3px 9px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin:0 4px 4px 0}
-.pill.solid{background:linear-gradient(135deg,var(--wine),var(--ember));color:var(--white);border-color:var(--ember);font-weight:600}
+.pill{display:inline-block;background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:none;color:var(--steel);border-radius:999px;padding:3px 9px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin:0 4px 4px 0}
+.pill.solid{background:linear-gradient(135deg,var(--wine),var(--ember));color:var(--white);border:none;font-weight:600}
 
 /* ─── Cover ─── */
 .cover{display:grid;grid-template-columns:1.05fr .95fr;gap:var(--s16);min-height:0}
@@ -127,7 +133,7 @@ table.phase td.who{color:var(--muted);white-space:nowrap}
 .ph span{position:absolute;left:7px;bottom:5px;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--white);text-shadow:0 1px 3px #000}
 
 /* ─── Contents ─── */
-button.jump{appearance:none;width:100%;display:flex;gap:var(--s8);align-items:baseline;text-align:left;background:transparent;color:var(--white);border:0;border-bottom:1px solid var(--g-border);padding:5px 2px;cursor:pointer;font-size:12px}
+button.jump{appearance:none;width:100%;display:flex;gap:var(--s8);align-items:baseline;text-align:left;background:transparent;color:var(--white);border:0;border-bottom:none;padding:5px 2px;cursor:pointer;font-size:12px}
 button.jump span{color:var(--steel-dim);font-variant-numeric:tabular-nums;width:16px;flex:0 0 auto;font-size:11px}
 button.jump em{font-style:normal;color:var(--muted);margin-left:auto;font-size:10px}
 button.jump:hover{color:var(--steel)}
@@ -135,16 +141,16 @@ button.jump:hover{color:var(--steel)}
 /* ─── Budget ─── */
 .giant{font-family:"Source Serif 4",Georgia,serif;font-weight:400;font-style:italic;font-size:78px;line-height:.86;letter-spacing:-0.03em}
 .eq{color:var(--muted);font-size:14px;margin:4px 0 var(--s8)} .eq b{color:var(--white);font-weight:500}
-.money{background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:1px solid var(--g-border);border-top-color:var(--g-border-hi);border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;box-shadow:0 8px 24px #06010088,0 2px 6px #08020044}
+.money{background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:none;border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;box-shadow:0 8px 24px #06010088,0 2px 6px #08020044}
 .money .v{font-family:"Source Serif 4",Georgia,serif;font-size:48px;font-style:italic;color:var(--steel);line-height:1}
 .money h3{font-size:13px;margin:4px 0 2px} .money p{color:var(--muted);font-size:11.5px;line-height:1.35}
 
 /* ─── Note bar (glass) ─── */
-.note-bar{background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:1px solid var(--g-border);border-left:3px solid var(--wine);border-radius:0 16px 16px 0;padding:10px var(--s12);font-size:12.5px;line-height:1.4;display:flex;align-items:flex-start;gap:10px;flex:0 0 auto}
+.note-bar{background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:none;border-left:3px solid var(--wine);border-radius:0 16px 16px 0;padding:10px var(--s12);font-size:12.5px;line-height:1.4;display:flex;align-items:flex-start;gap:10px;flex:0 0 auto}
 
 /* ─── Funnel ─── */
 .frow{display:grid;grid-template-columns:100px 1fr;gap:var(--s8);align-items:center}
-.fbar{height:38px;border-radius:12px;display:flex;align-items:center;padding:0 12px;background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:1px solid var(--g-border);border-top-color:var(--g-border-hi);font-size:12.5px;box-shadow:0 4px 12px #06010066}
+.fbar{height:38px;border-radius:12px;display:flex;align-items:center;padding:0 12px;background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:none;font-size:12.5px;box-shadow:0 4px 12px #06010066}
 .fbar strong{margin-right:8px} .fbar span{color:var(--muted)}
 .frow b{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel-dim)}
 .ads-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s12)}
@@ -163,7 +169,7 @@ button.jump:hover{color:var(--steel)}
 .bar{position:fixed;top:0;left:0;right:0;height:3px;background:#1a0a08;z-index:40}
 .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--wine),var(--ember))}
 .nav{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:40;display:flex;gap:6px;align-items:center}
-.nav button{appearance:none;border:1px solid var(--g-border);background:linear-gradient(180deg,var(--g-card-top),var(--g-card));color:var(--white);border-radius:999px;padding:7px 12px;font:500 12px/1 "Inter",sans-serif;cursor:pointer;border-top-color:var(--g-border-hi)}
+.nav button{appearance:none;border:none;background:linear-gradient(180deg,var(--g-card-top),var(--g-card));color:var(--white);border-radius:999px;padding:7px 12px;font:500 12px/1 "Inter",sans-serif;cursor:pointer}
 .nav button:hover{border-color:var(--steel-dim);color:var(--steel)}
 .nav .count{color:var(--muted);font-size:12px;min-width:118px;text-align:center;font-variant-numeric:tabular-nums}
 .hit{position:fixed;top:0;bottom:48px;width:36px;z-index:6;background:transparent;border:0;padding:0;cursor:pointer}
@@ -183,26 +189,22 @@ body.export .nav,body.export .hit,body.export .bar,body.export .hint{display:non
 <div class="bar" aria-hidden="true"><i id="prog"></i></div>
 <div id="stage">
 
-  <!-- 01 COVER -->
+  <!-- 01 COVER — full-bleed photo with dark veil -->
   <section class="slide active" data-title="Cover">
     <div class="eyebrow">KO Marketing · Execution plan</div>
-    <div class="cover fill">
-      <div class="cover-copy">
+    <div class="fill" style="max-width:440px">
+      <div>
         <h1>Fairway Golf<br/><em>and City Club</em></h1>
         <p class="plus">+ Mandrake Cafe</p>
         <div class="rule"></div>
         <p class="lede">One team running content and ads for both venues. From casting to ad spend.</p>
-        <div class="facts">
-          <div class="fact"><b>3 months</b><span>Oct – Dec 2026</span></div>
-          <div class="fact"><b>1 Oct</b><span>Kickoff</span></div>
-          <div class="fact"><b>2 Oct</b><span>First shoot</span></div>
-          <div class="fact"><b>End of month</b><span>Report</span></div>
-          <div class="fact"><b>~31 Dec</b><span>Contract end</span></div>
-        </div>
       </div>
-      <div class="cover-photos">
-        <div class="ph"><img src="assets/fairway-trackman-group.jpg" alt="Guests watching a golfer at the TrackMan simulator"><span>Fairway</span></div>
-        <div class="ph"><img src="assets/fairway-trackman-putting.jpg" alt="Woman putting in a TrackMan bay" style="object-position:center 30%"><span>Fairway</span></div>
+      <div class="facts">
+        <div class="fact"><b>3 months</b><span>Oct – Dec 2026</span></div>
+        <div class="fact"><b>1 Oct</b><span>Kickoff</span></div>
+        <div class="fact"><b>2 Oct</b><span>First shoot</span></div>
+        <div class="fact"><b>End of month</b><span>Report</span></div>
+        <div class="fact"><b>~31 Dec</b><span>Contract end</span></div>
       </div>
     </div>
     <div class="cover-foot">
