@@ -9,41 +9,40 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,500;1,8..60,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
-/* ═══ KO DECK v15 LIGHT — cream glass + pastel waves ═══ */
+/* ═══ KO DECK v16 LIGHT — white silk fabric background ═══ */
 :root {
   --ink:#110300;--ink-deep:#0d0200;--wine:#4c050c;--ember:#611609;
   --brown:#62483e;--steel:#5a7a8e;--steel-dim:#4a6a7e;
-  --warm:#f6f0e9;--cream:#e3dfce;--muted:#8b8480;--white:#110300;
-  --d-bg:#f6f0e9;
-  /* VISIBLE glass: opaque equiv — lighter fill lets wave shapes show through */
-  --g-card:#ffffff;--g-card-top:#ffffff;--g-border:#d8d0c4;--g-border-hi:#e8e0d4;
+  --warm:#f8f8f8;--cream:#e8e4dc;--muted:#7a726a;--white:#110300;
+  --d-bg:#f8f8f8;
+  --g-card:#ffffffee;--g-card-top:#ffffff;--g-border:#e0dcd6;--g-border-hi:#eceae6;
   --s4:4px;--s8:8px;--s12:12px;--s16:16px;--s24:24px;--s32:32px;--s48:48px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:#ece6de;color:#110300;font-family:"Inter",system-ui,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+html,body{height:100%;background:#f8f8f8;color:#110300;font-family:"Inter",system-ui,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 body{overflow:hidden} button,a{font-family:inherit}
 #stage{position:absolute;width:960px;height:540px;left:0;top:0;transform-origin:top left;z-index:1}
 
-/* ─── Slide with ambient glow ─── */
-.slide{position:absolute;inset:0;width:960px;height:540px;display:none;flex-direction:column;padding:24px 40px 10px;overflow:hidden;background:var(--d-bg);color:#110300}
+/* ─── Slide with silk fabric background ─── */
+.slide{position:absolute;inset:0;width:960px;height:540px;display:none;flex-direction:column;padding:24px 40px 10px;overflow:hidden;background:#f8f8f8;color:#110300}
 .slide.active{display:flex}
-/* ─── SVG wave ribbons + soft glow behind glass ─── */
+/* silk image behind glass — varied framing per slide */
 .slide::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 960 540'%3E%3Cpath d='M0 380Q240 320 480 360T960 300V540H0Z' fill='%23e8d0d0'/%3E%3Cpath d='M0 420Q300 360 600 400T960 350V540H0Z' fill='%23f0dcd4'/%3E%3Cpath d='M0 460Q200 430 500 450T960 410V540H0Z' fill='%23ede4dc'/%3E%3C/svg%3E");
-  background-size:cover;background-position:center}
-.slide::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0}
-/* varied wave positions via transform + glow accents */
-.slide:nth-child(odd)::before{transform:scaleX(-1)}
-.slide:nth-child(3n)::before{transform:scaleY(-1)}
-.slide:nth-child(3n+1)::before{transform:rotate(0deg)}
-.slide:nth-child(even)::before{transform:scaleX(-1) translateY(-60px)}
-.slide:nth-child(5n)::before{transform:scaleY(-1) scaleX(-1)}
-/* glow accents per slide */
-.slide:nth-child(odd)::after{background:radial-gradient(ellipse 500px 350px at 80% 60%,#ecd8d8,transparent 60%),radial-gradient(ellipse 400px 300px at 10% 30%,#d8e4f0,transparent 55%)}
-.slide:nth-child(even)::after{background:radial-gradient(ellipse 450px 350px at 15% 65%,#ead4d4,transparent 55%),radial-gradient(ellipse 500px 300px at 85% 25%,#dce8f2,transparent 55%)}
-.slide:nth-child(3n)::after{background:radial-gradient(ellipse 550px 300px at 70% 40%,#eedcdc,transparent 55%),radial-gradient(ellipse 400px 350px at 20% 70%,#dee8f0,transparent 55%)}
-.slide:nth-child(1)::before{transform:none}
-.slide:nth-child(1)::after{background:radial-gradient(ellipse 500px 400px at 30% 70%,#e8d0d0,transparent 60%),radial-gradient(ellipse 400px 300px at 80% 20%,#d8e4f0,transparent 55%)}
+  background:url('assets/white-silk-wave.png') center/cover no-repeat}
+/* vary per slide so it doesn't look copy-pasted */
+.slide:nth-child(1)::before{background-position:center center}
+.slide:nth-child(2)::before{background-position:right center;transform:scaleX(-1)}
+.slide:nth-child(3)::before{background-position:left 40%;background-size:110%}
+.slide:nth-child(4)::before{background-position:center bottom;transform:scaleX(-1)}
+.slide:nth-child(5)::before{background-position:right bottom;background-size:120%}
+.slide:nth-child(6)::before{background-position:left center;transform:scaleX(-1)}
+.slide:nth-child(7)::before{background-position:center 30%;background-size:115%}
+.slide:nth-child(8)::before{background-position:right 40%}
+.slide:nth-child(9)::before{background-position:left bottom;transform:scaleX(-1);background-size:110%}
+.slide:nth-child(10)::before{background-position:center center;transform:scaleX(-1)}
+.slide:nth-child(11)::before{background-position:right 30%;background-size:120%}
+.slide:nth-child(12)::before{background-position:left 60%;transform:scaleX(-1)}
+.slide:nth-child(13)::before{background-position:center bottom;background-size:115%}
 .slide>*{position:relative;z-index:1}
 
 /* ─── Typography ─── */
@@ -69,15 +68,15 @@ h3{font-size:13px;font-weight:600;margin:var(--s4) 0 var(--s4);letter-spacing:.0
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-items:stretch}
 .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s8);align-items:stretch}
 
-/* ─── Glass cards (opaque fake glass: gradient top highlight + warm tint + inner border) ─── */
+/* ─── Glass cards on silk: translucent white with soft shadow ─── */
 .card{
-  background:linear-gradient(180deg,var(--g-card-top) 0%,var(--g-card) 35%);
-  border:1px solid var(--g-border);
-  border-top-color:var(--g-border-hi);
+  background:linear-gradient(180deg,#ffffff 0%,#fafafaee 100%);
+  border:1px solid #e8e4e0;
+  border-top-color:#f0eeec;
   border-radius:20px;
   padding:14px 16px;
   display:flex;flex-direction:column;
-  box-shadow:0 4px 16px #00000010,0 1px 3px #00000006;
+  box-shadow:0 8px 32px #00000008,0 2px 8px #00000006;
 }
 .card h3{color:#110300} .card p,.card li{color:var(--muted);font-size:12px;line-height:1.4}
 
@@ -89,7 +88,7 @@ h3{font-size:13px;font-weight:600;margin:var(--s4) 0 var(--s4);letter-spacing:.0
 .ratio{display:flex;gap:2px;height:28px;border-radius:10px;overflow:hidden}
 .ratio .seg{display:flex;align-items:center;padding:0 10px;font-size:11px;font-weight:600;white-space:nowrap}
 .ratio .seg.a{background:linear-gradient(135deg,var(--wine),var(--ember));color:var(--white)}
-.ratio .seg.b{background:#ece6de;color:#110300}
+.ratio .seg.b{background:#f0eeec;color:#110300}
 
 /* ─── Statement ─── */
 .statement{font-family:"Source Serif 4",Georgia,serif;font-style:italic;font-size:38px;line-height:1.1;letter-spacing:-0.02em}
@@ -110,7 +109,7 @@ table.phase th{color:var(--steel-dim);font-weight:600;font-size:9px;letter-spaci
 table.phase td.who{color:var(--muted);white-space:nowrap}
 
 /* ─── Glass pills ─── */
-.pill{display:inline-block;background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:1px solid var(--g-border);border-top-color:var(--g-border-hi);color:var(--steel);border-radius:999px;padding:3px 9px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin:0 4px 4px 0}
+.pill{display:inline-block;background:linear-gradient(180deg,#ffffff,#f8f8f8);border:1px solid #e8e4e0;border-top-color:#f0eeec;color:var(--steel);border-radius:999px;padding:3px 9px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin:0 4px 4px 0}
 .pill.solid{background:linear-gradient(135deg,var(--wine),var(--ember));color:var(--white);border-color:var(--ember);font-weight:600}
 
 /* ─── Cover ─── */
@@ -135,16 +134,16 @@ button.jump:hover{color:var(--steel)}
 /* ─── Budget ─── */
 .giant{font-family:"Source Serif 4",Georgia,serif;font-weight:400;font-style:italic;font-size:78px;line-height:.86;letter-spacing:-0.03em}
 .eq{color:var(--muted);font-size:14px;margin:4px 0 var(--s8)} .eq b{color:var(--white);font-weight:500}
-.money{background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:1px solid var(--g-border);border-top-color:var(--g-border-hi);border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;box-shadow:0 4px 16px #00000010,0 1px 3px #00000006}
+.money{background:linear-gradient(180deg,#ffffff,#fafafaee);border:1px solid #e8e4e0;border-top-color:#f0eeec;border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;box-shadow:0 8px 32px #00000008,0 2px 8px #00000006}
 .money .v{font-family:"Source Serif 4",Georgia,serif;font-size:48px;font-style:italic;color:var(--wine);line-height:1}
 .money h3{font-size:13px;margin:4px 0 2px} .money p{color:var(--muted);font-size:11.5px;line-height:1.35}
 
 /* ─── Note bar (glass) ─── */
-.note-bar{background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:1px solid var(--g-border);border-left:3px solid var(--wine);border-radius:0 16px 16px 0;padding:10px var(--s12);font-size:12.5px;line-height:1.4;display:flex;align-items:flex-start;gap:10px;flex:0 0 auto}
+.note-bar{background:linear-gradient(180deg,#ffffff,#fafafaee);border:1px solid #e8e4e0;border-left:3px solid var(--wine);border-radius:0 16px 16px 0;padding:10px var(--s12);font-size:12.5px;line-height:1.4;display:flex;align-items:flex-start;gap:10px;flex:0 0 auto}
 
 /* ─── Funnel ─── */
 .frow{display:grid;grid-template-columns:100px 1fr;gap:var(--s8);align-items:center}
-.fbar{height:38px;border-radius:12px;display:flex;align-items:center;padding:0 12px;background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:1px solid var(--g-border);border-top-color:var(--g-border-hi);font-size:12.5px;box-shadow:0 2px 8px #00000008}
+.fbar{height:38px;border-radius:12px;display:flex;align-items:center;padding:0 12px;background:linear-gradient(180deg,#ffffff,#f8f8f8);border:1px solid #e8e4e0;border-top-color:#f0eeec;font-size:12.5px;box-shadow:0 2px 8px #00000008}
 .fbar strong{margin-right:8px} .fbar span{color:var(--muted)}
 .frow b{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel-dim)}
 .ads-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s12)}
@@ -160,7 +159,7 @@ button.jump:hover{color:var(--steel)}
 .cal .ev{color:#c45a5a;font-size:10px}
 
 /* ─── Nav ─── */
-.bar{position:fixed;top:0;left:0;right:0;height:3px;background:#e3dfce;z-index:40}
+.bar{position:fixed;top:0;left:0;right:0;height:3px;background:#e8e4e0;z-index:40}
 .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--wine),var(--ember))}
 .nav{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:40;display:flex;gap:6px;align-items:center}
 .nav button{appearance:none;border:1px solid var(--g-border);background:linear-gradient(180deg,var(--g-card-top),var(--g-card));color:var(--white);border-radius:999px;padding:7px 12px;font:500 12px/1 "Inter",sans-serif;cursor:pointer;border-top-color:var(--g-border-hi)}
@@ -171,7 +170,7 @@ button.jump:hover{color:var(--steel)}
 .hint{position:fixed;left:16px;bottom:16px;z-index:40;color:var(--muted);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
 @media(prefers-reduced-motion:reduce){.slide.active{animation:none}}
 @media print{.nav,.hit,.bar,.hint{display:none !important}}
-body.export{overflow:visible;height:auto;background:#f6f0e9}
+body.export{overflow:visible;height:auto;background:#f8f8f8}
 body.export #stage{position:static !important;transform:none !important;width:960px !important;height:auto !important}
 body.export .slide{display:flex !important;position:relative !important;inset:auto !important;width:960px;height:540px;page-break-after:always;break-after:page}
 body.export .slide:last-of-type{page-break-after:auto;break-after:auto}
