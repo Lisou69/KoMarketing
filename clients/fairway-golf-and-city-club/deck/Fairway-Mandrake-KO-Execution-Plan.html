@@ -7,641 +7,377 @@
 <title>Fairway Golf and City Club + Mandrake Cafe — Execution Plan · KO Marketing</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,500;1,8..60,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
-  :root {
-    --ink: #181615;
-    --ink-2: #221f1c;
-    --ink-3: #2c2824;
-    --cream: #F5F4F1;
-    --muted: #b7b0a6;
-    --gold: #E6C074;
-    --gold-2: #C9A24B;
-    --blue: #8FB0C7;
-    --green: #7FB09A;
-    --coral: #E29488;
-    --line: rgba(230,192,116,0.22);
-    --soft: rgba(230,192,116,0.10);
-    --green-soft: rgba(127,176,154,0.12);
-    --blue-soft: rgba(143,176,199,0.12);
-    --coral-soft: rgba(226,148,136,0.14);
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  html, body {
-    height: 100%;
-    background: #100e0c;
-    color: var(--cream);
-    font-family: "DM Sans", system-ui, sans-serif;
-  }
-  body { overflow: hidden; }
-  button, a { font-family: inherit; }
-  #stage {
-    position: absolute;
-    width: 960px;
-    height: 540px;
-    left: 0;
-    top: 0;
-    transform-origin: top left;
-    z-index: 1;
-  }
-  .slide {
-    position: absolute;
-    inset: 0;
-    width: 960px;
-    height: 540px;
-    display: none;
-    flex-direction: column;
-    padding: 14px 20px 10px;
-    overflow: hidden;
-    background: linear-gradient(180deg, #1e1b18 0%, var(--ink) 42%, #141210 100%);
-  }
-  .slide.active { display: flex; animation: fade .35s ease; }
-  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
-  .slide::before {
-    content: "";
-    position: absolute;
-    left: 0; right: 0; top: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--gold), rgba(230,192,116,0) 72%);
-  }
-  .slide[data-tone="mandrake"] { background: linear-gradient(180deg, #1a221e 0%, var(--ink) 50%, #121614 100%); }
-  .slide[data-tone="alert"] { background: linear-gradient(180deg, #241c1a 0%, var(--ink) 55%, #161211 100%); }
-  .slide[data-tone="hero"] { background: linear-gradient(180deg, #221e19 0%, var(--ink) 46%, #100e0c 100%); }
-  .eyebrow {
-    font-size: 10px;
-    letter-spacing: .22em;
-    text-transform: uppercase;
-    color: var(--gold);
-    font-weight: 500;
-    margin-bottom: 2px;
-  }
-  h1 {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-weight: 500;
-    font-size: 46px;
-    line-height: .92;
-    letter-spacing: -0.02em;
-  }
-  h1 em { font-style: italic; color: var(--gold); }
-  h2 {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-weight: 500;
-    font-size: 26px;
-    line-height: 1;
-    letter-spacing: -0.015em;
-    margin-bottom: 0;
-  }
-  h2 em { font-style: italic; color: var(--gold); }
-  .lede {
-    color: var(--muted);
-    font-size: 13px;
-    line-height: 1.45;
-    max-width: 640px;
-  }
-  .toprow {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 16px;
-  }
-  .ko {
-    color: var(--gold);
-    font-weight: 600;
-    letter-spacing: .2em;
-    text-transform: uppercase;
-    font-size: 10px;
-  }
-  .fill {
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    justify-content: center;
-  }
-  .fill > .grid-2,
-  .fill > .grid-3,
-  .fill > .grid-4,
-  .fill > .locks,
-  .fill > .steps,
-  .fill > .ads-split,
-  .fill > .cover,
-  .fill > .week { flex: 0 0 auto; }
-  .footer {
-    margin-top: auto;
-    padding-top: 6px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    border-top: 1px solid var(--line);
-    color: var(--muted);
-    font-size: 10px;
-    letter-spacing: .06em;
-  }
-  .footer strong { color: var(--cream); font-weight: 500; }
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-  .card {
-    background: var(--soft);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 10px 12px;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-  }
-  .card.green { background: var(--green-soft); border-color: rgba(127,176,154,0.35); }
-  .card.blue { background: var(--blue-soft); border-color: rgba(143,176,199,0.35); }
-  .card.coral { background: var(--coral-soft); border-color: rgba(226,148,136,0.45); }
-  .card h3 {
-    font-size: 13px;
-    font-weight: 600;
-    margin: 4px 0 4px;
-    letter-spacing: .01em;
-  }
-  .card p, .card li { color: var(--muted); font-size: 12px; line-height: 1.4; }
-  .num {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: 28px;
-    line-height: .9;
-    color: var(--gold);
-    font-weight: 500;
-  }
-  .num.green { color: var(--green); }
-  .num.blue { color: var(--blue); }
-  .num.coral { color: var(--coral); }
-  .kicker {
-    font-size: 9px;
-    letter-spacing: .16em;
-    text-transform: uppercase;
-    color: var(--gold-2);
-    font-weight: 600;
-  }
-  .kicker.green { color: var(--green); }
-  .kicker.blue { color: var(--blue); }
-  .kicker.coral { color: var(--coral); }
-  ul.clean { list-style: none; display: grid; gap: 3px; }
-  ul.clean li {
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
-    font-size: 12.5px;
-    line-height: 1.35;
-    color: var(--cream);
-  }
-  ul.clean li::before {
-    content: "";
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--gold);
-    margin-top: 5px;
-    flex: 0 0 auto;
-  }
-  ul.clean.green li::before { background: var(--green); }
-  ul.clean.blue li::before { background: var(--blue); }
-  ul.clean.coral li::before { background: var(--coral); }
-  table.phase {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-  }
-  table.phase th, table.phase td {
-    text-align: left;
-    padding: 4px 8px;
-    border-bottom: 1px solid var(--line);
-    vertical-align: top;
-  }
-  table.phase th {
-    color: var(--gold);
-    font-weight: 500;
-    font-size: 9px;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    padding-top: 0;
-  }
-  table.phase td.who, table.phase td.when { color: var(--muted); white-space: nowrap; }
-  table.phase tr.hot td { background: var(--coral-soft); }
-  .pill {
-    display: inline-block;
-    border: 1px solid var(--line);
-    color: var(--gold);
-    border-radius: 999px;
-    padding: 2px 7px;
-    font-size: 9px;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    margin: 0 4px 4px 0;
-  }
-  .pill.coral { color: var(--coral); border-color: rgba(226,148,136,0.55); }
-  .pill.green { color: var(--green); border-color: rgba(127,176,154,0.5); }
-  .pill.blue { color: var(--blue); border-color: rgba(143,176,199,0.5); }
-  .pill.solid {
-    background: var(--gold);
-    color: var(--ink);
-    border-color: var(--gold);
-    font-weight: 600;
-  }
-  .rule {
-    height: 1px;
-    width: 72px;
-    margin: 8px 0;
-    background: linear-gradient(90deg, var(--gold), transparent);
-  }
-  /* Cover */
-  .cover {
-    display: grid;
-    grid-template-columns: 1.05fr .95fr;
-    gap: 12px;
-    min-height: 0;
-  }
-  .cover-copy { display: flex; flex-direction: column; min-height: 0; }
-  .cover-photos { display: grid; grid-template-rows: 1.15fr .85fr; gap: 8px; min-height: 0; }
-  .facts {
-    margin-top: auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px 12px;
-  }
-  .fact b {
-    display: block;
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: 22px;
-    font-weight: 500;
-    color: var(--cream);
-    line-height: 1;
-  }
-  .fact span {
-    display: block;
-    margin-top: 2px;
-    font-size: 10px;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .plus {
-    margin-top: 4px;
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: 22px;
-    font-style: italic;
-    color: var(--green);
-  }
-  .cover-foot {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-top: 16px;
-    color: var(--muted);
-    font-size: 11px;
-    line-height: 1.45;
-  }
-  /* Contents */
-  .cols3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-  .cols3 h3 {
-    font-size: 10px;
-    letter-spacing: .16em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 4px;
-    font-weight: 600;
-  }
-  button.jump {
-    appearance: none;
-    width: 100%;
-    display: flex;
-    gap: 8px;
-    align-items: baseline;
-    text-align: left;
-    background: transparent;
-    color: var(--cream);
-    border: 0;
-    border-bottom: 1px solid rgba(230,192,116,0.14);
-    padding: 4px 2px;
-    cursor: pointer;
-    font-size: 12px;
-  }
-  button.jump span {
-    color: var(--gold);
-    font-variant-numeric: tabular-nums;
-    width: 16px;
-    flex: 0 0 auto;
-    font-size: 11px;
-  }
-  button.jump em { font-style: normal; color: var(--muted); margin-left: auto; font-size: 10px; }
-  button.jump:hover { color: var(--gold); }
-  /* Timeline rail */
-  .rail {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    margin-top: 8px;
-    position: relative;
-  }
-  .rail::before {
-    content: "";
-    position: absolute;
-    left: 8px; right: 8px; top: 15px;
-    height: 3px;
-    background: var(--gold-2);
-    opacity: .9;
-  }
-  .node {
-    position: relative;
-    padding-top: 32px;
-  }
-  .node i {
-    position: absolute;
-    top: 8px; left: 0;
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    background: var(--gold);
-    border: 3px solid var(--ink);
-    box-shadow: 0 0 0 2px var(--gold);
-  }
-  .node b { display: block; font-size: 13px; font-weight: 600; }
-  .node span { display: block; color: var(--muted); font-size: 11.5px; line-height: 1.35; margin-top: 3px; }
-  .node small { display: block; color: var(--gold); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; margin-top: 4px; }
-  /* Steps */
-  .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-  .step {
-    background: var(--soft);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 10px 10px 10px;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-  }
-  .step .n {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    color: var(--gold);
-    font-size: 22px;
-    line-height: 1;
-  }
-  .step h3 { font-size: 13px; margin: 6px 0 4px; }
-  .step p { color: var(--muted); font-size: 11.5px; line-height: 1.35; }
-  /* Funnel */
-  .funnel { display: grid; gap: 6px; margin-top: 4px; }
-  .frow {
-    display: grid;
-    grid-template-columns: 86px 1fr;
-    gap: 8px;
-    align-items: center;
-  }
-  .fbar {
-    height: 36px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    padding: 0 12px;
-    background: linear-gradient(90deg, rgba(230,192,116,0.28), rgba(230,192,116,0.08));
-    border: 1px solid var(--line);
-    font-size: 12.5px;
-  }
-  .fbar strong { margin-right: 8px; }
-  .fbar span { color: var(--muted); }
-  .frow b { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
-  /* Photos — only used on cover */
-  .ph {
-    position: relative;
-    overflow: hidden;
-    border-radius: 8px;
-    min-height: 0;
-    background: #111;
-  }
-  .ph img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-  .ph span {
-    position: absolute;
-    left: 7px;
-    bottom: 5px;
-    font-size: 8px;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: #fff;
-    text-shadow: 0 1px 3px rgba(0,0,0,.75);
-  }
-  /* Ads layout */
-  .ads-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-  .ads-grid .stack { display: flex; flex-direction: column; gap: 8px; }
-  /* Week blocks */
-  .band {
-    display: grid;
-    grid-template-columns: 92px 1fr;
-    gap: 10px;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--line);
-  }
-  .band .d {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: 20px;
-    color: var(--gold);
-    line-height: 1;
-  }
-  .band .d small { display: block; font-family: "DM Sans", sans-serif; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
-  .band p { font-size: 12.5px; line-height: 1.35; }
-  .band p span { color: var(--muted); }
-  /* Channels path */
-  .path {
-    display: flex;
-    align-items: stretch;
-    gap: 6px;
-    margin-top: 8px;
-  }
-  .path .p {
-    flex: 1;
-    background: var(--soft);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 8px;
-  }
-  .path .p b { display: block; font-size: 12px; margin-bottom: 3px; }
-  .path .p span { color: var(--muted); font-size: 11px; line-height: 1.3; display: block; }
-  .arrow { align-self: center; color: var(--gold); font-size: 14px; }
-  /* Nav */
-  .bar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: rgba(230,192,116,0.15);
-    z-index: 40;
-  }
-  .bar i {
-    display: block;
-    height: 100%;
-    width: 0;
-    background: linear-gradient(90deg, var(--gold-2), var(--gold));
-  }
-  .nav {
-    position: fixed;
-    left: 50%;
-    bottom: 12px;
-    transform: translateX(-50%);
-    z-index: 40;
-    display: flex;
-    gap: 6px;
-    align-items: center;
-  }
-  .nav button {
-    appearance: none;
-    border: 1px solid var(--line);
-    background: rgba(24,22,21,.92);
-    color: var(--cream);
-    border-radius: 999px;
-    padding: 7px 12px;
-    font: 500 12px/1 "DM Sans", sans-serif;
-    cursor: pointer;
-  }
-  .nav button:hover { border-color: var(--gold); color: var(--gold); }
-  .nav .count {
-    color: var(--muted);
-    font-size: 12px;
-    min-width: 118px;
-    text-align: center;
-    font-variant-numeric: tabular-nums;
-  }
-  .hit {
-    position: fixed;
-    top: 0; bottom: 48px;
-    width: 36px;
-    z-index: 6;
-    background: transparent;
-    border: 0;
-    padding: 0;
-    cursor: pointer;
-  }
-  .hit-left { left: 0; }
-  .hit-right { right: 0; }
-  .hint { position: fixed; left: 16px; bottom: 16px; z-index: 40; color: var(--muted); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
-  @media (prefers-reduced-motion: reduce) {
-    .slide.active { animation: none; }
-  }
-  @media print {
-    .nav, .hit, .bar, .hint { display: none !important; }
-  }
-  /* Budget */
-  .giant {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-weight: 500;
-    font-size: 78px;
-    line-height: .86;
-    color: var(--gold);
-    letter-spacing: -0.03em;
-  }
-  .eq { color: var(--muted); font-size: 14px; margin: 6px 0 10px; }
-  .eq b { color: var(--cream); font-weight: 500; }
-  .money {
-    background: rgba(245,244,241,0.03);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 10px 12px;
-  }
-  .money .v {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: 28px;
-    color: var(--gold);
-    line-height: 1;
-  }
-  .money h3 { font-size: 13px; margin: 3px 0; }
-  .money p { color: var(--muted); font-size: 11.5px; line-height: 1.35; }
-  .split {
-    display: grid;
-    grid-template-columns: 1.4fr 1fr;
-    gap: 8px;
-    margin-top: 8px;
-  }
-  .split .bit {
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 7px 10px;
-    font-size: 11.5px;
-    color: var(--muted);
-    line-height: 1.35;
-  }
-  .split .bit b { color: var(--cream); font-weight: 500; }
-  /* Lock close */
-  .locks { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-  .lock {
-    border-radius: 14px;
-    padding: 12px 14px 12px;
-    display: flex;
-    flex-direction: column;
-    border: 1px solid var(--line);
-    background: rgba(230,192,116,0.06);
-  }
-  .lock .big {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: 40px;
-    color: var(--gold);
-    line-height: .9;
-    margin-bottom: 4px;
-  }
-  .lock h3 { font-size: 16px; margin: 8px 0 6px; }
-  .lock p { color: var(--muted); font-size: 12.5px; line-height: 1.4; }
-  .lock .own { margin-top: auto; padding-top: 10px; font-size: 12px; }
-  .lock .own b { display: block; font-weight: 600; }
-  .lock .own span { color: var(--coral); font-size: 11px; letter-spacing: .04em; }
-  /* Callout note bar — matches Asian Gala style */
-  .note-bar {
-    background: rgba(230,192,116,0.07);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 8px 12px;
-    font-size: 12.5px;
-    line-height: 1.4;
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  .note-bar .label {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 999px;
-    font-size: 8px;
-    font-weight: 700;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    flex: 0 0 auto;
-    margin-top: 2px;
-  }
-  .note-bar .label.gold { background: var(--gold); color: var(--ink); }
-  .note-bar .label.coral { background: var(--coral); color: var(--ink); }
-  .note-bar .label.green { background: var(--green); color: var(--ink); }
-  /* Export */
-  body.export {
-    overflow: visible;
-    height: auto;
-    background: var(--ink);
-  }
-  body.export #stage {
-    position: static !important;
-    transform: none !important;
-    width: 960px !important;
-    height: auto !important;
-    left: auto !important;
-    top: auto !important;
-  }
-  body.export .slide {
-    display: flex !important;
-    position: relative !important;
-    inset: auto !important;
-    width: 960px;
-    height: 540px;
-    page-break-after: always;
-    break-after: page;
-    animation: none !important;
-  }
-  body.export .slide:last-of-type { page-break-after: auto; break-after: auto; }
-  body.export .nav, body.export .hit, body.export .bar, body.export .hint { display: none !important; }
-  @page { size: 960px 540px; margin: 0; }
+/* ═══════════════════════════════════════════════════
+   KO EXECUTION DECK THEME — extracted from komarketingagency.com
+   Fonts: Source Serif 4 (display, italic accent) + Inter (body)
+   ═══════════════════════════════════════════════════ */
+:root {
+  /* Palette — komarketingagency.com Sep 2026 */
+  --ink:        #110300;
+  --ink-deep:   #0d0200;
+  --ink-card:   #1a0f0b;
+  --ink-subtle: #231814;
+  --wine:       #4c050c;
+  --ember:      #611609;
+  --brown:      #62483e;
+  --steel:      #94b1c8;
+  --steel-dim:  #84a0b6;
+  --warm:       #f6f0e9;
+  --cream:      #e3dfce;
+  --muted:      #8b8480;
+  --subtle:     #534e4c;
+  --white:      #ffffff;
+  /* Opaque surface blends — no transparency for print safety */
+  --card-bg:    #1f1410;
+  --card-line:  #352a25;
+  --card-green: #162018;
+  --card-green-line: #294030;
+  --card-blue:  #141c22;
+  --card-blue-line: #2a3e4c;
+  --card-wine:  #200a0e;
+  --card-wine-line: #4a1a20;
+  --note-bg:    #1a1210;
+  --note-line:  #352520;
+  /* Spacing scale (8-pt grid) */
+  --s4: 4px; --s8: 8px; --s12: 12px; --s16: 16px;
+  --s24: 24px; --s32: 32px; --s48: 48px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  background: var(--ink-deep);
+  color: var(--white);
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+body { overflow: hidden; }
+button, a { font-family: inherit; }
+
+/* ─── Stage ─── */
+#stage {
+  position: absolute;
+  width: 960px; height: 540px;
+  left: 0; top: 0;
+  transform-origin: top left;
+  z-index: 1;
+}
+.slide {
+  position: absolute; inset: 0;
+  width: 960px; height: 540px;
+  display: none; flex-direction: column;
+  padding: 24px 40px 12px;
+  overflow: hidden;
+  background: var(--ink);
+}
+.slide.active { display: flex; animation: fadeIn .3s ease; }
+@keyframes fadeIn { from { visibility: hidden; } to { visibility: visible; } }
+
+/* Accent top bar — 3px wine gradient instead of old gold */
+.slide::before {
+  content: ""; position: absolute;
+  left: 0; right: 0; top: 0; height: 3px;
+  background: linear-gradient(90deg, var(--wine), var(--ember) 60%, transparent);
+}
+
+/* ─── Typography hierarchy ─── */
+.eyebrow {
+  font-size: 10px; font-weight: 600;
+  letter-spacing: .22em; text-transform: uppercase;
+  color: var(--steel);
+  margin-bottom: var(--s4);
+}
+h1 {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-weight: 400; font-style: italic;
+  font-size: 44px; line-height: .90;
+  letter-spacing: -0.03em;
+  color: var(--white);
+}
+h1 em { font-style: italic; color: var(--steel); }
+h2 {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-weight: 400; font-style: italic;
+  font-size: 26px; line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  margin-bottom: var(--s4);
+}
+h2 em { color: var(--steel); }
+h3 {
+  font-size: 13px; font-weight: 600;
+  margin: var(--s4) 0 var(--s4);
+  letter-spacing: .01em;
+}
+.lede {
+  color: var(--muted); font-size: 12.5px;
+  line-height: 1.45; max-width: 620px;
+}
+.toprow {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; gap: var(--s16);
+}
+
+/* ─── Section rule — AVI-inspired accent bar ─── */
+.accent-rule {
+  width: 48px; height: 3px; margin: var(--s8) 0;
+  background: linear-gradient(90deg, var(--wine), var(--ember));
+  border-radius: 2px;
+}
+
+/* ─── Fill (flexible content area) ─── */
+.fill {
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column;
+  gap: var(--s8);
+  justify-content: center;
+}
+
+/* ─── Footer (branded) ─── */
+.footer {
+  margin-top: auto; padding-top: var(--s8);
+  display: flex; justify-content: space-between;
+  align-items: center; gap: var(--s12);
+  border-top: 1px solid var(--card-line);
+  color: var(--muted); font-size: 10px;
+  letter-spacing: .04em;
+}
+.footer .ko-mark {
+  display: flex; align-items: center; gap: 6px;
+}
+.footer .ko-mark img { height: 14px; }
+
+/* ─── Grids ─── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s12); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s8); }
+
+/* ─── Cards (layered surface, no shadow — per AVI) ─── */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-line);
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: flex; flex-direction: column;
+}
+.card.green { background: var(--card-green); border-color: var(--card-green-line); }
+.card.blue { background: var(--card-blue); border-color: var(--card-blue-line); }
+.card.wine, .card.coral { background: var(--card-wine); border-color: var(--card-wine-line); }
+.card h3 { color: var(--white); }
+.card p, .card li { color: var(--muted); font-size: 12px; line-height: 1.4; }
+
+/* ─── Number callouts (Source Serif italic, like KO site) ─── */
+.num {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 28px; font-style: italic;
+  line-height: .9; color: var(--steel);
+  font-weight: 400;
+}
+.num.green { color: #7fb09a; }
+.num.blue { color: var(--steel); }
+.num.wine { color: var(--wine); }
+
+/* ─── Kickers ─── */
+.kicker {
+  font-size: 9px; letter-spacing: .16em;
+  text-transform: uppercase; font-weight: 600;
+  color: var(--steel-dim);
+}
+.kicker.green { color: #7fb09a; }
+.kicker.blue { color: var(--steel); }
+.kicker.wine { color: #c45a5a; }
+
+/* ─── Lists ─── */
+ul.clean { list-style: none; display: grid; gap: 3px; }
+ul.clean li {
+  display: flex; gap: var(--s8);
+  align-items: flex-start;
+  font-size: 12.5px; line-height: 1.35;
+  color: var(--white);
+}
+ul.clean li::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--steel-dim);
+  margin-top: 5px; flex: 0 0 auto;
+}
+ul.clean.green li::before { background: #7fb09a; }
+ul.clean.wine li::before { background: #c45a5a; }
+
+/* ─── Tables ─── */
+table.phase {
+  width: 100%; border-collapse: collapse; font-size: 12px;
+}
+table.phase th, table.phase td {
+  text-align: left; padding: 5px 8px;
+  border-bottom: 1px solid var(--card-line);
+  vertical-align: top;
+}
+table.phase th {
+  color: var(--steel-dim); font-weight: 600;
+  font-size: 9px; letter-spacing: .14em;
+  text-transform: uppercase; padding-top: 0;
+}
+table.phase td.who, table.phase td.when { color: var(--muted); white-space: nowrap; }
+table.phase tr.hot td { background: var(--card-wine); }
+
+/* ─── Pills (KO website pill-button style) ─── */
+.pill {
+  display: inline-block;
+  border: 1px solid var(--card-line);
+  color: var(--steel-dim); border-radius: 999px;
+  padding: 2px 7px; font-size: 9px;
+  letter-spacing: .08em; text-transform: uppercase;
+  margin: 0 4px 4px 0;
+}
+.pill.wine { color: #c45a5a; border-color: var(--card-wine-line); }
+.pill.green { color: #7fb09a; border-color: var(--card-green-line); }
+.pill.solid {
+  background: linear-gradient(135deg, var(--wine), var(--ember));
+  color: var(--white); border-color: var(--ember); font-weight: 600;
+}
+
+/* ─── Accent rule (divider) ─── */
+.rule { height: 1px; width: 48px; margin: var(--s8) 0; background: linear-gradient(90deg, var(--wine), transparent); }
+
+/* ─── Cover ─── */
+.cover { display: grid; grid-template-columns: 1.05fr .95fr; gap: var(--s16); min-height: 0; }
+.cover-copy { display: flex; flex-direction: column; min-height: 0; }
+.cover-photos { display: grid; grid-template-rows: 1.15fr .85fr; gap: var(--s8); min-height: 0; }
+.facts { margin-top: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 6px var(--s12); }
+.fact b { display: block; font-family: "Source Serif 4", Georgia, serif; font-size: 22px; font-weight: 400; font-style: italic; color: var(--white); line-height: 1; }
+.fact span { display: block; margin-top: 2px; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.plus { margin-top: var(--s4); font-family: "Source Serif 4", Georgia, serif; font-size: 22px; font-style: italic; color: #7fb09a; }
+.cover-foot { display: flex; justify-content: space-between; align-items: flex-end; margin-top: var(--s16); color: var(--muted); font-size: 11px; line-height: 1.45; }
+/* Photo frame */
+.ph { position: relative; overflow: hidden; border-radius: 10px; min-height: 0; background: #0a0200; }
+.ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ph span { position: absolute; left: 7px; bottom: 5px; font-size: 8px; letter-spacing: .12em; text-transform: uppercase; color: var(--white); text-shadow: 0 1px 3px #000; }
+
+/* ─── Contents ─── */
+.cols3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--s16); }
+.cols3 h3 { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--steel); margin-bottom: var(--s4); font-weight: 600; }
+button.jump {
+  appearance: none; width: 100%; display: flex; gap: var(--s8);
+  align-items: baseline; text-align: left;
+  background: transparent; color: var(--white);
+  border: 0; border-bottom: 1px solid var(--card-line);
+  padding: 4px 2px; cursor: pointer; font-size: 12px;
+}
+button.jump span { color: var(--steel-dim); font-variant-numeric: tabular-nums; width: 16px; flex: 0 0 auto; font-size: 11px; }
+button.jump em { font-style: normal; color: var(--muted); margin-left: auto; font-size: 10px; }
+button.jump:hover { color: var(--steel); }
+
+/* ─── Timeline rail ─── */
+.rail { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s8); margin-top: var(--s8); position: relative; }
+.rail::before { content: ""; position: absolute; left: 8px; right: 8px; top: 15px; height: 3px; background: linear-gradient(90deg, var(--wine), var(--ember)); border-radius: 2px; }
+.node { position: relative; padding-top: 32px; }
+.node i { position: absolute; top: 8px; left: 0; width: 14px; height: 14px; border-radius: 50%; background: var(--wine); border: 3px solid var(--ink); box-shadow: 0 0 0 2px var(--wine); }
+.node b { display: block; font-size: 13px; font-weight: 600; }
+.node span { display: block; color: var(--muted); font-size: 11.5px; line-height: 1.35; margin-top: 3px; }
+.node small { display: block; color: var(--steel-dim); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; margin-top: var(--s4); }
+
+/* ─── Steps ─── */
+.steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--s8); }
+.step {
+  background: var(--card-bg); border: 1px solid var(--card-line);
+  border-radius: 14px; padding: 10px 10px; display: flex; flex-direction: column;
+}
+.step .n { font-family: "Source Serif 4", Georgia, serif; color: var(--steel-dim); font-size: 22px; font-style: italic; line-height: 1; }
+.step h3 { font-size: 13px; margin: 6px 0 4px; }
+.step p { color: var(--muted); font-size: 11.5px; line-height: 1.35; }
+
+/* ─── Funnel ─── */
+.funnel { display: grid; gap: 6px; margin-top: var(--s4); }
+.frow { display: grid; grid-template-columns: 86px 1fr; gap: var(--s8); align-items: center; }
+.fbar { height: 36px; border-radius: 8px; display: flex; align-items: center; padding: 0 12px; background: linear-gradient(90deg, #2a1510, #1a0a08); border: 1px solid var(--card-line); font-size: 12.5px; }
+.fbar strong { margin-right: 8px; }
+.fbar span { color: var(--muted); }
+.frow b { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--steel-dim); }
+
+/* ─── Ads layout ─── */
+.ads-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s12); }
+.ads-grid .stack { display: flex; flex-direction: column; gap: var(--s8); }
+
+/* ─── Channels path ─── */
+.path { display: flex; align-items: stretch; gap: 6px; margin-top: var(--s8); }
+.path .p { flex: 1; background: var(--card-bg); border: 1px solid var(--card-line); border-radius: 10px; padding: var(--s8); }
+.path .p b { display: block; font-size: 12px; margin-bottom: 3px; }
+.path .p span { color: var(--muted); font-size: 11px; line-height: 1.3; display: block; }
+.arrow { align-self: center; color: var(--steel-dim); font-size: 14px; }
+
+/* ─── Budget ─── */
+.giant { font-family: "Source Serif 4", Georgia, serif; font-weight: 400; font-style: italic; font-size: 72px; line-height: .88; color: var(--white); letter-spacing: -0.03em; }
+.eq { color: var(--muted); font-size: 14px; margin: 6px 0 var(--s8); }
+.eq b { color: var(--white); font-weight: 500; }
+.money { background: var(--card-bg); border: 1px solid var(--card-line); border-radius: 14px; padding: 10px 12px; }
+.money .v { font-family: "Source Serif 4", Georgia, serif; font-size: 28px; font-style: italic; color: var(--steel); line-height: 1; }
+.money h3 { font-size: 13px; margin: 3px 0; }
+.money p { color: var(--muted); font-size: 11.5px; line-height: 1.35; }
+.split { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--s8); margin-top: var(--s8); }
+.split .bit { border: 1px solid var(--card-line); border-radius: 10px; padding: 7px 10px; font-size: 11.5px; color: var(--muted); line-height: 1.35; }
+.split .bit b { color: var(--white); font-weight: 500; }
+
+/* ─── Lock-ins ─── */
+.locks { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--s8); }
+.lock {
+  border-radius: 14px; padding: 14px 14px 12px;
+  display: flex; flex-direction: column;
+  border: 1px solid var(--card-wine-line);
+  background: var(--card-wine);
+}
+.lock .big { font-family: "Source Serif 4", Georgia, serif; font-size: 40px; font-style: italic; color: var(--steel); line-height: .9; margin-bottom: var(--s4); }
+.lock h3 { font-size: 16px; margin: var(--s8) 0 6px; }
+.lock p { color: var(--muted); font-size: 12.5px; line-height: 1.4; }
+.lock .own { margin-top: auto; padding-top: 10px; font-size: 12px; }
+.lock .own b { display: block; font-weight: 600; }
+.lock .own span { color: #c45a5a; font-size: 11px; letter-spacing: .04em; }
+
+/* ─── Week bands ─── */
+.band { display: grid; grid-template-columns: 92px 1fr; gap: 10px; padding: var(--s8) 0; border-bottom: 1px solid var(--card-line); }
+.band .d { font-family: "Source Serif 4", Georgia, serif; font-size: 20px; font-style: italic; color: var(--steel); line-height: 1; }
+.band .d small { display: block; font-family: "Inter", sans-serif; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; font-style: normal; }
+.band p { font-size: 12.5px; line-height: 1.35; }
+.band p span { color: var(--muted); }
+
+/* ─── Note bar (AVI-inspired, with left accent) ─── */
+.note-bar {
+  background: var(--note-bg); border: 1px solid var(--note-line);
+  border-left: 3px solid var(--wine); border-radius: 0 10px 10px 0;
+  padding: var(--s8) var(--s12); font-size: 12.5px; line-height: 1.4;
+  display: flex; align-items: flex-start; gap: 10px;
+}
+.note-bar .label {
+  display: inline-block; padding: 2px 8px;
+  border-radius: 999px; font-size: 8px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase;
+  flex: 0 0 auto; margin-top: 2px;
+}
+.note-bar .label.wine { background: var(--wine); color: var(--white); }
+.note-bar .label.green { background: #1a3a24; color: #7fb09a; }
+.note-bar .label.steel { background: #1a2a38; color: var(--steel); }
+
+/* ─── Nav chrome ─── */
+.bar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: #1a0a08; z-index: 40; }
+.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--wine), var(--ember)); }
+.nav { position: fixed; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 40; display: flex; gap: 6px; align-items: center; }
+.nav button { appearance: none; border: 1px solid var(--card-line); background: #0d0200; color: var(--white); border-radius: 999px; padding: 7px 12px; font: 500 12px/1 "Inter", sans-serif; cursor: pointer; }
+.nav button:hover { border-color: var(--wine); color: var(--steel); }
+.nav .count { color: var(--muted); font-size: 12px; min-width: 118px; text-align: center; font-variant-numeric: tabular-nums; }
+.hit { position: fixed; top: 0; bottom: 48px; width: 36px; z-index: 6; background: transparent; border: 0; padding: 0; cursor: pointer; }
+.hit-left { left: 0; } .hit-right { right: 0; }
+.hint { position: fixed; left: 16px; bottom: 16px; z-index: 40; color: var(--muted); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+@media (prefers-reduced-motion: reduce) { .slide.active { animation: none; } }
+@media print { .nav, .hit, .bar, .hint { display: none !important; } }
+
+/* ─── Export / Print ─── */
+body.export { overflow: visible; height: auto; background: var(--ink); }
+body.export #stage { position: static !important; transform: none !important; width: 960px !important; height: auto !important; left: auto !important; top: auto !important; }
+body.export .slide { display: flex !important; position: relative !important; inset: auto !important; width: 960px; height: 540px; page-break-after: always; break-after: page; animation: none !important; }
+body.export .slide:last-of-type { page-break-after: auto; break-after: auto; }
+body.export .nav, body.export .hit, body.export .bar, body.export .hint { display: none !important; }
+@page { size: 960px 540px; margin: 0; }
 </style>
 </head>
 <body>
@@ -667,12 +403,12 @@
       </div>
       <div class="cover-photos">
         <div class="ph"><img src="assets/golf-drive.jpg" alt="Golf green and fairway"><span>Fairway · Unsplash</span></div>
-        <div class="ph"><img src="assets/cafe-interior.jpg" alt="Cafe interior with coffee"><span>Mandrake · Unsplash</span></div>
+        <div class="ph"><img src="assets/cafe-interior.jpg" alt="Cafe interior"><span>Mandrake · Unsplash</span></div>
       </div>
     </div>
     <div class="cover-foot">
       <div>Prepared 24 Sep 2026 · figures from the 23 Sep proposal<br/>Not a signed contract · three items still to lock</div>
-      <div class="ko">KO</div>
+      <div><img src="assets/ko-logo.png" alt="KO Marketing" style="height:22px" /></div>
     </div>
   </section>
 
@@ -680,6 +416,7 @@
   <section class="slide" data-title="Contents">
     <div class="eyebrow">02 · Contents</div>
     <h2>The plan, <em>end to end.</em></h2>
+    <div class="accent-rule"></div>
     <div class="fill">
     <div class="cols3">
       <div>
@@ -714,13 +451,14 @@
       </div>
     </div>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>Fairway Golf and City Club + Mandrake Cafe</span><span>02 / 23</span></div>
+    <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>Fairway Golf and City Club + Mandrake Cafe</span><span>02 / 23</span></div>
   </section>
 
   <!-- 03 OUTCOMES -->
   <section class="slide" data-title="Outcomes">
     <div class="eyebrow">03 · Outcomes</div>
     <h2>What success <em>looks like.</em></h2>
+    <div class="accent-rule"></div>
     <div class="fill">
     <div class="grid-2">
       <div class="card">
@@ -744,46 +482,28 @@
     </div>
     <p class="lede">One KO package covers both venues. Shared monthly shoot day. Targets for these outcomes are not locked yet — see KPIs.</p>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>03 · Outcomes</span><span>03 / 23</span></div>
+    <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>03 · Outcomes</span><span>03 / 23</span></div>
   </section>
 
   <!-- 04 OFFER -->
   <section class="slide" data-title="Offer">
     <div class="eyebrow">04 · Offer</div>
     <h2>Content + paid ads. <em>KO posts.</em></h2>
+    <div class="accent-rule"></div>
     <div class="fill">
     <div class="grid-3">
-      <div class="card">
-        <div class="num">2</div>
-        <h3>Venues in one package</h3>
-        <p>Fairway Golf and City Club and Mandrake Cafe. Production, posting, and paid ads.</p>
-      </div>
-      <div class="card blue">
-        <div class="num blue">KO</div>
-        <h3>KO posts everything</h3>
-        <p>Instagram, TikTok repost, and the ads. No handoff of the content calendar to the venues.</p>
-      </div>
-      <div class="card coral">
-        <div class="num coral">—</div>
-        <h3>Out of scope</h3>
-        <p>Website build or redesign. Email marketing. Influencers — paid models only.</p>
-      </div>
+      <div class="card"><div class="num">2</div><h3>Venues in one package</h3><p>Fairway Golf and City Club and Mandrake Cafe. Production, posting, and paid ads.</p></div>
+      <div class="card blue"><div class="num blue">KO</div><h3>KO posts everything</h3><p>Instagram, TikTok repost, and the ads. No handoff of the content calendar to the venues.</p></div>
+      <div class="card wine"><div class="num wine">—</div><h3>Out of scope</h3><p>Website build or redesign. Email marketing. Influencers — paid models only.</p></div>
     </div>
     <div>
       <span class="pill solid">In</span>
-      <span class="pill">Videos</span>
-      <span class="pill">Graphics</span>
-      <span class="pill">AI promo</span>
-      <span class="pill">Menu shoot</span>
-      <span class="pill">1 shoot day</span>
-      <span class="pill">Paid ads</span>
-      <span class="pill">Monthly report</span>
-      <span class="pill coral">Website out</span>
-      <span class="pill coral">Email out</span>
-      <span class="pill coral">Influencers no</span>
+      <span class="pill">Videos</span> <span class="pill">Graphics</span> <span class="pill">AI promo</span>
+      <span class="pill">Menu shoot</span> <span class="pill">1 shoot day</span> <span class="pill">Paid ads</span> <span class="pill">Monthly report</span>
+      <span class="pill wine">Website out</span> <span class="pill wine">Email out</span> <span class="pill wine">Influencers no</span>
     </div>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>Fixed monthly fee · not a % of media</span><span>04 / 23</span></div>
+    <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>Fixed monthly fee · not a % of media</span><span>04 / 23</span></div>
   </section>
 
   <!-- 05 TIMELINE -->
@@ -804,7 +524,7 @@
       <div class="card green"><div class="kicker green">Dec</div><h3>Scale</h3><p>Double down. Renewal view for months 4–6.</p></div>
     </div>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>05 · Timeline</span><span>05 / 23</span></div>
+    <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>05 · Timeline</span><span>05 / 23</span></div>
   </section>
 
   <!-- 06 RUNWAY -->
@@ -816,39 +536,21 @@
       <div class="card">
         <div class="kicker">Month 1 · October</div>
         <h3>Launch</h3>
-        <ul class="clean">
-          <li>Week 1 shoot, edit, ads, go-live 4 Oct</li>
-          <li>10 Fairway videos · 5 graphics · AI cuts</li>
-          <li>15 Mandrake videos · menu photos + graphics</li>
-          <li>KO posts all · report end of October</li>
-          <li>Money locked: ฿82,000</li>
-        </ul>
+        <ul class="clean"><li>Week 1 shoot, edit, ads, go-live 4 Oct</li><li>10 Fairway videos · 5 graphics · AI cuts</li><li>15 Mandrake videos · menu photos + graphics</li><li>KO posts all · report end of October</li><li>Money locked: ฿82,000</li></ul>
       </div>
       <div class="card blue">
         <div class="kicker blue">Month 2 · November</div>
         <h3>Optimize</h3>
-        <ul class="clean blue">
-          <li>Iterate angles that moved bookings, menu, local</li>
-          <li>Shift ad weight toward best inquiries / CPI</li>
-          <li>Next 3 models, if approval is locked</li>
-          <li>Same monthly quotas · report end of November</li>
-          <li>Ads reconfirm. Baseline stays ฿45,000 unless the owner changes it</li>
-        </ul>
+        <ul class="clean"><li>Iterate angles that moved bookings, menu, local</li><li>Shift ad weight toward best inquiries / CPI</li><li>Next 3 models, if approval is locked</li><li>Same monthly quotas · report end of November</li><li>Ads reconfirm. Baseline stays ฿45,000 unless the owner changes it</li></ul>
       </div>
       <div class="card green">
         <div class="kicker green">Month 3 · December</div>
         <h3>Scale what works</h3>
-        <ul class="clean green">
-          <li>Fairway: booking and membership angles</li>
-          <li>Mandrake: local visitors and the menu</li>
-          <li>Coaching / events only if convenient, or if events exist</li>
-          <li>Report plus a months 4–6 recommendation</li>
-          <li>Contract end ~31 Dec</li>
-        </ul>
+        <ul class="clean green"><li>Fairway: booking and membership angles</li><li>Mandrake: local visitors and the menu</li><li>Coaching / events only if convenient, or if events exist</li><li>Report plus a months 4–6 recommendation</li><li>Contract end ~31 Dec</li></ul>
       </div>
     </div>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>KO package ฿30,000 / month across all three months</span><span>06 / 23</span></div>
+    <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>KO package ฿30,000 / month across all three months</span><span>06 / 23</span></div>
   </section>
 
   <!-- 07 WEEK 1 -->
@@ -858,34 +560,18 @@
     <div class="fill">
     <div class="grid-2">
       <div>
-        <div class="band">
-          <div class="d"><small>Thu</small>1 Oct</div>
-          <p><strong>Kickoff.</strong> <span>Goals, access, brand assets, LINE and Instagram. Mandrake menu status. Confirm the shoot date. Model shortlist.</span></p>
-        </div>
-        <div class="band">
-          <div class="d"><small>Block</small>1–4</div>
-          <p><strong>Produce.</strong> <span>Re-edit existing Fairway footage. Shoot how to get here, what we have, why Fairway. Mandrake menu, BTS, atmosphere. One shoot day, 3 models. Ads setup. First post calendars.</span></p>
-        </div>
-        <div class="band" style="border-bottom:0">
-          <div class="d"><small>Sun</small>4 Oct</div>
-          <p><strong>Go-live.</strong> <span>Start posting both venues. Ads can start as soon as creatives are ready. Owner: KO.</span></p>
-        </div>
+        <div class="band"><div class="d"><small>Thu</small>1 Oct</div><p><strong>Kickoff.</strong> <span>Goals, access, brand assets, LINE and Instagram. Mandrake menu status. Confirm the shoot date. Model shortlist.</span></p></div>
+        <div class="band"><div class="d"><small>Block</small>1–4</div><p><strong>Produce.</strong> <span>Re-edit existing Fairway footage. Shoot how to get here, what we have, why Fairway. Mandrake menu, BTS, atmosphere. One shoot day, 3 models. Ads setup. First post calendars.</span></p></div>
+        <div class="band" style="border-bottom:0"><div class="d"><small>Sun</small>4 Oct</div><p><strong>Go-live.</strong> <span>Start posting both venues. Ads can start as soon as creatives are ready. Owner: KO.</span></p></div>
       </div>
-      <div class="card coral">
-        <div class="kicker coral">Owner brings · 1 Oct</div>
+      <div class="card wine">
+        <div class="kicker wine">Owner brings · 1 Oct</div>
         <h3>Week 1 does not start without these</h3>
-        <ul class="clean coral">
-          <li>Spelling confirmed: Fairway Golf and City Club</li>
-          <li>Ad access: Facebook, Instagram, Google</li>
-          <li>LINE admin for @fairwaygolf</li>
-          <li>Logos, fonts, photos, existing footage</li>
-          <li>Mandrake menu status, and launch date if any</li>
-          <li>Model approval: yes or no, and lead time</li>
-        </ul>
+        <ul class="clean wine"><li>Spelling confirmed: Fairway Golf and City Club</li><li>Ad access: Facebook, Instagram, Google</li><li>LINE admin for @fairwaygolf</li><li>Logos, fonts, photos, existing footage</li><li>Mandrake menu status, and launch date if any</li><li>Model approval: yes or no, and lead time</li></ul>
       </div>
     </div>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>Shoot clock time is set at kickoff · not pinned yet</span><span>07 / 23</span></div>
+    <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>Shoot clock time is set at kickoff · not pinned yet</span><span>07 / 23</span></div>
   </section>
 
   <!-- 08 CADENCE -->
@@ -906,7 +592,7 @@
       <div class="card blue"><div class="kicker blue">Shared / month</div><h3>1 shoot · 3 models</h3><p>฿7,000. KO posts all platforms in scope.</p></div>
     </div>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>08 · Monthly cadence</span><span>08 / 23</span></div>
+    <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>08 · Monthly cadence</span><span>08 / 23</span></div>
   </section>
 
   <!-- 09 FAIRWAY -->
@@ -921,27 +607,15 @@
       <div class="card blue"><div class="num blue">KO</div><h3>Posted by KO</h3><p>Not left in a shared folder.</p></div>
     </div>
     <div class="grid-2">
-      <div class="card">
-        <div class="kicker" style="margin-bottom:4px">Themes on the must list</div>
-        <ul class="clean">
-          <li>How to get here</li>
-          <li>What we have</li>
-          <li>Why Fairway</li>
-          <li>Re-edits of existing footage</li>
-        </ul>
-      </div>
-      <div class="card">
-        <div class="kicker">Nice — not a miss if skipped</div>
-        <h3>Coaching and events</h3>
-        <p>Coaching videos only if convenient. Event videos only if there are events that month. Events calendar Oct–Dec is still TBD with the owner.</p>
-      </div>
+      <div class="card"><div class="kicker" style="margin-bottom:4px">Themes on the must list</div><ul class="clean"><li>How to get here</li><li>What we have</li><li>Why Fairway</li><li>Re-edits of existing footage</li></ul></div>
+      <div class="card"><div class="kicker">Nice — not a miss if skipped</div><h3>Coaching and events</h3><p>Coaching videos only if convenient. Event videos only if there are events that month. Events calendar Oct–Dec is still TBD with the owner.</p></div>
     </div>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>09 · Fairway deliverables</span><span>09 / 23</span></div>
+    <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>09 · Fairway deliverables</span><span>09 / 23</span></div>
   </section>
 
   <!-- 10 MANDRAKE -->
-  <section class="slide" data-tone="mandrake" data-title="Mandrake deliverables">
+  <section class="slide" data-title="Mandrake deliverables">
     <div class="eyebrow">10 · Mandrake Cafe · monthly</div>
     <h2>15 videos. Menu shoot. <em>Menu graphics.</em></h2>
     <div class="fill">
@@ -951,56 +625,25 @@
       <div class="card green"><div class="num green">+</div><h3>Menu graphics</h3><p>Included with the shoot.</p></div>
     </div>
     <div class="grid-2">
-      <div class="card green">
-        <div class="kicker green" style="margin-bottom:4px">Content themes</div>
-        <ul class="clean green">
-          <li>Menu making — the new menu, on camera</li>
-          <li>Behind the scenes</li>
-          <li>With the shared models</li>
-          <li>Atmosphere that feels local, not stock</li>
-        </ul>
-      </div>
-      <div class="card coral">
-        <div class="kicker coral">Date not locked</div>
-        <h3>New-menu launch</h3>
-        <p>If Mandrake has a launch date, it sets shoot priority. Owner / Mandrake to confirm. Until then, menu content still ships inside the monthly 15.</p>
-      </div>
+      <div class="card green"><div class="kicker green" style="margin-bottom:4px">Content themes</div><ul class="clean green"><li>Menu making — the new menu, on camera</li><li>Behind the scenes</li><li>With the shared models</li><li>Atmosphere that feels local, not stock</li></ul></div>
+      <div class="card wine"><div class="kicker wine">Date not locked</div><h3>New-menu launch</h3><p>If Mandrake has a launch date, it sets shoot priority. Owner / Mandrake to confirm. Until then, menu content still ships inside the monthly 15.</p></div>
     </div>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>10 · Mandrake deliverables</span><span>10 / 23</span></div>
+    <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>10 · Mandrake deliverables</span><span>10 / 23</span></div>
   </section>
 
   <!-- 11 MUST VS NICE -->
   <section class="slide" data-title="Must vs nice">
     <div class="eyebrow">11 · Scope line</div>
     <h2>Must every month. <em>Nice if it fits.</em></h2>
+    <div class="accent-rule"></div>
     <div class="fill">
     <div class="grid-2">
-      <div class="card">
-        <div class="kicker">Must</div>
-        <h3>This is the package</h3>
-        <ul class="clean">
-          <li>Ad budgets live, including the Fairway 3-step funnel</li>
-          <li>10 Fairway videos</li>
-          <li>15 Mandrake videos</li>
-          <li>Monthly model shoot — 3 models</li>
-          <li>5 Fairway graphics</li>
-          <li>Mandrake menu photos and graphics</li>
-          <li>KO posting</li>
-        </ul>
-      </div>
-      <div class="card" style="background:transparent">
-        <div class="kicker">Nice</div>
-        <h3>Only when it is actually there</h3>
-        <ul class="clean">
-          <li>Coaching videos — only if convenient</li>
-          <li>Event videos — only if there are events that month</li>
-        </ul>
-        <p class="lede" style="margin-top:6px">Skipping nice items is not a missed deliverable. Adding them does not add a fee inside this package.</p>
-      </div>
+      <div class="card"><div class="kicker">Must</div><h3>This is the package</h3><ul class="clean"><li>Ad budgets live, including the Fairway 3-step funnel</li><li>10 Fairway videos</li><li>15 Mandrake videos</li><li>Monthly model shoot — 3 models</li><li>5 Fairway graphics</li><li>Mandrake menu photos and graphics</li><li>KO posting</li></ul></div>
+      <div class="card" style="background:transparent; border-color:var(--card-line)"><div class="kicker">Nice</div><h3>Only when it is actually there</h3><ul class="clean"><li>Coaching videos — only if convenient</li><li>Event videos — only if there are events that month</li></ul><p class="lede" style="margin-top:6px">Skipping nice items is not a missed deliverable. Adding them does not add a fee inside this package.</p></div>
     </div>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>11 · Must vs nice</span><span>11 / 23</span></div>
+    <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>11 · Must vs nice</span><span>11 / 23</span></div>
   </section>
 
   <!-- 12 PRODUCTION -->
@@ -1012,22 +655,14 @@
       <div class="card"><div class="num">1</div><h3>Shoot day / month</h3><p>Shared by both venues.</p></div>
       <div class="card"><div class="num">3</div><h3>Models / month</h3><p>Cast by KO. Not influencers.</p></div>
       <div class="card"><div class="num">฿7,000</div><h3>Model fee / month</h3><p>Month-1 figure. Same baseline in Nov and Dec.</p></div>
-      <div class="card coral"><div class="num coral">TBD</div><h3>Owner approval</h3><p>Process and lead time. Lock before the shoot day.</p></div>
+      <div class="card wine"><div class="num wine">TBD</div><h3>Owner approval</h3><p>Process and lead time. Lock before the shoot day.</p></div>
     </div>
     <div class="grid-2">
-      <div class="card blue">
-        <div class="kicker blue">KO casts</div>
-        <h3>Shortlist at kickoff 1 Oct</h3>
-        <p>If the first shoot sits inside 1–4 Oct, approval has to be decided on kickoff day. A slow yes pushes the shoot and the 4 Oct creative.</p>
-      </div>
-      <div class="card">
-        <div class="kicker">Hard no</div>
-        <h3>Influencers are not in this plan</h3>
-        <p>Paid models only. No creator roster, no influencer line in the ฿82,000.</p>
-      </div>
+      <div class="card blue"><div class="kicker blue">KO casts</div><h3>Shortlist at kickoff 1 Oct</h3><p>If the first shoot sits inside 1–4 Oct, approval has to be decided on kickoff day. A slow yes pushes the shoot and the 4 Oct creative.</p></div>
+      <div class="card"><div class="kicker">Hard no</div><h3>Influencers are not in this plan</h3><p>Paid models only. No creator roster, no influencer line in the ฿82,000.</p></div>
     </div>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>Owner to lock approval · before first shoot</span><span>12 / 23</span></div>
+    <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>Owner to lock approval · before first shoot</span><span>12 / 23</span></div>
   </section>
 
   <!-- 13 ADS FAIRWAY -->
@@ -1056,13 +691,13 @@
         <p class="lede">KO fee is separate. Media is not a percent on top.</p>
       </div>
     </div>
-    <div class="note-bar"><span class="label gold">Note</span> Ad spend is funded by the client. KO manages all campaign setup, creative, and optimisation. Monthly budget reconfirm from month 2.</div>
+    <div class="note-bar"><span class="label wine">Note</span> Ad spend is funded by the client. KO manages all campaign setup, creative, and optimisation. Monthly budget reconfirm from month 2.</div>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>13 · Fairway ads</span><span>13 / 23</span></div>
+    <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>13 · Fairway ads</span><span>13 / 23</span></div>
   </section>
 
   <!-- 14 ADS MANDRAKE -->
-  <section class="slide" data-tone="mandrake" data-title="Mandrake ads">
+  <section class="slide" data-title="Mandrake ads">
     <div class="eyebrow">14 · Paid · Mandrake Cafe · month 1</div>
     <h2>฿10,000. <em>Nearby</em> only.</h2>
     <div class="fill">
@@ -1078,20 +713,13 @@
         </table>
       </div>
       <div class="stack">
-        <div class="card coral">
-          <div class="kicker coral">Radius not locked</div>
-          <p>Kilometres around the cafe are set when ads are built in week 1. No radius is assumed in this deck.</p>
-        </div>
-        <div class="card green">
-          <div class="kicker green">Objective</div>
-          <h3>Nearby foot traffic</h3>
-          <p>Atmosphere and food content aimed at people who are close enough to walk in. Google catches search intent.</p>
-        </div>
+        <div class="card wine"><div class="kicker wine">Radius not locked</div><p>Kilometres around the cafe are set when ads are built in week 1. No radius is assumed in this deck.</p></div>
+        <div class="card green"><div class="kicker green">Objective</div><h3>Nearby foot traffic</h3><p>Atmosphere and food content aimed at people who are close enough to walk in. Google catches search intent.</p></div>
       </div>
     </div>
     <div class="note-bar"><span class="label green">Combined</span> Both venues · ad spend month 1 = <strong>฿45,000</strong>. Fairway ฿35,000 + Mandrake ฿10,000. KO runs all campaigns.</div>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>Both venues · ad spend month 1 = ฿45,000</span><span>14 / 23</span></div>
+    <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>Both venues · ad spend month 1 = ฿45,000</span><span>14 / 23</span></div>
   </section>
 
   <!-- 15 CHANNELS -->
@@ -1115,46 +743,28 @@
     </div>
     <p class="lede">Website visits can be a demand signal if analytics exist. Building or redesigning the site is out of scope. Email is out of scope.</p>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>15 · Channels</span><span>15 / 23</span></div>
+    <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>15 · Channels</span><span>15 / 23</span></div>
   </section>
 
   <!-- 16 BUDGET HERO -->
-  <section class="slide" data-tone="hero" data-title="Month-1 budget">
+  <section class="slide" data-title="Month-1 budget">
     <div class="eyebrow">16 · Budget · month 1 · locked total</div>
     <div class="fill">
     <div class="toprow">
-      <div>
-        <div class="giant">฿82,000</div>
-        <p class="eq"><b>฿30,000</b> KO &nbsp;+&nbsp; <b>฿45,000</b> ads &nbsp;+&nbsp; <b>฿7,000</b> models</p>
-      </div>
-      <div style="text-align:right">
-        <div class="kicker">October</div>
-        <div style="font-size:13px;margin-top:4px">Both venues<br/>Not a % of media</div>
-      </div>
+      <div><div class="giant">฿82,000</div><p class="eq"><b>฿30,000</b> KO &nbsp;+&nbsp; <b>฿45,000</b> ads &nbsp;+&nbsp; <b>฿7,000</b> models</p></div>
+      <div style="text-align:right"><div class="kicker">October</div><div style="font-size:13px;margin-top:4px;color:var(--muted)">Both venues<br/>Not a % of media</div></div>
     </div>
     <div class="grid-3">
-      <div class="money">
-        <div class="v">฿30,000</div>
-        <h3>KO package</h3>
-        <p>Both venues. Fixed fee. Pays company KO. Not a percent of ad spend.</p>
-      </div>
-      <div class="money">
-        <div class="v">฿45,000</div>
-        <h3>Ad spend</h3>
-        <p>Media only. KO runs it. Fairway ฿35,000 + Mandrake ฿10,000.</p>
-      </div>
-      <div class="money">
-        <div class="v">฿7,000</div>
-        <h3>Models</h3>
-        <p>3 models. Cast by KO. Influencers are not in this number.</p>
-      </div>
+      <div class="money"><div class="v">฿30,000</div><h3>KO package</h3><p>Both venues. Fixed fee. Pays company KO. Not a percent of ad spend.</p></div>
+      <div class="money"><div class="v">฿45,000</div><h3>Ad spend</h3><p>Media only. KO runs it. Fairway ฿35,000 + Mandrake ฿10,000.</p></div>
+      <div class="money"><div class="v">฿7,000</div><h3>Models</h3><p>3 models. Cast by KO. Influencers are not in this number.</p></div>
     </div>
     <div class="split">
       <div class="bit"><b>Fairway ads ฿35,000</b> — Facebook / Instagram ฿20,000 (3-step) + Google ฿15,000</div>
       <div class="bit"><b>Mandrake ads ฿10,000</b> — Facebook ฿5,000 + Google ฿5,000, nearby</div>
     </div>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>Payee company KO · THB assumed · billing terms TBD</span><span>16 / 23</span></div>
+    <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>Payee company KO · THB assumed · billing terms TBD</span><span>16 / 23</span></div>
   </section>
 
   <!-- 17 MONTHS 2-3 -->
@@ -1163,90 +773,38 @@
     <h2>Package holds. <em>Ads get reconfirmed.</em></h2>
     <div class="fill">
     <table class="phase">
-      <thead>
-        <tr><th>Month</th><th>KO package</th><th>Models</th><th>Ads</th><th>Total</th></tr>
-      </thead>
+      <thead><tr><th>Month</th><th>KO package</th><th>Models</th><th>Ads</th><th>Total</th></tr></thead>
       <tbody>
-        <tr>
-          <td>Oct · month 1</td>
-          <td>฿30,000</td>
-          <td>฿7,000</td>
-          <td>฿45,000 locked</td>
-          <td><strong>฿82,000</strong></td>
-        </tr>
-        <tr>
-          <td>Nov · month 2</td>
-          <td>฿30,000</td>
-          <td>฿7,000</td>
-          <td class="who">฿45,000 baseline · reconfirm</td>
-          <td>฿82,000 only if ads stay</td>
-        </tr>
-        <tr>
-          <td>Dec · month 3</td>
-          <td>฿30,000</td>
-          <td>฿7,000</td>
-          <td class="who">฿45,000 baseline · reconfirm</td>
-          <td>฿82,000 only if ads stay</td>
-        </tr>
+        <tr><td>Oct · month 1</td><td>฿30,000</td><td>฿7,000</td><td>฿45,000 locked</td><td><strong>฿82,000</strong></td></tr>
+        <tr><td>Nov · month 2</td><td>฿30,000</td><td>฿7,000</td><td class="who">฿45,000 baseline · reconfirm</td><td>฿82,000 only if ads stay</td></tr>
+        <tr><td>Dec · month 3</td><td>฿30,000</td><td>฿7,000</td><td class="who">฿45,000 baseline · reconfirm</td><td>฿82,000 only if ads stay</td></tr>
       </tbody>
     </table>
     <div class="grid-2">
-      <div class="card">
-        <div class="kicker">If the baseline holds</div>
-        <h3>฿246,000 across three months</h3>
-        <p>82,000 × 3. This is arithmetic, not a locked contract total. It is true only if November and December ads stay at ฿45,000.</p>
-      </div>
-      <div class="card coral">
-        <div class="kicker coral">What can move</div>
-        <h3>Ad spend, monthly</h3>
-        <p>Owner can change the media number. KO fee and the model baseline do not float with that change. Fee is not a percent of media.</p>
-      </div>
+      <div class="card"><div class="kicker">If the baseline holds</div><h3>฿246,000 across three months</h3><p>82,000 × 3. This is arithmetic, not a locked contract total. It is true only if November and December ads stay at ฿45,000.</p></div>
+      <div class="card wine"><div class="kicker wine">What can move</div><h3>Ad spend, monthly</h3><p>Owner can change the media number. KO fee and the model baseline do not float with that change. Fee is not a percent of media.</p></div>
     </div>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>17 · Months 2–3</span><span>17 / 23</span></div>
+    <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>17 · Months 2–3</span><span>17 / 23</span></div>
   </section>
 
   <!-- 18 KPIs -->
-  <section class="slide" data-tone="alert" data-title="KPIs to lock">
+  <section class="slide" data-title="KPIs to lock">
     <div class="eyebrow">18 · KPIs · propose, then agree</div>
     <h2>No targets yet. <em>Four to lock.</em></h2>
     <div class="fill">
     <div class="grid-4">
-      <div class="card coral">
-        <span class="pill coral">Propose / agree</span>
-        <h3>Bookings / month</h3>
-        <p>Core Fairway revenue. Tracked in Fairway ops / the booking system.</p>
-      </div>
-      <div class="card coral">
-        <span class="pill coral">Propose / agree</span>
-        <h3>Inquiries / month</h3>
-        <p>Instagram DMs + LINE @fairwaygolf. Top of funnel.</p>
-      </div>
-      <div class="card coral">
-        <span class="pill coral">Propose / agree</span>
-        <h3>Cost per inquiry</h3>
-        <p>Ad spend ÷ attributed inquiries. The efficiency number.</p>
-      </div>
-      <div class="card coral">
-        <span class="pill coral">Propose / agree</span>
-        <h3>Website visits</h3>
-        <p>Demand signal only. Analytics if they exist. Site work stays out of scope.</p>
-      </div>
+      <div class="card wine"><span class="pill wine">Propose / agree</span><h3>Bookings / month</h3><p>Core Fairway revenue. Tracked in Fairway ops / the booking system.</p></div>
+      <div class="card wine"><span class="pill wine">Propose / agree</span><h3>Inquiries / month</h3><p>Instagram DMs + LINE @fairwaygolf. Top of funnel.</p></div>
+      <div class="card wine"><span class="pill wine">Propose / agree</span><h3>Cost per inquiry</h3><p>Ad spend ÷ attributed inquiries. The efficiency number.</p></div>
+      <div class="card wine"><span class="pill wine">Propose / agree</span><h3>Website visits</h3><p>Demand signal only. Analytics if they exist. Site work stays out of scope.</p></div>
     </div>
     <div class="grid-2">
-      <div class="card">
-        <div class="kicker">Owner</div>
-        <h3>Fairway owner + KO</h3>
-        <p>KO will not invent the targets in the first report.</p>
-      </div>
-      <div class="card">
-        <div class="kicker coral">By</div>
-        <h3>4 Oct ideal</h3>
-        <p>End of week 1. Hard stop: the first monthly report, end of October.</p>
-      </div>
+      <div class="card"><div class="kicker">Owner</div><h3>Fairway owner + KO</h3><p>KO will not invent the targets in the first report.</p></div>
+      <div class="card"><div class="kicker wine">By</div><h3>4 Oct ideal</h3><p>End of week 1. Hard stop: the first monthly report, end of October.</p></div>
     </div>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>Status: TBD · not locked</span><span>18 / 23</span></div>
+    <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>Status: TBD · not locked</span><span>18 / 23</span></div>
   </section>
 
   <!-- 19 REPORT -->
@@ -1255,32 +813,16 @@
     <h2>What the end-of-month <em>note contains.</em></h2>
     <div class="fill">
     <div class="grid-2">
-      <table class="phase">
-        <thead><tr><th>#</th><th>Section</th><th>Source</th></tr></thead>
-        <tbody>
-          <tr><td>1</td><td>Quotas vs delivered</td><td class="who">KO production</td></tr>
-          <tr><td>2</td><td>Posts live · IG + TikTok repost</td><td class="who">KO</td></tr>
-          <tr><td>3</td><td>Ad spend vs plan, by channel</td><td class="who">Ad accounts</td></tr>
-          <tr><td>4</td><td>Inquiries · IG DMs + LINE</td><td class="who">Insights + LINE</td></tr>
-        </tbody>
-      </table>
-      <table class="phase">
-        <thead><tr><th>#</th><th>Section</th><th>Source</th></tr></thead>
-        <tbody>
-          <tr><td>5</td><td>Bookings, if ops shares them</td><td class="who">Fairway ops</td></tr>
-          <tr><td>6</td><td>Cost per inquiry</td><td class="who">Spend ÷ inquiries</td></tr>
-          <tr><td>7</td><td>Site visits, if analytics exist</td><td class="who">Analytics</td></tr>
-          <tr><td>8</td><td>Keep / change next month</td><td class="who">KO recommendation</td></tr>
-        </tbody>
-      </table>
+      <table class="phase"><thead><tr><th>#</th><th>Section</th><th>Source</th></tr></thead><tbody><tr><td>1</td><td>Quotas vs delivered</td><td class="who">KO production</td></tr><tr><td>2</td><td>Posts live · IG + TikTok repost</td><td class="who">KO</td></tr><tr><td>3</td><td>Ad spend vs plan, by channel</td><td class="who">Ad accounts</td></tr><tr><td>4</td><td>Inquiries · IG DMs + LINE</td><td class="who">Insights + LINE</td></tr></tbody></table>
+      <table class="phase"><thead><tr><th>#</th><th>Section</th><th>Source</th></tr></thead><tbody><tr><td>5</td><td>Bookings, if ops shares them</td><td class="who">Fairway ops</td></tr><tr><td>6</td><td>Cost per inquiry</td><td class="who">Spend ÷ inquiries</td></tr><tr><td>7</td><td>Site visits, if analytics exist</td><td class="who">Analytics</td></tr><tr><td>8</td><td>Keep / change next month</td><td class="who">KO recommendation</td></tr></tbody></table>
     </div>
-    <div class="note-bar"><span class="label coral">Status</span> <strong>Proposed, not agreed.</strong> Owner + KO sign the contents before the first report (end of October). Until then this list is the working draft, not the template.</div>
+    <div class="note-bar"><span class="label wine">Status</span> <strong>Proposed, not agreed.</strong> Owner + KO sign the contents before the first report (end of October). Until then this list is the working draft, not the template.</div>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>One report per month · both venues</span><span>19 / 23</span></div>
+    <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>One report per month · both venues</span><span>19 / 23</span></div>
   </section>
 
   <!-- 20 BILLING -->
-  <section class="slide" data-tone="alert" data-title="Billing TBD">
+  <section class="slide" data-title="Billing TBD">
     <div class="eyebrow">20 · Billing · open on purpose</div>
     <h2>Pay company KO. <em>Terms are TBD.</em></h2>
     <div class="fill">
@@ -1297,13 +839,14 @@
     </table>
     <p class="lede">The ฿82,000 is the month-1 amount. It is not a payment schedule. Lock terms before the first invoice. Owner + KO.</p>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>20 · Billing · TBD</span><span>20 / 23</span></div>
+    <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>20 · Billing · TBD</span><span>20 / 23</span></div>
   </section>
 
   <!-- 21 NEXT STEPS -->
   <section class="slide" data-title="Next steps">
     <div class="eyebrow">21 · Next steps</div>
     <h2>Owners and dates. <em>Nothing vague.</em></h2>
+    <div class="accent-rule"></div>
     <div class="fill">
     <table class="phase">
       <thead><tr><th>#</th><th>Action</th><th>Owner</th><th>By</th></tr></thead>
@@ -1317,41 +860,24 @@
         <tr><td>7</td><td>Go-live posting</td><td class="who">KO</td><td class="when">4 Oct</td></tr>
       </tbody>
     </table>
-    <div class="note-bar"><span class="label gold">Kickoff</span> 1 Oct is a Thursday. Week 1 runs Thu–Sun (1–4 Oct). The first creatives go live on the 4th.</div>
+    <div class="note-bar"><span class="label steel">Kickoff</span> 1 Oct is a Thursday. Week 1 runs Thu–Sun (1–4 Oct). The first creatives go live on the 4th.</div>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>21 · Next steps</span><span>21 / 23</span></div>
+    <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>21 · Next steps</span><span>21 / 23</span></div>
   </section>
 
   <!-- 22 LOCK-INS -->
-  <section class="slide" data-tone="hero" data-title="Three lock-ins">
+  <section class="slide" data-title="Three lock-ins">
     <div class="eyebrow">22 · Close · three decisions</div>
     <h2>Lock these three. <em>Then we run.</em></h2>
+    <div class="accent-rule"></div>
     <div class="fill">
     <div class="locks">
-      <div class="lock">
-        <div class="big">01</div>
-        <span class="pill coral">To lock</span>
-        <h3>KPI targets</h3>
-        <p>Bookings / month. Inquiries / month (Instagram + LINE). Cost per inquiry. Website visits. Numbers are proposed, not set.</p>
-        <div class="own"><b>Fairway owner + KO</b><span>4 Oct ideal · hard stop: end of October report</span></div>
-      </div>
-      <div class="lock">
-        <div class="big">02</div>
-        <span class="pill coral">To lock</span>
-        <h3>Model approval</h3>
-        <p>Does the owner approve the 3 models before the shoot, and how many days of lead time? KO casts. Influencers stay out.</p>
-        <div class="own"><b>Owner</b><span>Before the first shoot day · kickoff if that day is inside 1–4 Oct</span></div>
-      </div>
-      <div class="lock">
-        <div class="big">03</div>
-        <span class="pill coral">To lock</span>
-        <h3>Billing terms</h3>
-        <p>Payment terms, invoice schedule, whether a PO is required, confirm THB, and one invoice or a Fairway / Mandrake split. Payee is company KO.</p>
-        <div class="own"><b>Owner + KO</b><span>Before the first invoice</span></div>
-      </div>
+      <div class="lock"><div class="big">01</div><span class="pill wine">To lock</span><h3>KPI targets</h3><p>Bookings / month. Inquiries / month (Instagram + LINE). Cost per inquiry. Website visits. Numbers are proposed, not set.</p><div class="own"><b>Fairway owner + KO</b><span>4 Oct ideal · hard stop: end of October report</span></div></div>
+      <div class="lock"><div class="big">02</div><span class="pill wine">To lock</span><h3>Model approval</h3><p>Does the owner approve the 3 models before the shoot, and how many days of lead time? KO casts. Influencers stay out.</p><div class="own"><b>Owner</b><span>Before the first shoot day · kickoff if that day is inside 1–4 Oct</span></div></div>
+      <div class="lock"><div class="big">03</div><span class="pill wine">To lock</span><h3>Billing terms</h3><p>Payment terms, invoice schedule, whether a PO is required, confirm THB, and one invoice or a Fairway / Mandrake split. Payee is company KO.</p><div class="own"><b>Owner + KO</b><span>Before the first invoice</span></div></div>
     </div>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>Kickoff 1 Oct · go-live 4 Oct</span><span>22 / 23</span></div>
+    <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>Kickoff 1 Oct · go-live 4 Oct</span><span>22 / 23</span></div>
   </section>
 
   <!-- 23 APPENDIX -->
@@ -1360,40 +886,16 @@
     <h2>Quotas, out of scope, <em>still open.</em></h2>
     <div class="fill">
     <div class="grid-3">
-      <div class="card">
-        <div class="kicker">Fairway / month</div>
-        <p>10 videos · 5 graphics · AI promo included · themes: how to get here, what we have, why Fairway, re-edits</p>
-      </div>
-      <div class="card green">
-        <div class="kicker green">Mandrake / month</div>
-        <p>15 videos · new-menu photo shoot · menu graphics · making, BTS, models, atmosphere</p>
-      </div>
-      <div class="card blue">
-        <div class="kicker blue">Shared / month</div>
-        <p>1 shoot day · 3 models · ฿7,000 · KO posts everything · report end of month</p>
-      </div>
+      <div class="card"><div class="kicker">Fairway / month</div><p>10 videos · 5 graphics · AI promo included · themes: how to get here, what we have, why Fairway, re-edits</p></div>
+      <div class="card green"><div class="kicker green">Mandrake / month</div><p>15 videos · new-menu photo shoot · menu graphics · making, BTS, models, atmosphere</p></div>
+      <div class="card blue"><div class="kicker blue">Shared / month</div><p>1 shoot day · 3 models · ฿7,000 · KO posts everything · report end of month</p></div>
     </div>
     <div class="grid-2">
-      <div>
-        <div class="kicker" style="margin-bottom:4px">Out of scope · all 90 days</div>
-        <ul class="clean coral">
-          <li>Website build or redesign</li>
-          <li>Email marketing</li>
-          <li>Influencers</li>
-        </ul>
-      </div>
-      <div>
-        <div class="kicker coral" style="margin-bottom:4px">Still open · not the three lock-ins</div>
-        <ul class="clean">
-          <li>Ad account access and LINE admin — owner, week 1</li>
-          <li>Brand assets and existing footage location — owner</li>
-          <li>Mandrake new-menu launch date — if any</li>
-          <li>Events calendar Oct–Dec — nice-to-have videos only</li>
-        </ul>
-      </div>
+      <div><div class="kicker" style="margin-bottom:4px">Out of scope · all 90 days</div><ul class="clean wine"><li>Website build or redesign</li><li>Email marketing</li><li>Influencers</li></ul></div>
+      <div><div class="kicker wine" style="margin-bottom:4px">Still open · not the three lock-ins</div><ul class="clean"><li>Ad account access and LINE admin — owner, week 1</li><li>Brand assets and existing footage location — owner</li><li>Mandrake new-menu launch date — if any</li><li>Events calendar Oct–Dec — nice-to-have videos only</li></ul></div>
     </div>
     </div>
-    <div class="footer"><span class="ko">KO</span><span>Fairway Golf and City Club + Mandrake Cafe</span><span>23 / 23</span></div>
+    <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>Fairway Golf and City Club + Mandrake Cafe</span><span>23 / 23</span></div>
   </section>
 
 </div>
@@ -1417,49 +919,30 @@
   var prog = document.getElementById("prog");
   var i = 0;
   var exporting = /(?:\?|&)export=pdf(?:&|$)/.test(location.search);
-
   function fit() {
-    if (exporting || document.body.classList.contains("export")) {
-      stage.style.transform = "none";
-      stage.style.position = "static";
-      return;
-    }
-    var vw = window.innerWidth;
-    var vh = window.innerHeight;
+    if (exporting || document.body.classList.contains("export")) { stage.style.transform = "none"; stage.style.position = "static"; return; }
+    var vw = window.innerWidth, vh = window.innerHeight;
     var s = Math.min(vw / 960, (vh - 56) / 540);
     stage.style.position = "absolute";
     stage.style.transform = "scale(" + s + ")";
     stage.style.left = ((vw - 960 * s) / 2) + "px";
     stage.style.top = Math.max(8, (vh - 56 - 540 * s) / 2) + "px";
   }
-
   function show(n) {
     i = (n + slides.length) % slides.length;
-    for (var k = 0; k < slides.length; k++) {
-      slides[k].classList.toggle("active", k === i);
-    }
+    for (var k = 0; k < slides.length; k++) slides[k].classList.toggle("active", k === i);
     var title = slides[i].getAttribute("data-title") || "";
     countEl.textContent = (i + 1) + " / " + slides.length + "  ·  " + title;
     prog.style.width = ((i + 1) / slides.length * 100) + "%";
-    if (!exporting && history.replaceState) {
-      history.replaceState(null, "", "#" + (i + 1));
-    }
+    if (!exporting && history.replaceState) history.replaceState(null, "", "#" + (i + 1));
   }
-
   function next() { show(i + 1); }
   function prev() { show(i - 1); }
-
   document.getElementById("prev").addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); prev(); });
   document.getElementById("next").addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); next(); });
   document.getElementById("hitPrev").addEventListener("click", function (e) { e.preventDefault(); prev(); });
   document.getElementById("hitNext").addEventListener("click", function (e) { e.preventDefault(); next(); });
-  stage.addEventListener("click", function (e) {
-    var t = e.target.closest("[data-go]");
-    if (!t) return;
-    e.preventDefault();
-    e.stopPropagation();
-    show(parseInt(t.getAttribute("data-go"), 10) - 1);
-  });
+  stage.addEventListener("click", function (e) { var t = e.target.closest("[data-go]"); if (!t) return; e.preventDefault(); e.stopPropagation(); show(parseInt(t.getAttribute("data-go"), 10) - 1); });
   document.addEventListener("keydown", function (e) {
     var tag = (e.target && e.target.tagName) || "";
     if (tag === "INPUT" || tag === "TEXTAREA") return;
@@ -1469,48 +952,15 @@
     else if (e.key === "End") { e.preventDefault(); show(slides.length - 1); }
   });
   document.getElementById("dl").addEventListener("click", function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    try {
-      var html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
-      var blob = new Blob([html], { type: "text/html;charset=utf-8" });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement("a");
-      a.href = url;
-      a.download = "Fairway-Mandrake-KO-Execution-Plan.html";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(function () { URL.revokeObjectURL(url); }, 1200);
-    } catch (err) {
-      window.print();
-    }
+    e.preventDefault(); e.stopPropagation();
+    try { var html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML; var blob = new Blob([html], { type: "text/html;charset=utf-8" }); var url = URL.createObjectURL(blob); var a = document.createElement("a"); a.href = url; a.download = "Fairway-Mandrake-KO-Execution-Plan.html"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(url); }, 1200); } catch (err) { window.print(); }
   });
-  document.getElementById("print").addEventListener("click", function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    window.print();
-  });
-  window.addEventListener("beforeprint", function () {
-    document.body.classList.add("export");
-    fit();
-  });
-  window.addEventListener("afterprint", function () {
-    if (!exporting) document.body.classList.remove("export");
-    fit();
-    show(i);
-  });
+  document.getElementById("print").addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); window.print(); });
+  window.addEventListener("beforeprint", function () { document.body.classList.add("export"); fit(); });
+  window.addEventListener("afterprint", function () { if (!exporting) document.body.classList.remove("export"); fit(); show(i); });
   window.addEventListener("resize", fit);
-
-  if (exporting) {
-    document.body.classList.add("export");
-    for (var s = 0; s < slides.length; s++) slides[s].classList.add("active");
-  } else {
-    var hash = (location.hash || "").replace("#", "");
-    var start = /^\d+$/.test(hash) ? parseInt(hash, 10) - 1 : 0;
-    fit();
-    show(start);
-  }
+  if (exporting) { document.body.classList.add("export"); for (var s = 0; s < slides.length; s++) slides[s].classList.add("active"); }
+  else { var hash = (location.hash || "").replace("#", ""); var start = /^\d+$/.test(hash) ? parseInt(hash, 10) - 1 : 0; fit(); show(start); }
 })();
 </script>
 </body>
