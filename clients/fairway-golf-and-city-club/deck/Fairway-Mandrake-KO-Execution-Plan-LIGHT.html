@@ -71,7 +71,7 @@ h3{font-size:13px;font-weight:600;margin:var(--s4) 0 var(--s4);letter-spacing:.0
 .fill{flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--s12);justify-content:center}
 
 /* ─── Footer ─── */
-.footer{flex:0 0 auto;margin-top:var(--s8);padding-top:6px;display:flex;justify-content:space-between;align-items:center;gap:var(--s12);border-top:1px solid var(--g-border);color:var(--muted);font-size:10px;letter-spacing:.04em}
+.footer{flex:0 0 auto;margin-top:var(--s8);padding-top:6px;display:flex;justify-content:space-between;align-items:center;gap:var(--s12);border-top:none;color:var(--muted);font-size:10px;letter-spacing:.04em}
 .footer .ko-mark{display:flex;align-items:center;gap:6px}
 .footer .ko-mark img{height:14px}
 
@@ -83,8 +83,7 @@ h3{font-size:13px;font-weight:600;margin:var(--s4) 0 var(--s4);letter-spacing:.0
 /* ─── Glass cards on silk: translucent white with soft shadow ─── */
 .card{
   background:linear-gradient(180deg,#ffffff 0%,#fafafaee 100%);
-  border:1px solid #e8e4e0;
-  border-top-color:#f0eeec;
+  border:none;
   border-radius:20px;
   padding:14px 16px;
   display:flex;flex-direction:column;
@@ -116,13 +115,13 @@ ul.clean li::before{content:"";width:6px;height:6px;border-radius:50%;background
 
 /* ─── Tables (glass cells) ─── */
 table.phase{width:100%;border-collapse:collapse;font-size:12px}
-table.phase th,table.phase td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--g-border);vertical-align:top}
+table.phase th,table.phase td{text-align:left;padding:6px 8px;border-bottom:none;vertical-align:top}
 table.phase th{color:var(--steel-dim);font-weight:600;font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding-top:0}
 table.phase td.who{color:var(--muted);white-space:nowrap}
 
 /* ─── Glass pills ─── */
-.pill{display:inline-block;background:linear-gradient(180deg,#ffffff,#f8f8f8);border:1px solid #e8e4e0;border-top-color:#f0eeec;color:var(--steel);border-radius:999px;padding:3px 9px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin:0 4px 4px 0}
-.pill.solid{background:linear-gradient(135deg,var(--wine),var(--ember));color:var(--white);border-color:var(--ember);font-weight:600}
+.pill{display:inline-block;background:linear-gradient(180deg,#ffffff,#f8f8f8);border:none;color:var(--steel);border-radius:999px;padding:3px 9px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin:0 4px 4px 0}
+.pill.solid{background:linear-gradient(135deg,var(--wine),var(--ember));color:var(--white);border:none;font-weight:600}
 
 /* ─── Cover ─── */
 .cover{display:grid;grid-template-columns:1.05fr .95fr;gap:var(--s16);min-height:0}
@@ -138,7 +137,7 @@ table.phase td.who{color:var(--muted);white-space:nowrap}
 .ph span{position:absolute;left:7px;bottom:5px;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--white);text-shadow:0 1px 3px #000}
 
 /* ─── Contents ─── */
-button.jump{appearance:none;width:100%;display:flex;gap:var(--s8);align-items:baseline;text-align:left;background:transparent;color:var(--white);border:0;border-bottom:1px solid var(--g-border);padding:5px 2px;cursor:pointer;font-size:12px}
+button.jump{appearance:none;width:100%;display:flex;gap:var(--s8);align-items:baseline;text-align:left;background:transparent;color:var(--white);border:0;border-bottom:none;padding:5px 2px;cursor:pointer;font-size:12px}
 button.jump span{color:var(--steel-dim);font-variant-numeric:tabular-nums;width:16px;flex:0 0 auto;font-size:11px}
 button.jump em{font-style:normal;color:var(--muted);margin-left:auto;font-size:10px}
 button.jump:hover{color:var(--steel)}
@@ -146,16 +145,16 @@ button.jump:hover{color:var(--steel)}
 /* ─── Budget ─── */
 .giant{font-family:"Source Serif 4",Georgia,serif;font-weight:400;font-style:italic;font-size:78px;line-height:.86;letter-spacing:-0.03em}
 .eq{color:var(--muted);font-size:14px;margin:4px 0 var(--s8)} .eq b{color:var(--white);font-weight:500}
-.money{background:linear-gradient(180deg,#ffffff,#fafafaee);border:1px solid #e8e4e0;border-top-color:#f0eeec;border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;box-shadow:0 8px 32px #00000008,0 2px 8px #00000006}
+.money{background:linear-gradient(180deg,#ffffff,#fafafaee);border:none;border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;box-shadow:0 8px 32px #00000008,0 2px 8px #00000006}
 .money .v{font-family:"Source Serif 4",Georgia,serif;font-size:48px;font-style:italic;color:var(--wine);line-height:1}
 .money h3{font-size:13px;margin:4px 0 2px} .money p{color:var(--muted);font-size:11.5px;line-height:1.35}
 
 /* ─── Note bar (glass) ─── */
-.note-bar{background:linear-gradient(180deg,#ffffff,#fafafaee);border:1px solid #e8e4e0;border-left:3px solid var(--wine);border-radius:0 16px 16px 0;padding:10px var(--s12);font-size:12.5px;line-height:1.4;display:flex;align-items:flex-start;gap:10px;flex:0 0 auto}
+.note-bar{background:linear-gradient(180deg,#ffffff,#fafafaee);border:none;border-left:3px solid var(--wine);border-radius:0 16px 16px 0;padding:10px var(--s12);font-size:12.5px;line-height:1.4;display:flex;align-items:flex-start;gap:10px;flex:0 0 auto}
 
 /* ─── Funnel ─── */
 .frow{display:grid;grid-template-columns:100px 1fr;gap:var(--s8);align-items:center}
-.fbar{height:38px;border-radius:12px;display:flex;align-items:center;padding:0 12px;background:linear-gradient(180deg,#ffffff,#f8f8f8);border:1px solid #e8e4e0;border-top-color:#f0eeec;font-size:12.5px;box-shadow:0 2px 8px #00000008}
+.fbar{height:38px;border-radius:12px;display:flex;align-items:center;padding:0 12px;background:linear-gradient(180deg,#ffffff,#f8f8f8);border:none;font-size:12.5px;box-shadow:0 2px 8px #00000008}
 .fbar strong{margin-right:8px} .fbar span{color:var(--muted)}
 .frow b{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel-dim)}
 .ads-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s12)}
@@ -174,7 +173,7 @@ button.jump:hover{color:var(--steel)}
 .bar{position:fixed;top:0;left:0;right:0;height:3px;background:#e8e4e0;z-index:40}
 .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--wine),var(--ember))}
 .nav{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:40;display:flex;gap:6px;align-items:center}
-.nav button{appearance:none;border:1px solid var(--g-border);background:linear-gradient(180deg,var(--g-card-top),var(--g-card));color:var(--white);border-radius:999px;padding:7px 12px;font:500 12px/1 "Inter",sans-serif;cursor:pointer;border-top-color:var(--g-border-hi)}
+.nav button{appearance:none;border:none;background:linear-gradient(180deg,var(--g-card-top),var(--g-card));color:var(--white);border-radius:999px;padding:7px 12px;font:500 12px/1 "Inter",sans-serif;cursor:pointer}
 .nav button:hover{border-color:var(--steel-dim);color:var(--steel)}
 .nav .count{color:var(--muted);font-size:12px;min-width:118px;text-align:center;font-variant-numeric:tabular-nums}
 .hit{position:fixed;top:0;bottom:48px;width:36px;z-index:6;background:transparent;border:0;padding:0;cursor:pointer}
