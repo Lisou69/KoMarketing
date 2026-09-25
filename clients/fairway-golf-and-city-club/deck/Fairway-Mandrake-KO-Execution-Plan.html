@@ -25,12 +25,7 @@
   --d-card-b:  #141c22; --d-line-b: #2a3e4c;
   --d-card-w:  #200a0e; --d-line-w: #4a1a20;
   --d-note:    #1a1210; --d-note-l: #352520;
-  /* Light-mode surfaces (opaque, pre-blended on #f6f0e9) */
-  --l-bg:      #f6f0e9; --l-card: #ffffff; --l-line: #e3dfce;
-  --l-card-g:  #eaf2ed; --l-line-g: #b8d0c0;
-  --l-card-b:  #eaf0f4; --l-line-b: #a8c0d0;
-  --l-card-w:  #f2e8e8; --l-line-w: #d0a0a0;
-  --l-note:    #fdf9f5; --l-note-l: #e3dfce;
+  /* single dark theme — no light surfaces */
   --s4: 4px; --s8: 8px; --s12: 12px; --s16: 16px; --s24: 24px; --s32: 32px; --s48: 48px;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -50,84 +45,9 @@ button, a { font-family: inherit; }
   color: var(--white);
 }
 .slide.active { display: flex; }
-.slide::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--wine), var(--ember) 60%, transparent); }
+/* top bar removed per client feedback */
 
-/* ─── Light slides ─── */
-.slide[data-tone="light"] { background: var(--l-bg); color: var(--ink); }
-.slide[data-tone="light"]::before { background: linear-gradient(90deg, var(--wine), var(--ember) 50%, var(--cream)); }
-.slide[data-tone="light"] .eyebrow { color: var(--brown); }
-.slide[data-tone="light"] h2 { color: var(--ink); }
-.slide[data-tone="light"] h2 em { color: var(--wine); }
-.slide[data-tone="light"] h3 { color: var(--ink); }
-.slide[data-tone="light"] .lede { color: var(--brown); }
-.slide[data-tone="light"] .muted, .slide[data-tone="light"] .card p, .slide[data-tone="light"] .card li { color: var(--brown); }
-.slide[data-tone="light"] .card { background: var(--l-card); border-color: var(--l-line); }
-.slide[data-tone="light"] .card h3 { color: var(--ink); }
-.slide[data-tone="light"] .card.green { background: var(--l-card-g); border-color: var(--l-line-g); }
-.slide[data-tone="light"] .card.blue { background: var(--l-card-b); border-color: var(--l-line-b); }
-.slide[data-tone="light"] .card.wine { background: var(--l-card-w); border-color: var(--l-line-w); }
-.slide[data-tone="light"] .num { color: var(--wine); }
-.slide[data-tone="light"] .num.green { color: #3a7a5a; }
-.slide[data-tone="light"] .num.blue { color: #4a7a9a; }
-.slide[data-tone="light"] .num.wine { color: var(--wine); }
-.slide[data-tone="light"] .kicker { color: var(--brown); }
-.slide[data-tone="light"] .kicker.green { color: #3a7a5a; }
-.slide[data-tone="light"] .kicker.blue { color: #4a7a9a; }
-.slide[data-tone="light"] .kicker.wine { color: var(--wine); }
-.slide[data-tone="light"] ul.clean li { color: var(--ink); }
-.slide[data-tone="light"] ul.clean li::before { background: var(--wine); }
-.slide[data-tone="light"] ul.clean.green li::before { background: #3a7a5a; }
-.slide[data-tone="light"] ul.clean.wine li::before { background: var(--wine); }
-.slide[data-tone="light"] table.phase th { color: var(--brown); }
-.slide[data-tone="light"] table.phase td { border-color: var(--l-line); color: var(--ink); }
-.slide[data-tone="light"] table.phase td.who, .slide[data-tone="light"] table.phase td.when { color: var(--brown); }
-.slide[data-tone="light"] table.phase tr.hot td { background: var(--l-card-w); }
-.slide[data-tone="light"] .pill { border-color: var(--l-line); color: var(--brown); }
-.slide[data-tone="light"] .pill.wine { color: var(--wine); border-color: var(--l-line-w); }
-.slide[data-tone="light"] .pill.green { color: #3a7a5a; border-color: var(--l-line-g); }
-.slide[data-tone="light"] .pill.solid { background: linear-gradient(135deg, var(--wine), var(--ember)); color: var(--white); }
-.slide[data-tone="light"] .note-bar { background: var(--l-note); border-color: var(--l-note-l); border-left-color: var(--wine); color: var(--ink); }
-.slide[data-tone="light"] .footer { border-color: var(--l-line); color: var(--brown); }
-.slide[data-tone="light"] .money { background: var(--l-card); border-color: var(--l-line); }
-.slide[data-tone="light"] .money .v { color: var(--wine); }
-.slide[data-tone="light"] .money h3 { color: var(--ink); }
-.slide[data-tone="light"] .money p { color: var(--brown); }
-.slide[data-tone="light"] .split .bit { border-color: var(--l-line); color: var(--brown); }
-.slide[data-tone="light"] .split .bit b { color: var(--ink); }
-.slide[data-tone="light"] .giant { color: var(--ink); }
-.slide[data-tone="light"] .eq { color: var(--brown); }
-.slide[data-tone="light"] .eq b { color: var(--ink); }
-.slide[data-tone="light"] .step { background: var(--l-card); border-color: var(--l-line); }
-.slide[data-tone="light"] .step .n { color: var(--wine); }
-.slide[data-tone="light"] .step h3 { color: var(--ink); }
-.slide[data-tone="light"] .step p { color: var(--brown); }
-.slide[data-tone="light"] .node b { color: var(--ink); }
-.slide[data-tone="light"] .node span { color: var(--brown); }
-.slide[data-tone="light"] .node i { border-color: var(--l-bg); }
-.slide[data-tone="light"] .rail::before { border-radius: 2px; }
-.slide[data-tone="light"] .band { border-color: var(--l-line); }
-.slide[data-tone="light"] .band .d { color: var(--wine); }
-.slide[data-tone="light"] .band .d small { color: var(--brown); }
-.slide[data-tone="light"] .band p { color: var(--ink); }
-.slide[data-tone="light"] .band p span { color: var(--brown); }
-.slide[data-tone="light"] .path .p { background: var(--l-card); border-color: var(--l-line); }
-.slide[data-tone="light"] .path .p b { color: var(--ink); }
-.slide[data-tone="light"] .path .p span { color: var(--brown); }
-.slide[data-tone="light"] .arrow { color: var(--wine); }
-.slide[data-tone="light"] .fbar { background: linear-gradient(90deg, var(--l-card-w), var(--l-card)); border-color: var(--l-line); color: var(--ink); }
-.slide[data-tone="light"] .fbar span { color: var(--brown); }
-.slide[data-tone="light"] .frow b { color: var(--wine); }
-.slide[data-tone="light"] .lock { background: var(--l-card); border-color: var(--l-line); }
-.slide[data-tone="light"] .lock .big { color: var(--wine); }
-.slide[data-tone="light"] .lock h3 { color: var(--ink); }
-.slide[data-tone="light"] .lock p { color: var(--brown); }
-.slide[data-tone="light"] .lock .own b { color: var(--ink); }
-.slide[data-tone="light"] .lock .own span { color: var(--wine); }
-.slide[data-tone="light"] button.jump { color: var(--ink); border-color: var(--l-line); }
-.slide[data-tone="light"] button.jump span { color: var(--wine); }
-.slide[data-tone="light"] button.jump em { color: var(--brown); }
-.slide[data-tone="light"] button.jump:hover { color: var(--wine); }
-.slide[data-tone="light"] .cols3 h3 { color: var(--wine); }
+/* single dark theme — light overrides removed */
 
 /* ─── Typography ─── */
 .eyebrow { font-size: 10px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--steel); margin-bottom: var(--s4); }
@@ -161,9 +81,8 @@ h3 { font-size: 13px; font-weight: 600; margin: var(--s4) 0 var(--s4); letter-sp
 
 /* ─── Cards ─── */
 .card { background: var(--d-card); border: 1px solid var(--d-line); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; }
-.card.green { background: var(--d-card-g); border-color: var(--d-line-g); }
-.card.blue { background: var(--d-card-b); border-color: var(--d-line-b); }
-.card.wine, .card.coral { background: var(--d-card-w); border-color: var(--d-line-w); }
+/* all card variants use the same surface */
+.card.green, .card.blue, .card.wine, .card.coral { background: var(--d-card); border-color: var(--d-line); }
 .card h3 { color: var(--white); }
 .card p, .card li { color: var(--muted); font-size: 12px; line-height: 1.4; }
 
@@ -175,15 +94,11 @@ h3 { font-size: 13px; font-weight: 600; margin: var(--s4) 0 var(--s4); letter-sp
 /* ─── Ratio bar (proportional split visualisation) ─── */
 .ratio { display: flex; gap: 2px; height: 28px; border-radius: 6px; overflow: hidden; }
 .ratio .seg { display: flex; align-items: center; padding: 0 10px; font-size: 11px; font-weight: 600; white-space: nowrap; }
-.ratio .seg.a { background: var(--d-card-w); color: var(--white); }
-.ratio .seg.b { background: var(--d-card-b); color: var(--steel); }
-.slide[data-tone="light"] .ratio .seg.a { background: var(--l-card-w); color: var(--ink); }
-.slide[data-tone="light"] .ratio .seg.b { background: var(--l-card-b); color: #4a7a9a; }
-
+.ratio .seg.a { background: var(--wine); color: var(--white); }
+.ratio .seg.b { background: var(--d-card); color: var(--steel); }
 /* ─── Statement (large italic for asymmetric layouts) ─── */
 .statement { font-family: "Source Serif 4", Georgia, serif; font-style: italic; font-size: 38px; line-height: 1.1; letter-spacing: -0.02em; }
 .statement em { color: var(--steel); }
-.slide[data-tone="light"] .statement em { color: var(--wine); }
 
 /* ─── Kickers ─── */
 .kicker { font-size: 9px; letter-spacing: .16em; text-transform: uppercase; font-weight: 600; color: var(--steel-dim); }
@@ -200,12 +115,12 @@ table.phase { width: 100%; border-collapse: collapse; font-size: 12px; }
 table.phase th, table.phase td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--d-line); vertical-align: top; }
 table.phase th { color: var(--steel-dim); font-weight: 600; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; padding-top: 0; }
 table.phase td.who, table.phase td.when { color: var(--muted); white-space: nowrap; }
-table.phase tr.hot td { background: var(--d-card-w); }
+table.phase tr.hot td { background: var(--d-card); }
 
 /* ─── Pills ─── */
 .pill { display: inline-block; border: 1px solid var(--d-line); color: var(--steel-dim); border-radius: 999px; padding: 2px 7px; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; margin: 0 4px 4px 0; }
-.pill.wine { color: #c45a5a; border-color: var(--d-line-w); }
-.pill.green { color: #7fb09a; border-color: var(--d-line-g); }
+.pill.wine { color: #c45a5a; border-color: var(--d-line); }
+.pill.green { color: #7fb09a; border-color: var(--d-line); }
 .pill.solid { background: linear-gradient(135deg, var(--wine), var(--ember)); color: var(--white); border-color: var(--ember); font-weight: 600; }
 
 /* ─── Cover ─── */
@@ -273,7 +188,7 @@ button.jump:hover { color: var(--steel); }
 
 /* ─── Lock-ins ─── */
 .locks { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--s8); }
-.lock { border-radius: 14px; padding: 16px 14px 14px; display: flex; flex-direction: column; border: 1px solid var(--d-line-w); background: var(--d-card-w); }
+.lock { border-radius: 14px; padding: 16px 14px 14px; display: flex; flex-direction: column; border: 1px solid var(--d-line); background: var(--d-card); }
 .lock .big { font-family: "Source Serif 4", Georgia, serif; font-size: 48px; font-style: italic; color: var(--steel); line-height: .9; margin-bottom: var(--s4); }
 .lock h3 { font-size: 15px; margin: var(--s4) 0 6px; }
 .lock p { color: var(--muted); font-size: 12.5px; line-height: 1.4; }
@@ -287,11 +202,11 @@ button.jump:hover { color: var(--steel); }
 .band p { font-size: 12.5px; line-height: 1.35; } .band p span { color: var(--muted); }
 
 /* ─── Note bar ─── */
-.note-bar { background: var(--d-note); border: 1px solid var(--d-note-l); border-left: 3px solid var(--wine); border-radius: 0 10px 10px 0; padding: 10px var(--s12); font-size: 12.5px; line-height: 1.4; display: flex; align-items: flex-start; gap: 10px; flex: 0 0 auto; }
+.note-bar { background: var(--d-card); border: 1px solid var(--d-line); border-left: 3px solid var(--wine); border-radius: 0 10px 10px 0; padding: 10px var(--s12); font-size: 12.5px; line-height: 1.4; display: flex; align-items: flex-start; gap: 10px; flex: 0 0 auto; }
 .note-bar .label { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 8px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; flex: 0 0 auto; margin-top: 2px; }
 .note-bar .label.wine { background: var(--wine); color: var(--white); }
-.note-bar .label.green { background: #1a3a24; color: #7fb09a; }
-.note-bar .label.steel { background: #1a2a38; color: var(--steel); }
+.note-bar .label.green { background: var(--d-card); color: #7fb09a; }
+.note-bar .label.steel { background: var(--d-card); color: var(--steel); }
 
 /* ─── Nav ─── */
 .bar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: #1a0a08; z-index: 40; }
@@ -348,7 +263,7 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
   </section>
 
   <!-- 02 CONTENTS — light -->
-  <section class="slide" data-tone="light" data-title="Contents">
+  <section class="slide" data-title="Contents">
     <div class="eyebrow">02 · Contents</div>
     <h2>The plan, <em>end to end.</em></h2>
     <div class="accent-rule"></div>
@@ -407,7 +322,7 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
   </section>
 
   <!-- 04 OFFER — light -->
-  <section class="slide" data-tone="light" data-title="Offer">
+  <section class="slide" data-title="Offer">
     <div class="eyebrow">04 · Offer</div>
     <h2>Content + paid ads. <em>KO posts.</em></h2>
     <div class="accent-rule"></div>
@@ -443,7 +358,7 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
   </section>
 
   <!-- 06 RUNWAY — light -->
-  <section class="slide" data-tone="light" data-title="90-day runway">
+  <section class="slide" data-title="90-day runway">
     <div class="eyebrow">06 · Runway · Oct – Dec</div>
     <h2>Three months. <em>Three jobs.</em></h2>
     <div class="fill">
@@ -474,7 +389,7 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
   </section>
 
   <!-- 08 CADENCE — light -->
-  <section class="slide" data-tone="light" data-title="Monthly cadence">
+  <section class="slide" data-title="Monthly cadence">
     <div class="eyebrow">08 · Cadence · every month</div>
     <h2>Same machine. <em>Oct, Nov, Dec.</em></h2>
     <div class="fill">
@@ -514,7 +429,7 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
   </section>
 
   <!-- 10 MANDRAKE — light -->
-  <section class="slide" data-tone="light" data-title="Mandrake deliverables">
+  <section class="slide" data-title="Mandrake deliverables">
     <div class="eyebrow">10 · Mandrake Cafe · monthly</div>
     <h2>15 videos. Menu shoot. <em>Menu graphics.</em></h2>
     <div class="fill">
@@ -546,7 +461,7 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
   </section>
 
   <!-- 12 PRODUCTION — light -->
-  <section class="slide" data-tone="light" data-title="Shoot and models">
+  <section class="slide" data-title="Shoot and models">
     <div class="eyebrow">12 · Shared production</div>
     <h2>One shoot day. <em>Three models.</em> No influencers.</h2>
     <div class="fill">
@@ -592,7 +507,7 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
   </section>
 
   <!-- 14 ADS MANDRAKE — light -->
-  <section class="slide" data-tone="light" data-title="Mandrake ads">
+  <section class="slide" data-title="Mandrake ads">
     <div class="eyebrow">14 · Paid · Mandrake Cafe · month 1</div>
     <h2>฿10,000. <em>Nearby</em> only.</h2>
     <div class="fill">
@@ -632,7 +547,7 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
   </section>
 
   <!-- 16 BUDGET — light -->
-  <section class="slide" data-tone="light" data-title="Month-1 budget">
+  <section class="slide" data-title="Month-1 budget">
     <div class="eyebrow">16 · Budget · month 1 · locked total</div>
     <div class="fill">
     <div class="toprow"><div><div class="giant">฿82,000</div><p class="eq"><b>฿30,000</b> KO &nbsp;+&nbsp; <b>฿45,000</b> ads &nbsp;+&nbsp; <b>฿7,000</b> models</p></div><div style="text-align:right"><div class="kicker">October</div><div style="font-size:13px;margin-top:4px">Both venues<br/>Not a % of media</div></div></div>
@@ -664,7 +579,7 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
   </section>
 
   <!-- 18 KPIs — light -->
-  <section class="slide" data-tone="light" data-title="KPIs to lock">
+  <section class="slide" data-title="KPIs to lock">
     <div class="eyebrow">18 · KPIs · propose, then agree</div>
     <h2>No targets yet. <em>Four to lock.</em></h2>
     <div class="fill">
@@ -697,7 +612,7 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
   </section>
 
   <!-- 20 BILLING — light -->
-  <section class="slide" data-tone="light" data-title="Billing TBD">
+  <section class="slide" data-title="Billing TBD">
     <div class="eyebrow">20 · Billing · open on purpose</div>
     <h2>Pay company KO. <em>Terms are TBD.</em></h2>
     <div class="fill">
@@ -735,7 +650,7 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
   </section>
 
   <!-- 23 APPENDIX — light -->
-  <section class="slide" data-tone="light" data-title="Appendix">
+  <section class="slide" data-title="Appendix">
     <div class="eyebrow">23 · Appendix</div>
     <h2>Quotas, out of scope, <em>still open.</em></h2>
     <div class="fill">

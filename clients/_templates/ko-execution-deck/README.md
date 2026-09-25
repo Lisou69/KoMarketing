@@ -55,7 +55,7 @@ Loaded from Google Fonts. If offline, embed as base64 `@font-face`.
 - **Slide size:** 960 × 540 px (16:9)
 - **Padding:** 24px top, 40px sides, 10px bottom (top ≥ 20px is Lisa's rule)
 - **Spacing scale:** 4 / 8 / 12 / 16 / 24 / 32 / 48 px (8-pt grid)
-- **Light/dark rhythm:** AVI-style alternation. ~11 light slides (`data-tone="light"`, bg `#f6f0e9`) and ~12 dark slides (bg `#110300`). Light surfaces use white cards with cream borders; dark surfaces use pre-blended opaque card fills.
+- **Single dark theme:** Every slide uses ink `#110300`. One card surface `#1f1410`, one border `#352a25`, one accent system (wine/ember + steel). No per-slide tinting or alternation. No top gradient bar above the eyebrow.
 - **Fill-center layout:** `.fill` uses `flex: 1; justify-content: center` to vertically center the content band. Grids hug content (`flex: 0 0 auto`, `align-items: start`). Cards never stretch taller than their content + generous padding. Use display-weight elements (large numbers, ratio bars, statements) to earn visual weight instead of stretching boxes.
 - **Card empty-space check:** `(cardHeight - contentHeight) / cardHeight ≤ 40%` on every `.card`, `.lock`, `.money`, `.step`. Measure in the export-mode DOM.
 - **Cards:** `border-radius: 14px`, 1px solid border, opaque fill
