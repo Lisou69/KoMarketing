@@ -80,14 +80,14 @@ h3{font-size:13px;font-weight:600;margin:var(--s4) 0 var(--s4);letter-spacing:.0
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-items:stretch}
 .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s8);align-items:stretch}
 
-/* ─── Glass cards on silk: translucent white with soft shadow ─── */
+/* ─── Glass cards on silk: translucent white, no outline, no shadow ─── */
 .card{
   background:linear-gradient(180deg,#ffffff 0%,#fafafaee 100%);
   border:none;
   border-radius:20px;
   padding:14px 16px;
   display:flex;flex-direction:column;
-  box-shadow:0 8px 32px #00000008,0 2px 8px #00000006;
+  box-shadow:none;
 }
 .card h3{color:#110300} .card p,.card li{color:var(--muted);font-size:12px;line-height:1.4}
 
@@ -145,7 +145,7 @@ button.jump:hover{color:var(--steel)}
 /* ─── Budget ─── */
 .giant{font-family:"Source Serif 4",Georgia,serif;font-weight:400;font-style:italic;font-size:78px;line-height:.86;letter-spacing:-0.03em}
 .eq{color:var(--muted);font-size:14px;margin:4px 0 var(--s8)} .eq b{color:var(--white);font-weight:500}
-.money{background:linear-gradient(180deg,#ffffff,#fafafaee);border:none;border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;box-shadow:0 8px 32px #00000008,0 2px 8px #00000006}
+.money{background:linear-gradient(180deg,#ffffff,#fafafaee);border:none;border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;box-shadow:none}
 .money .v{font-family:"Source Serif 4",Georgia,serif;font-size:48px;font-style:italic;color:var(--wine);line-height:1}
 .money h3{font-size:13px;margin:4px 0 2px} .money p{color:var(--muted);font-size:11.5px;line-height:1.35}
 
@@ -154,7 +154,7 @@ button.jump:hover{color:var(--steel)}
 
 /* ─── Funnel ─── */
 .frow{display:grid;grid-template-columns:100px 1fr;gap:var(--s8);align-items:center}
-.fbar{height:38px;border-radius:12px;display:flex;align-items:center;padding:0 12px;background:linear-gradient(180deg,#ffffff,#f8f8f8);border:none;font-size:12.5px;box-shadow:0 2px 8px #00000008}
+.fbar{height:38px;border-radius:12px;display:flex;align-items:center;padding:0 12px;background:linear-gradient(180deg,#ffffff,#f8f8f8);border:none;font-size:12.5px;box-shadow:none}
 .fbar strong{margin-right:8px} .fbar span{color:var(--muted)}
 .frow b{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel-dim)}
 .ads-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s12)}
