@@ -30,7 +30,16 @@ body{overflow:hidden} button,a{font-family:inherit}
 .slide::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
   background:url('assets/white-silk-wave.png') center/cover no-repeat}
 /* vary per slide so it doesn't look copy-pasted */
-.slide:nth-child(1)::before{background-position:center center}
+/* cover: full-bleed group photo with CSS mask fade (Chrome PDF supports mask) */
+.slide:nth-child(1)::before{
+  background:url('assets/fairway-trackman-group.jpg') right center/cover no-repeat;
+  -webkit-mask:linear-gradient(to left,#000 25%,transparent 72%);
+  mask:linear-gradient(to left,#000 25%,transparent 72%)}
+/* slide 13: putting photo faded from right */
+.slide:nth-child(13)::before{
+  background:url('assets/fairway-trackman-putting.jpg') right 25% center/auto 110% no-repeat;
+  -webkit-mask:linear-gradient(to left,#000 10%,transparent 55%);
+  mask:linear-gradient(to left,#000 10%,transparent 55%)}
 .slide:nth-child(2)::before{background-position:right center;transform:scaleX(-1)}
 .slide:nth-child(3)::before{background-position:left 40%;background-size:110%}
 .slide:nth-child(4)::before{background-position:center bottom;transform:scaleX(-1)}
@@ -42,7 +51,6 @@ body{overflow:hidden} button,a{font-family:inherit}
 .slide:nth-child(10)::before{background-position:center center;transform:scaleX(-1)}
 .slide:nth-child(11)::before{background-position:right 30%;background-size:120%}
 .slide:nth-child(12)::before{background-position:left 60%;transform:scaleX(-1)}
-.slide:nth-child(13)::before{background-position:center bottom;background-size:115%}
 .slide>*{position:relative;z-index:1}
 
 /* ─── Typography ─── */
@@ -182,26 +190,22 @@ body.export .nav,body.export .hit,body.export .bar,body.export .hint{display:non
 <div class="bar" aria-hidden="true"><i id="prog"></i></div>
 <div id="stage">
 
-  <!-- 01 COVER -->
+  <!-- 01 COVER — full-bleed photo fade -->
   <section class="slide active" data-title="Cover">
     <div class="eyebrow">KO Marketing · Execution plan</div>
-    <div class="cover fill">
-      <div class="cover-copy">
+    <div class="fill" style="max-width:480px">
+      <div>
         <h1>Fairway Golf<br/><em>and City Club</em></h1>
         <p class="plus">+ Mandrake Cafe</p>
         <div class="rule"></div>
         <p class="lede">One team running content and ads for both venues. From casting to ad spend.</p>
-        <div class="facts">
-          <div class="fact"><b>3 months</b><span>Oct – Dec 2026</span></div>
-          <div class="fact"><b>1 Oct</b><span>Kickoff</span></div>
-          <div class="fact"><b>2 Oct</b><span>First shoot</span></div>
-          <div class="fact"><b>End of month</b><span>Report</span></div>
-          <div class="fact"><b>~31 Dec</b><span>Contract end</span></div>
-        </div>
       </div>
-      <div class="cover-photos">
-        <div class="ph"><img src="assets/fairway-trackman-group.jpg" alt="Guests watching a golfer at the TrackMan simulator"><span>Fairway</span></div>
-        <div class="ph"><img src="assets/fairway-trackman-putting.jpg" alt="Woman putting in a TrackMan bay" style="object-position:center 30%"><span>Fairway</span></div>
+      <div class="facts">
+        <div class="fact"><b>3 months</b><span>Oct – Dec 2026</span></div>
+        <div class="fact"><b>1 Oct</b><span>Kickoff</span></div>
+        <div class="fact"><b>2 Oct</b><span>First shoot</span></div>
+        <div class="fact"><b>End of month</b><span>Report</span></div>
+        <div class="fact"><b>~31 Dec</b><span>Contract end</span></div>
       </div>
     </div>
     <div class="cover-foot">
