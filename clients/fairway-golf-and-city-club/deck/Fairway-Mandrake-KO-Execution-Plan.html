@@ -9,19 +9,32 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,500;1,8..60,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
+/* ═══ KO DECK v11 — glass site-style, all opaque for print ═══ */
 :root {
   --ink:#110300;--ink-deep:#0d0200;--wine:#4c050c;--ember:#611609;
   --brown:#62483e;--steel:#94b1c8;--steel-dim:#84a0b6;
   --warm:#f6f0e9;--cream:#e3dfce;--muted:#8b8480;--white:#ffffff;
-  --d-bg:#110300;--d-card:#1f1410;--d-line:#352a25;
+  --d-bg:#110300;
+  /* glass card: warm-tinted surface with top-edge highlight gradient */
+  --g-card:#1c120e;--g-card-top:#261c18;--g-border:#2f211e;--g-border-hi:#3a2e28;
   --s4:4px;--s8:8px;--s12:12px;--s16:16px;--s24:24px;--s32:32px;--s48:48px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;background:var(--ink-deep);color:var(--white);font-family:"Inter",system-ui,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 body{overflow:hidden} button,a{font-family:inherit}
 #stage{position:absolute;width:960px;height:540px;left:0;top:0;transform-origin:top left;z-index:1}
+
+/* ─── Slide with ambient glow ─── */
 .slide{position:absolute;inset:0;width:960px;height:540px;display:none;flex-direction:column;padding:24px 40px 10px;overflow:hidden;background:var(--d-bg);color:var(--white)}
 .slide.active{display:flex}
+/* ambient glow orbs — varied per slide via nth-child, all opaque radial-gradients */
+.slide::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0}
+.slide:nth-child(odd)::after{background:radial-gradient(ellipse 420px 320px at 85% 75%,#1a0808,transparent 70%),radial-gradient(ellipse 300px 260px at 10% 20%,#120a14,transparent 70%)}
+.slide:nth-child(even)::after{background:radial-gradient(ellipse 380px 300px at 15% 80%,#180a06,transparent 70%),radial-gradient(ellipse 350px 280px at 90% 15%,#0e0e18,transparent 70%)}
+.slide:nth-child(3n)::after{background:radial-gradient(ellipse 400px 340px at 80% 25%,#1a0a0a,transparent 65%),radial-gradient(ellipse 320px 300px at 20% 70%,#0c0c16,transparent 70%)}
+.slide>*{position:relative;z-index:1}
+
+/* ─── Typography ─── */
 .eyebrow{font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--steel);margin-bottom:var(--s4)}
 h1{font-family:"Source Serif 4",Georgia,serif;font-weight:400;font-style:italic;font-size:44px;line-height:.90;letter-spacing:-0.03em}
 h1 em{font-style:italic;color:var(--steel)}
@@ -33,32 +46,62 @@ h3{font-size:13px;font-weight:600;margin:var(--s4) 0 var(--s4);letter-spacing:.0
 .accent-rule{width:48px;height:3px;margin:6px 0 4px;background:linear-gradient(90deg,var(--wine),var(--ember));border-radius:2px;flex:0 0 auto}
 .rule{height:1px;width:48px;margin:var(--s8) 0;background:linear-gradient(90deg,var(--wine),transparent)}
 .fill{flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--s12);justify-content:center}
-.footer{flex:0 0 auto;margin-top:var(--s8);padding-top:6px;display:flex;justify-content:space-between;align-items:center;gap:var(--s12);border-top:1px solid var(--d-line);color:var(--muted);font-size:10px;letter-spacing:.04em}
+
+/* ─── Footer ─── */
+.footer{flex:0 0 auto;margin-top:var(--s8);padding-top:6px;display:flex;justify-content:space-between;align-items:center;gap:var(--s12);border-top:1px solid var(--g-border);color:var(--muted);font-size:10px;letter-spacing:.04em}
 .footer .ko-mark{display:flex;align-items:center;gap:6px}
 .footer .ko-mark img{height:14px}
+
+/* ─── Grids ─── */
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:var(--s12);align-items:stretch}
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-items:stretch}
 .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s8);align-items:stretch}
-.card{background:var(--d-card);border:1px solid var(--d-line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column}
+
+/* ─── Glass cards (opaque fake glass: gradient top highlight + warm tint + inner border) ─── */
+.card{
+  background:linear-gradient(180deg,var(--g-card-top) 0%,var(--g-card) 28%);
+  border:1px solid var(--g-border);
+  border-top-color:var(--g-border-hi);
+  border-radius:20px;
+  padding:14px 16px;
+  display:flex;flex-direction:column;
+  box-shadow:0 2px 8px #0a020066,inset 0 1px 0 #3a2e2833;
+}
 .card h3{color:var(--white)} .card p,.card li{color:var(--muted);font-size:12px;line-height:1.4}
+
+/* ─── Numbers ─── */
 .num{font-family:"Source Serif 4",Georgia,serif;font-size:36px;font-style:italic;line-height:.9;color:var(--steel);font-weight:400}
 .num.lg{font-size:48px}
-.ratio{display:flex;gap:2px;height:28px;border-radius:6px;overflow:hidden}
+
+/* ─── Ratio bar ─── */
+.ratio{display:flex;gap:2px;height:28px;border-radius:10px;overflow:hidden}
 .ratio .seg{display:flex;align-items:center;padding:0 10px;font-size:11px;font-weight:600;white-space:nowrap}
-.ratio .seg.a{background:var(--wine);color:var(--white)}
-.ratio .seg.b{background:var(--d-card);color:var(--steel)}
+.ratio .seg.a{background:linear-gradient(135deg,var(--wine),var(--ember));color:var(--white)}
+.ratio .seg.b{background:var(--g-card);color:var(--steel)}
+
+/* ─── Statement ─── */
 .statement{font-family:"Source Serif 4",Georgia,serif;font-style:italic;font-size:38px;line-height:1.1;letter-spacing:-0.02em}
 .statement em{color:var(--steel)}
+
+/* ─── Kickers ─── */
 .kicker{font-size:9px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--steel-dim)}
+
+/* ─── Lists ─── */
 ul.clean{list-style:none;display:grid;gap:3px}
 ul.clean li{display:flex;gap:var(--s8);align-items:flex-start;font-size:12.5px;line-height:1.35;color:var(--white)}
 ul.clean li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--steel-dim);margin-top:5px;flex:0 0 auto}
+
+/* ─── Tables (glass cells) ─── */
 table.phase{width:100%;border-collapse:collapse;font-size:12px}
-table.phase th,table.phase td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--d-line);vertical-align:top}
+table.phase th,table.phase td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--g-border);vertical-align:top}
 table.phase th{color:var(--steel-dim);font-weight:600;font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding-top:0}
 table.phase td.who{color:var(--muted);white-space:nowrap}
-.pill{display:inline-block;border:1px solid var(--d-line);color:var(--steel-dim);border-radius:999px;padding:2px 7px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin:0 4px 4px 0}
+
+/* ─── Glass pills ─── */
+.pill{display:inline-block;background:linear-gradient(180deg,#261c18,#1c120e);border:1px solid var(--g-border);border-top-color:var(--g-border-hi);color:var(--steel-dim);border-radius:999px;padding:3px 9px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin:0 4px 4px 0}
 .pill.solid{background:linear-gradient(135deg,var(--wine),var(--ember));color:var(--white);border-color:var(--ember);font-weight:600}
+
+/* ─── Cover ─── */
 .cover{display:grid;grid-template-columns:1.05fr .95fr;gap:var(--s16);min-height:0}
 .cover-copy{display:flex;flex-direction:column;min-height:0}
 .cover-photos{display:grid;grid-template-rows:1.15fr .85fr;gap:var(--s8);min-height:0}
@@ -67,39 +110,49 @@ table.phase td.who{color:var(--muted);white-space:nowrap}
 .fact span{display:block;margin-top:2px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .plus{margin-top:var(--s4);font-family:"Source Serif 4",Georgia,serif;font-size:22px;font-style:italic;color:#7fb09a}
 .cover-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:var(--s16);color:var(--muted);font-size:11px;line-height:1.45}
-.ph{position:relative;overflow:hidden;border-radius:10px;min-height:0;background:#0a0200}
+.ph{position:relative;overflow:hidden;border-radius:16px;min-height:0;background:#0a0200;box-shadow:0 4px 16px #0a020088}
 .ph img{width:100%;height:100%;object-fit:cover;display:block}
 .ph span{position:absolute;left:7px;bottom:5px;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--white);text-shadow:0 1px 3px #000}
-button.jump{appearance:none;width:100%;display:flex;gap:var(--s8);align-items:baseline;text-align:left;background:transparent;color:var(--white);border:0;border-bottom:1px solid var(--d-line);padding:5px 2px;cursor:pointer;font-size:12px}
+
+/* ─── Contents ─── */
+button.jump{appearance:none;width:100%;display:flex;gap:var(--s8);align-items:baseline;text-align:left;background:transparent;color:var(--white);border:0;border-bottom:1px solid var(--g-border);padding:5px 2px;cursor:pointer;font-size:12px}
 button.jump span{color:var(--steel-dim);font-variant-numeric:tabular-nums;width:16px;flex:0 0 auto;font-size:11px}
 button.jump em{font-style:normal;color:var(--muted);margin-left:auto;font-size:10px}
 button.jump:hover{color:var(--steel)}
+
+/* ─── Budget ─── */
 .giant{font-family:"Source Serif 4",Georgia,serif;font-weight:400;font-style:italic;font-size:78px;line-height:.86;letter-spacing:-0.03em}
 .eq{color:var(--muted);font-size:14px;margin:4px 0 var(--s8)} .eq b{color:var(--white);font-weight:500}
-.money{background:var(--d-card);border:1px solid var(--d-line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column}
+.money{background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:1px solid var(--g-border);border-top-color:var(--g-border-hi);border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;box-shadow:0 2px 8px #0a020066}
 .money .v{font-family:"Source Serif 4",Georgia,serif;font-size:48px;font-style:italic;color:var(--steel);line-height:1}
 .money h3{font-size:13px;margin:4px 0 2px} .money p{color:var(--muted);font-size:11.5px;line-height:1.35}
-.note-bar{background:var(--d-card);border:1px solid var(--d-line);border-left:3px solid var(--wine);border-radius:0 10px 10px 0;padding:10px var(--s12);font-size:12.5px;line-height:1.4;display:flex;align-items:flex-start;gap:10px;flex:0 0 auto}
+
+/* ─── Note bar (glass) ─── */
+.note-bar{background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:1px solid var(--g-border);border-left:3px solid var(--wine);border-radius:0 16px 16px 0;padding:10px var(--s12);font-size:12.5px;line-height:1.4;display:flex;align-items:flex-start;gap:10px;flex:0 0 auto}
+
+/* ─── Funnel ─── */
 .frow{display:grid;grid-template-columns:100px 1fr;gap:var(--s8);align-items:center}
-.fbar{height:38px;border-radius:8px;display:flex;align-items:center;padding:0 12px;background:linear-gradient(90deg,#2a1510,#1a0a08);border:1px solid var(--d-line);font-size:12.5px}
+.fbar{height:38px;border-radius:12px;display:flex;align-items:center;padding:0 12px;background:linear-gradient(90deg,#2a1510,#1a0a08);border:1px solid var(--g-border);border-top-color:var(--g-border-hi);font-size:12.5px}
 .fbar strong{margin-right:8px} .fbar span{color:var(--muted)}
 .frow b{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel-dim)}
 .ads-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s12)}
 .ads-grid .stack{display:flex;flex-direction:column;gap:var(--s8);justify-content:center}
-/* Calendar */
-.cal{width:100%;border-collapse:collapse;font-size:11px}
-.cal th{color:var(--steel-dim);font-weight:600;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 3px;border-bottom:1px solid var(--d-line);text-align:left}
-.cal td{padding:4px 3px;border-bottom:1px solid var(--d-line);vertical-align:top;line-height:1.3;color:var(--muted)}
+
+/* ─── Calendar (glass cells) ─── */
+.cal{width:100%;border-collapse:separate;border-spacing:2px;font-size:11px}
+.cal th{color:var(--steel-dim);font-weight:600;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 3px;text-align:left}
+.cal td{padding:4px 4px;vertical-align:top;line-height:1.3;color:var(--muted);background:var(--g-card);border-radius:6px}
 .cal td b{color:var(--white);font-weight:500;display:block;font-size:12px}
 .cal .fw{color:var(--steel)}
 .cal .mk{color:#7fb09a}
 .cal .ev{color:#c45a5a;font-size:10px}
-/* Nav */
+
+/* ─── Nav ─── */
 .bar{position:fixed;top:0;left:0;right:0;height:3px;background:#1a0a08;z-index:40}
 .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--wine),var(--ember))}
 .nav{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:40;display:flex;gap:6px;align-items:center}
-.nav button{appearance:none;border:1px solid var(--d-line);background:#0d0200;color:var(--white);border-radius:999px;padding:7px 12px;font:500 12px/1 "Inter",sans-serif;cursor:pointer}
-.nav button:hover{border-color:var(--wine);color:var(--steel)}
+.nav button{appearance:none;border:1px solid var(--g-border);background:linear-gradient(180deg,var(--g-card-top),var(--g-card));color:var(--white);border-radius:999px;padding:7px 12px;font:500 12px/1 "Inter",sans-serif;cursor:pointer;border-top-color:var(--g-border-hi)}
+.nav button:hover{border-color:var(--steel-dim);color:var(--steel)}
 .nav .count{color:var(--muted);font-size:12px;min-width:118px;text-align:center;font-variant-numeric:tabular-nums}
 .hit{position:fixed;top:0;bottom:48px;width:36px;z-index:6;background:transparent;border:0;padding:0;cursor:pointer}
 .hit-left{left:0}.hit-right{right:0}
