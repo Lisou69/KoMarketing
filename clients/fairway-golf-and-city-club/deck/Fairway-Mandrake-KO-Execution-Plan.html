@@ -27,67 +27,30 @@ body{overflow:hidden} button,a{font-family:inherit}
 /* ─── Slide with ambient glow ─── */
 .slide{position:absolute;inset:0;width:960px;height:540px;display:none;flex-direction:column;padding:24px 40px 10px;overflow:hidden;background:var(--d-bg);color:var(--white)}
 .slide.active{display:flex}
-/* flowing wave/blob shapes behind glass — varied per slide */
+/* ─── SVG wave ribbons + soft glow behind glass ─── */
+.slide::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 960 540'%3E%3Cpath d='M0 380Q240 320 480 360T960 300V540H0Z' fill='%234c050c'/%3E%3Cpath d='M0 420Q300 360 600 400T960 350V540H0Z' fill='%23611609'/%3E%3Cpath d='M0 460Q200 430 500 450T960 410V540H0Z' fill='%23190604'/%3E%3C/svg%3E");
+  background-size:cover;background-position:center}
 .slide::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0}
-.slide:nth-child(1)::after{background:
-  radial-gradient(ellipse 600px 300px at 70% 85%,#3a0a10,transparent 65%),
-  radial-gradient(ellipse 500px 250px at 20% 40%,#18203a,transparent 60%),
-  radial-gradient(ellipse 400px 500px at 95% 30%,#2a0c08,transparent 55%)}
-.slide:nth-child(2)::after{background:
-  radial-gradient(ellipse 700px 200px at 50% 70%,#2e0a0c,transparent 60%),
-  radial-gradient(ellipse 350px 400px at 5% 50%,#161e30,transparent 55%),
-  radial-gradient(ellipse 300px 350px at 90% 80%,#1a1628,transparent 60%)}
-.slide:nth-child(3)::after{background:
-  radial-gradient(ellipse 500px 350px at 15% 65%,#320e12,transparent 55%),
-  radial-gradient(ellipse 600px 250px at 80% 30%,#141c2e,transparent 60%),
-  radial-gradient(ellipse 400px 300px at 60% 90%,#280a08,transparent 50%)}
-.slide:nth-child(4)::after{background:
-  radial-gradient(ellipse 800px 200px at 50% 60%,#2a0c0e,transparent 55%),
-  radial-gradient(ellipse 400px 350px at 10% 30%,#182034,transparent 55%),
-  radial-gradient(ellipse 350px 400px at 85% 75%,#201018,transparent 55%)}
-.slide:nth-child(5)::after{background:
-  radial-gradient(ellipse 700px 250px at 40% 45%,#2e0e10,transparent 55%),
-  radial-gradient(ellipse 500px 300px at 90% 80%,#141a28,transparent 60%),
-  radial-gradient(ellipse 400px 350px at 5% 70%,#2a0a0a,transparent 55%)}
-.slide:nth-child(6)::after{background:
-  radial-gradient(ellipse 550px 300px at 80% 50%,#340e14,transparent 55%),
-  radial-gradient(ellipse 450px 350px at 10% 80%,#161e30,transparent 55%),
-  radial-gradient(ellipse 600px 200px at 50% 20%,#220a08,transparent 50%)}
-.slide:nth-child(7)::after{background:
-  radial-gradient(ellipse 600px 280px at 20% 55%,#300c10,transparent 55%),
-  radial-gradient(ellipse 500px 300px at 85% 35%,#141828,transparent 55%),
-  radial-gradient(ellipse 400px 400px at 50% 90%,#2a0e0c,transparent 50%)}
-.slide:nth-child(8)::after{background:
-  radial-gradient(ellipse 700px 250px at 60% 70%,#2e0a0e,transparent 55%),
-  radial-gradient(ellipse 400px 350px at 5% 35%,#18223a,transparent 55%),
-  radial-gradient(ellipse 500px 300px at 90% 50%,#240c08,transparent 50%)}
-.slide:nth-child(9)::after{background:
-  radial-gradient(ellipse 550px 350px at 25% 50%,#380e14,transparent 50%),
-  radial-gradient(ellipse 600px 280px at 80% 70%,#161c30,transparent 55%),
-  radial-gradient(ellipse 350px 400px at 60% 15%,#2c0c0a,transparent 55%)}
-.slide:nth-child(10)::after{background:
-  radial-gradient(ellipse 600px 300px at 75% 60%,#300a0e,transparent 55%),
-  radial-gradient(ellipse 450px 350px at 10% 45%,#141a2a,transparent 55%),
-  radial-gradient(ellipse 500px 250px at 50% 90%,#280e0a,transparent 50%)}
-.slide:nth-child(11)::after{background:
-  radial-gradient(ellipse 750px 200px at 50% 55%,#2e0a10,transparent 55%),
-  radial-gradient(ellipse 400px 350px at 5% 70%,#161e34,transparent 55%),
-  radial-gradient(ellipse 450px 300px at 90% 30%,#2a100c,transparent 50%)}
-.slide:nth-child(12)::after{background:
-  radial-gradient(ellipse 500px 350px at 70% 45%,#340e12,transparent 55%),
-  radial-gradient(ellipse 600px 250px at 15% 75%,#141828,transparent 55%),
-  radial-gradient(ellipse 400px 300px at 50% 10%,#260c08,transparent 50%)}
-.slide:nth-child(13)::after{background:
-  radial-gradient(ellipse 600px 300px at 30% 55%,#320c10,transparent 55%),
-  radial-gradient(ellipse 550px 280px at 85% 40%,#161c2e,transparent 55%),
-  radial-gradient(ellipse 400px 350px at 50% 85%,#2c0e0a,transparent 50%)}
+/* varied wave positions via transform + glow accents */
+.slide:nth-child(odd)::before{transform:scaleX(-1)}
+.slide:nth-child(3n)::before{transform:scaleY(-1)}
+.slide:nth-child(3n+1)::before{transform:rotate(0deg)}
+.slide:nth-child(even)::before{transform:scaleX(-1) translateY(-60px)}
+.slide:nth-child(5n)::before{transform:scaleY(-1) scaleX(-1)}
+/* glow accents per slide */
+.slide:nth-child(odd)::after{background:radial-gradient(ellipse 500px 350px at 80% 60%,#2e0a0c,transparent 60%),radial-gradient(ellipse 400px 300px at 10% 30%,#141828,transparent 55%)}
+.slide:nth-child(even)::after{background:radial-gradient(ellipse 450px 350px at 15% 65%,#300c10,transparent 55%),radial-gradient(ellipse 500px 300px at 85% 25%,#121620,transparent 55%)}
+.slide:nth-child(3n)::after{background:radial-gradient(ellipse 550px 300px at 70% 40%,#2c0a0e,transparent 55%),radial-gradient(ellipse 400px 350px at 20% 70%,#101624,transparent 55%)}
+.slide:nth-child(1)::before{transform:none}
+.slide:nth-child(1)::after{background:radial-gradient(ellipse 500px 400px at 30% 70%,#3a0a10,transparent 60%),radial-gradient(ellipse 400px 300px at 80% 20%,#141828,transparent 55%)}
 .slide>*{position:relative;z-index:1}
 
 /* ─── Typography ─── */
 .eyebrow{font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--steel);margin-bottom:var(--s4)}
 h1{font-family:"Source Serif 4",Georgia,serif;font-weight:400;font-style:italic;font-size:44px;line-height:.90;letter-spacing:-0.03em}
 h1 em{font-style:italic;color:var(--steel)}
-h2{font-family:"Source Serif 4",Georgia,serif;font-weight:400;font-style:italic;font-size:26px;line-height:1.05;letter-spacing:-0.02em;margin-bottom:0}
+h2{font-family:"Source Serif 4",Georgia,serif;font-weight:400;font-style:italic;font-size:26px;line-height:1.05;letter-spacing:-0.02em;margin-bottom:4px}
 h2 em{color:var(--steel)}
 h3{font-size:13px;font-weight:600;margin:var(--s4) 0 var(--s4);letter-spacing:.01em}
 .lede{color:var(--muted);font-size:12.5px;line-height:1.45;max-width:620px}
