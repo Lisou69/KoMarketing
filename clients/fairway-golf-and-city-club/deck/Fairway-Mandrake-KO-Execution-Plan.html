@@ -74,10 +74,10 @@ h3 { font-size: 13px; font-weight: 600; margin: var(--s4) 0 var(--s4); letter-sp
 .footer .ko-mark { display: flex; align-items: center; gap: 6px; }
 .footer .ko-mark img { height: 14px; }
 
-/* ─── Grids (hug content, never stretch children) ─── */
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s12); align-items: start; }
-.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; align-items: start; }
-.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s8); align-items: start; }
+/* ─── Grids: rows hug content, siblings stretch to match tallest ─── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s12); align-items: stretch; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; align-items: stretch; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s8); align-items: stretch; }
 
 /* ─── Cards ─── */
 .card { background: var(--d-card); border: 1px solid var(--d-line); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; }
@@ -85,6 +85,7 @@ h3 { font-size: 13px; font-weight: 600; margin: var(--s4) 0 var(--s4); letter-sp
 .card.green, .card.blue, .card.wine, .card.coral { background: var(--d-card); border-color: var(--d-line); }
 .card h3 { color: var(--white); }
 .card p, .card li { color: var(--muted); font-size: 12px; line-height: 1.4; }
+.card > p:last-child, .card > ul:last-child { margin-top: auto; }
 
 /* ─── Numbers ─── */
 .num { font-family: "Source Serif 4", Georgia, serif; font-size: 36px; font-style: italic; line-height: .9; color: var(--steel); font-weight: 400; }
@@ -158,7 +159,7 @@ button.jump:hover { color: var(--steel); }
 .step { background: var(--d-card); border: 1px solid var(--d-line); border-radius: 14px; padding: 12px 10px; display: flex; flex-direction: column; }
 .step .n { font-family: "Source Serif 4", Georgia, serif; color: var(--steel-dim); font-size: 30px; font-style: italic; line-height: 1; }
 .step h3 { font-size: 13px; margin: 6px 0 4px; }
-.step p { color: var(--muted); font-size: 11.5px; line-height: 1.35; }
+.step p { color: var(--muted); font-size: 11.5px; line-height: 1.35; margin-top: auto; }
 
 /* ─── Funnel ─── */
 .funnel { display: grid; gap: 6px; }
@@ -179,9 +180,9 @@ button.jump:hover { color: var(--steel); }
 .giant { font-family: "Source Serif 4", Georgia, serif; font-weight: 400; font-style: italic; font-size: 78px; line-height: .86; letter-spacing: -0.03em; }
 .eq { color: var(--muted); font-size: 14px; margin: 4px 0 var(--s8); }
 .eq b { color: var(--white); font-weight: 500; }
-.money { background: var(--d-card); border: 1px solid var(--d-line); border-radius: 14px; padding: 12px 14px; }
+.money { background: var(--d-card); border: 1px solid var(--d-line); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; }
 .money .v { font-family: "Source Serif 4", Georgia, serif; font-size: 48px; font-style: italic; color: var(--steel); line-height: 1; }
-.money h3 { font-size: 13px; margin: 4px 0 2px; } .money p { color: var(--muted); font-size: 11.5px; line-height: 1.35; }
+.money h3 { font-size: 13px; margin: 4px 0 2px; } .money p { color: var(--muted); font-size: 11.5px; line-height: 1.35; margin-top: auto; }
 .split { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--s8); }
 .split .bit { border: 1px solid var(--d-line); border-radius: 10px; padding: 8px 10px; font-size: 11.5px; color: var(--muted); line-height: 1.35; }
 .split .bit b { color: var(--white); font-weight: 500; }
@@ -454,7 +455,7 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
     <div class="fill">
     <div class="grid-2">
       <div class="card"><div class="kicker">Must</div><h3>This is the package</h3><ul class="clean"><li>Ad budgets live, including the Fairway 3-step funnel</li><li>10 Fairway videos</li><li>15 Mandrake videos</li><li>Monthly model shoot — 3 models</li><li>5 Fairway graphics</li><li>Mandrake menu photos and graphics</li><li>KO posting</li></ul></div>
-      <div class="card" style="background:transparent; border-color:var(--d-line)"><div class="kicker">Nice</div><h3>Only when it is actually there</h3><ul class="clean"><li>Coaching videos — only if convenient</li><li>Event videos — only if there are events that month</li></ul><p class="lede" style="margin-top:6px">Skipping nice items is not a missed deliverable. Adding them does not add a fee inside this package.</p></div>
+      <div class="card" style="background:transparent; border-color:var(--d-line)"><div class="kicker">Nice</div><h3>Only when it is actually there</h3><ul class="clean"><li>Coaching videos — only if convenient, not a production target</li><li>Event videos — only if there are events that month</li><li>Events calendar Oct–Dec is still TBD with the owner</li></ul><p class="lede" style="margin-top:6px">Skipping nice items is not a missed deliverable. Adding them does not add a fee inside this package. They are in the scope as opportunities, not commitments.</p></div>
     </div>
     </div>
     <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>11 · Must vs nice</span><span>11 / 23</span></div>
