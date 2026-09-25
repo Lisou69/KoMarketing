@@ -9,86 +9,86 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,500;1,8..60,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
-/* ═══ KO DECK v13 — strong glass, matching komarketingagency.com ═══ */
+/* ═══ KO DECK v13 LIGHT — cream glass variant ═══ */
 :root {
   --ink:#110300;--ink-deep:#0d0200;--wine:#4c050c;--ember:#611609;
-  --brown:#62483e;--steel:#94b1c8;--steel-dim:#84a0b6;
-  --warm:#f6f0e9;--cream:#e3dfce;--muted:#8b8480;--white:#ffffff;
-  --d-bg:#110300;
-  /* VISIBLE glass: opaque equiv — lighter fill lets wave shapes show through */
-  --g-card:#221a17;--g-card-top:#382f2a;--g-border:#5a4e4a;--g-border-hi:#6e6058;
+  --brown:#62483e;--steel:#5a7a8e;--steel-dim:#4a6a7e;
+  --warm:#f6f0e9;--cream:#e3dfce;--muted:#7a726a;--white:#110300;
+  --d-bg:#f6f0e9;
+  /* Light glass: white/cream frosted cards with subtle borders */
+  --g-card:#ffffff;--g-card-top:#ffffff;--g-border:#d8d0c4;--g-border-hi:#e8e0d4;
   --s4:4px;--s8:8px;--s12:12px;--s16:16px;--s24:24px;--s32:32px;--s48:48px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--ink-deep);color:var(--white);font-family:"Inter",system-ui,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+html,body{height:100%;background:#ece6de;color:var(--ink);font-family:"Inter",system-ui,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 body{overflow:hidden} button,a{font-family:inherit}
 #stage{position:absolute;width:960px;height:540px;left:0;top:0;transform-origin:top left;z-index:1}
 
 /* ─── Slide with ambient glow ─── */
-.slide{position:absolute;inset:0;width:960px;height:540px;display:none;flex-direction:column;padding:24px 40px 10px;overflow:hidden;background:var(--d-bg);color:var(--white)}
+.slide{position:absolute;inset:0;width:960px;height:540px;display:none;flex-direction:column;padding:24px 40px 10px;overflow:hidden;background:var(--d-bg);color:var(--ink)}
 .slide.active{display:flex}
 /* flowing wave/blob shapes behind glass — varied per slide */
 .slide::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0}
 .slide:nth-child(1)::after{background:
-  radial-gradient(ellipse 600px 300px at 70% 85%,#3a0a10,transparent 65%),
-  radial-gradient(ellipse 500px 250px at 20% 40%,#18203a,transparent 60%),
+  radial-gradient(ellipse 600px 300px at 70% 85%,#e8ccc8,transparent 65%),
+  radial-gradient(ellipse 500px 250px at 20% 40%,#d4e0ee,transparent 60%),
   radial-gradient(ellipse 400px 500px at 95% 30%,#2a0c08,transparent 55%)}
 .slide:nth-child(2)::after{background:
-  radial-gradient(ellipse 700px 200px at 50% 70%,#2e0a0c,transparent 60%),
-  radial-gradient(ellipse 350px 400px at 5% 50%,#161e30,transparent 55%),
-  radial-gradient(ellipse 300px 350px at 90% 80%,#1a1628,transparent 60%)}
+  radial-gradient(ellipse 700px 200px at 50% 70%,#ecd8d4,transparent 60%),
+  radial-gradient(ellipse 350px 400px at 5% 50%,#d8e2ee,transparent 55%),
+  radial-gradient(ellipse 300px 350px at 90% 80%,#d6dce8,transparent 60%)}
 .slide:nth-child(3)::after{background:
-  radial-gradient(ellipse 500px 350px at 15% 65%,#320e12,transparent 55%),
-  radial-gradient(ellipse 600px 250px at 80% 30%,#141c2e,transparent 60%),
-  radial-gradient(ellipse 400px 300px at 60% 90%,#280a08,transparent 50%)}
+  radial-gradient(ellipse 500px 350px at 15% 65%,#e6d0cc,transparent 55%),
+  radial-gradient(ellipse 600px 250px at 80% 30%,#dae4f0,transparent 60%),
+  radial-gradient(ellipse 400px 300px at 60% 90%,#eedcd8,transparent 50%)}
 .slide:nth-child(4)::after{background:
-  radial-gradient(ellipse 800px 200px at 50% 60%,#2a0c0e,transparent 55%),
-  radial-gradient(ellipse 400px 350px at 10% 30%,#182034,transparent 55%),
-  radial-gradient(ellipse 350px 400px at 85% 75%,#201018,transparent 55%)}
+  radial-gradient(ellipse 800px 200px at 50% 60%,#ecd8d4,transparent 55%),
+  radial-gradient(ellipse 400px 350px at 10% 30%,#d6e0ec,transparent 55%),
+  radial-gradient(ellipse 350px 400px at 85% 75%,#e2d4dc,transparent 55%)}
 .slide:nth-child(5)::after{background:
   radial-gradient(ellipse 700px 250px at 40% 45%,#2e0e10,transparent 55%),
-  radial-gradient(ellipse 500px 300px at 90% 80%,#141a28,transparent 60%),
-  radial-gradient(ellipse 400px 350px at 5% 70%,#2a0a0a,transparent 55%)}
+  radial-gradient(ellipse 500px 300px at 90% 80%,#dce4ee,transparent 60%),
+  radial-gradient(ellipse 400px 350px at 5% 70%,#eeddda,transparent 55%)}
 .slide:nth-child(6)::after{background:
-  radial-gradient(ellipse 550px 300px at 80% 50%,#340e14,transparent 55%),
-  radial-gradient(ellipse 450px 350px at 10% 80%,#161e30,transparent 55%),
-  radial-gradient(ellipse 600px 200px at 50% 20%,#220a08,transparent 50%)}
+  radial-gradient(ellipse 550px 300px at 80% 50%,#e4cec8,transparent 55%),
+  radial-gradient(ellipse 450px 350px at 10% 80%,#d8e2ee,transparent 55%),
+  radial-gradient(ellipse 600px 200px at 50% 20%,#f0e0dc,transparent 50%)}
 .slide:nth-child(7)::after{background:
-  radial-gradient(ellipse 600px 280px at 20% 55%,#300c10,transparent 55%),
-  radial-gradient(ellipse 500px 300px at 85% 35%,#141828,transparent 55%),
+  radial-gradient(ellipse 600px 280px at 20% 55%,#e8d2ce,transparent 55%),
+  radial-gradient(ellipse 500px 300px at 85% 35%,#dce6f0,transparent 55%),
   radial-gradient(ellipse 400px 400px at 50% 90%,#2a0e0c,transparent 50%)}
 .slide:nth-child(8)::after{background:
   radial-gradient(ellipse 700px 250px at 60% 70%,#2e0a0e,transparent 55%),
-  radial-gradient(ellipse 400px 350px at 5% 35%,#18223a,transparent 55%),
-  radial-gradient(ellipse 500px 300px at 90% 50%,#240c08,transparent 50%)}
+  radial-gradient(ellipse 400px 350px at 5% 35%,#d4deec,transparent 55%),
+  radial-gradient(ellipse 500px 300px at 90% 50%,#f0deda,transparent 50%)}
 .slide:nth-child(9)::after{background:
-  radial-gradient(ellipse 550px 350px at 25% 50%,#380e14,transparent 50%),
-  radial-gradient(ellipse 600px 280px at 80% 70%,#161c30,transparent 55%),
+  radial-gradient(ellipse 550px 350px at 25% 50%,#e2ccc6,transparent 50%),
+  radial-gradient(ellipse 600px 280px at 80% 70%,#d8e2ee,transparent 55%),
   radial-gradient(ellipse 350px 400px at 60% 15%,#2c0c0a,transparent 55%)}
 .slide:nth-child(10)::after{background:
   radial-gradient(ellipse 600px 300px at 75% 60%,#300a0e,transparent 55%),
-  radial-gradient(ellipse 450px 350px at 10% 45%,#141a2a,transparent 55%),
-  radial-gradient(ellipse 500px 250px at 50% 90%,#280e0a,transparent 50%)}
+  radial-gradient(ellipse 450px 350px at 10% 45%,#dce4ee,transparent 55%),
+  radial-gradient(ellipse 500px 250px at 50% 90%,#eeddda,transparent 50%)}
 .slide:nth-child(11)::after{background:
   radial-gradient(ellipse 750px 200px at 50% 55%,#2e0a10,transparent 55%),
-  radial-gradient(ellipse 400px 350px at 5% 70%,#161e34,transparent 55%),
-  radial-gradient(ellipse 450px 300px at 90% 30%,#2a100c,transparent 50%)}
+  radial-gradient(ellipse 400px 350px at 5% 70%,#d8e2ee,transparent 55%),
+  radial-gradient(ellipse 450px 300px at 90% 30%,#ecd8d2,transparent 50%)}
 .slide:nth-child(12)::after{background:
   radial-gradient(ellipse 500px 350px at 70% 45%,#340e12,transparent 55%),
-  radial-gradient(ellipse 600px 250px at 15% 75%,#141828,transparent 55%),
-  radial-gradient(ellipse 400px 300px at 50% 10%,#260c08,transparent 50%)}
+  radial-gradient(ellipse 600px 250px at 15% 75%,#dce6f0,transparent 55%),
+  radial-gradient(ellipse 400px 300px at 50% 10%,#eedcd6,transparent 50%)}
 .slide:nth-child(13)::after{background:
   radial-gradient(ellipse 600px 300px at 30% 55%,#320c10,transparent 55%),
   radial-gradient(ellipse 550px 280px at 85% 40%,#161c2e,transparent 55%),
-  radial-gradient(ellipse 400px 350px at 50% 85%,#2c0e0a,transparent 50%)}
+  radial-gradient(ellipse 400px 350px at 50% 85%,#eadcd6,transparent 50%)}
 .slide>*{position:relative;z-index:1}
 
 /* ─── Typography ─── */
 .eyebrow{font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--steel);margin-bottom:var(--s4)}
-h1{font-family:"Source Serif 4",Georgia,serif;font-weight:400;font-style:italic;font-size:44px;line-height:.90;letter-spacing:-0.03em}
-h1 em{font-style:italic;color:var(--steel)}
+h1{font-family:"Source Serif 4",Georgia,serif;font-weight:400;font-style:italic;font-size:44px;line-height:.90;letter-spacing:-0.03em;color:var(--ink)}
+h1 em{font-style:italic;color:var(--wine)}
 h2{font-family:"Source Serif 4",Georgia,serif;font-weight:400;font-style:italic;font-size:26px;line-height:1.05;letter-spacing:-0.02em;margin-bottom:0}
-h2 em{color:var(--steel)}
+h2 em{color:var(--wine)}
 h3{font-size:13px;font-weight:600;margin:var(--s4) 0 var(--s4);letter-spacing:.01em}
 .lede{color:var(--muted);font-size:12.5px;line-height:1.45;max-width:620px}
 .toprow{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--s16)}
@@ -97,7 +97,7 @@ h3{font-size:13px;font-weight:600;margin:var(--s4) 0 var(--s4);letter-spacing:.0
 .fill{flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--s12);justify-content:center}
 
 /* ─── Footer ─── */
-.footer{flex:0 0 auto;margin-top:var(--s8);padding-top:6px;display:flex;justify-content:space-between;align-items:center;gap:var(--s12);border-top:1px solid var(--g-border);color:var(--muted);font-size:10px;letter-spacing:.04em}
+.footer{flex:0 0 auto;margin-top:var(--s8);padding-top:6px;display:flex;justify-content:space-between;align-items:center;gap:var(--s12);border-top:1px solid #d8d0c4;color:var(--muted);font-size:10px;letter-spacing:.04em}
 .footer .ko-mark{display:flex;align-items:center;gap:6px}
 .footer .ko-mark img{height:14px}
 
@@ -109,45 +109,45 @@ h3{font-size:13px;font-weight:600;margin:var(--s4) 0 var(--s4);letter-spacing:.0
 /* ─── Glass cards (opaque fake glass: gradient top highlight + warm tint + inner border) ─── */
 .card{
   background:linear-gradient(180deg,var(--g-card-top) 0%,var(--g-card) 35%);
-  border:1px solid var(--g-border);
+  border:1px solid #d8d0c4;
   border-top-color:var(--g-border-hi);
   border-radius:20px;
   padding:14px 16px;
   display:flex;flex-direction:column;
-  box-shadow:0 8px 24px #06010088,0 2px 6px #08020044;
+  box-shadow:0 4px 16px #00000012,0 1px 3px #00000008;
 }
-.card h3{color:var(--white)} .card p,.card li{color:var(--muted);font-size:12px;line-height:1.4}
+.card h3{color:var(--ink)} .card p,.card li{color:var(--muted);font-size:12px;line-height:1.4}
 
 /* ─── Numbers ─── */
-.num{font-family:"Source Serif 4",Georgia,serif;font-size:36px;font-style:italic;line-height:.9;color:var(--steel);font-weight:400}
+.num{font-family:"Source Serif 4",Georgia,serif;font-size:36px;font-style:italic;line-height:.9;color:var(--wine);font-weight:400}
 .num.lg{font-size:48px}
 
 /* ─── Ratio bar ─── */
 .ratio{display:flex;gap:2px;height:28px;border-radius:10px;overflow:hidden}
 .ratio .seg{display:flex;align-items:center;padding:0 10px;font-size:11px;font-weight:600;white-space:nowrap}
-.ratio .seg.a{background:linear-gradient(135deg,var(--wine),var(--ember));color:var(--white)}
-.ratio .seg.b{background:var(--g-card);color:var(--steel)}
+.ratio .seg.a{background:linear-gradient(135deg,var(--wine),var(--ember));color:var(--ink)}
+.ratio .seg.b{background:#e8e0d4;color:var(--ink)}
 
 /* ─── Statement ─── */
 .statement{font-family:"Source Serif 4",Georgia,serif;font-style:italic;font-size:38px;line-height:1.1;letter-spacing:-0.02em}
-.statement em{color:var(--steel)}
+.statement em{color:var(--wine)}
 
 /* ─── Kickers ─── */
 .kicker{font-size:9px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--steel-dim)}
 
 /* ─── Lists ─── */
 ul.clean{list-style:none;display:grid;gap:3px}
-ul.clean li{display:flex;gap:var(--s8);align-items:flex-start;font-size:12.5px;line-height:1.35;color:var(--white)}
+ul.clean li{display:flex;gap:var(--s8);align-items:flex-start;font-size:12.5px;line-height:1.35;color:var(--ink)}
 ul.clean li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--steel-dim);margin-top:5px;flex:0 0 auto}
 
 /* ─── Tables (glass cells) ─── */
 table.phase{width:100%;border-collapse:collapse;font-size:12px}
-table.phase th,table.phase td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--g-border);vertical-align:top}
+table.phase th,table.phase td{text-align:left;padding:6px 8px;border-bottom:1px solid #d8d0c4;vertical-align:top}
 table.phase th{color:var(--steel-dim);font-weight:600;font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding-top:0}
 table.phase td.who{color:var(--muted);white-space:nowrap}
 
 /* ─── Glass pills ─── */
-.pill{display:inline-block;background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:1px solid var(--g-border);border-top-color:var(--g-border-hi);color:var(--steel);border-radius:999px;padding:3px 9px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin:0 4px 4px 0}
+.pill{display:inline-block;background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:1px solid #d8d0c4;border-top-color:var(--g-border-hi);color:var(--brown);border-radius:999px;padding:3px 9px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin:0 4px 4px 0}
 .pill.solid{background:linear-gradient(135deg,var(--wine),var(--ember));color:var(--white);border-color:var(--ember);font-weight:600}
 
 /* ─── Cover ─── */
@@ -158,13 +158,13 @@ table.phase td.who{color:var(--muted);white-space:nowrap}
 .fact b{display:block;font-family:"Source Serif 4",Georgia,serif;font-size:22px;font-weight:400;font-style:italic;color:var(--white);line-height:1}
 .fact span{display:block;margin-top:2px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .plus{margin-top:var(--s4);font-family:"Source Serif 4",Georgia,serif;font-size:22px;font-style:italic;color:#7fb09a}
-.cover-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:var(--s16);color:var(--muted);font-size:11px;line-height:1.45}
-.ph{position:relative;overflow:hidden;border-radius:16px;min-height:0;background:#0a0200;box-shadow:0 4px 16px #0a020088}
+.cover-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:var(--s16);color:var(--brown);font-size:11px;line-height:1.45}
+.ph{position:relative;overflow:hidden;border-radius:16px;min-height:0;background:#0a0200;box-shadow:0 4px 16px #00000018}
 .ph img{width:100%;height:100%;object-fit:cover;display:block}
 .ph span{position:absolute;left:7px;bottom:5px;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--white);text-shadow:0 1px 3px #000}
 
 /* ─── Contents ─── */
-button.jump{appearance:none;width:100%;display:flex;gap:var(--s8);align-items:baseline;text-align:left;background:transparent;color:var(--white);border:0;border-bottom:1px solid var(--g-border);padding:5px 2px;cursor:pointer;font-size:12px}
+button.jump{appearance:none;width:100%;display:flex;gap:var(--s8);align-items:baseline;text-align:left;background:transparent;color:var(--white);border:0;border-bottom:1px solid #d8d0c4;padding:5px 2px;cursor:pointer;font-size:12px}
 button.jump span{color:var(--steel-dim);font-variant-numeric:tabular-nums;width:16px;flex:0 0 auto;font-size:11px}
 button.jump em{font-style:normal;color:var(--muted);margin-left:auto;font-size:10px}
 button.jump:hover{color:var(--steel)}
@@ -172,16 +172,16 @@ button.jump:hover{color:var(--steel)}
 /* ─── Budget ─── */
 .giant{font-family:"Source Serif 4",Georgia,serif;font-weight:400;font-style:italic;font-size:78px;line-height:.86;letter-spacing:-0.03em}
 .eq{color:var(--muted);font-size:14px;margin:4px 0 var(--s8)} .eq b{color:var(--white);font-weight:500}
-.money{background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:1px solid var(--g-border);border-top-color:var(--g-border-hi);border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;box-shadow:0 8px 24px #06010088,0 2px 6px #08020044}
-.money .v{font-family:"Source Serif 4",Georgia,serif;font-size:48px;font-style:italic;color:var(--steel);line-height:1}
+.money{background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:1px solid #d8d0c4;border-top-color:var(--g-border-hi);border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;box-shadow:0 4px 16px #00000012,0 1px 3px #00000008}
+.money .v{font-family:"Source Serif 4",Georgia,serif;font-size:48px;font-style:italic;color:var(--wine);line-height:1}
 .money h3{font-size:13px;margin:4px 0 2px} .money p{color:var(--muted);font-size:11.5px;line-height:1.35}
 
 /* ─── Note bar (glass) ─── */
-.note-bar{background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:1px solid var(--g-border);border-left:3px solid var(--wine);border-radius:0 16px 16px 0;padding:10px var(--s12);font-size:12.5px;line-height:1.4;display:flex;align-items:flex-start;gap:10px;flex:0 0 auto}
+.note-bar{background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:1px solid #d8d0c4;border-left:3px solid var(--wine);border-radius:0 16px 16px 0;padding:10px var(--s12);font-size:12.5px;line-height:1.4;display:flex;align-items:flex-start;gap:10px;flex:0 0 auto}
 
 /* ─── Funnel ─── */
 .frow{display:grid;grid-template-columns:100px 1fr;gap:var(--s8);align-items:center}
-.fbar{height:38px;border-radius:12px;display:flex;align-items:center;padding:0 12px;background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:1px solid var(--g-border);border-top-color:var(--g-border-hi);font-size:12.5px;box-shadow:0 4px 12px #06010066}
+.fbar{height:38px;border-radius:12px;display:flex;align-items:center;padding:0 12px;background:linear-gradient(180deg,var(--g-card-top),var(--g-card));border:1px solid #d8d0c4;border-top-color:var(--g-border-hi);font-size:12.5px;box-shadow:0 2px 8px #00000010}
 .fbar strong{margin-right:8px} .fbar span{color:var(--muted)}
 .frow b{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel-dim)}
 .ads-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s12)}
@@ -190,17 +190,17 @@ button.jump:hover{color:var(--steel)}
 /* ─── Calendar (glass cells) ─── */
 .cal{width:100%;border-collapse:separate;border-spacing:2px;font-size:11px}
 .cal th{color:var(--steel-dim);font-weight:600;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 3px;text-align:left}
-.cal td{padding:4px 4px;vertical-align:top;line-height:1.3;color:var(--muted);background:var(--g-card);border-radius:6px}
-.cal td b{color:var(--white);font-weight:500;display:block;font-size:12px}
+.cal td{padding:4px 4px;vertical-align:top;line-height:1.3;color:var(--brown);background:#ffffff;border-radius:6px}
+.cal td b{color:var(--ink);font-weight:500;display:block;font-size:12px}
 .cal .fw{color:var(--steel)}
 .cal .mk{color:#7fb09a}
 .cal .ev{color:#c45a5a;font-size:10px}
 
 /* ─── Nav ─── */
-.bar{position:fixed;top:0;left:0;right:0;height:3px;background:#1a0a08;z-index:40}
+.bar{position:fixed;top:0;left:0;right:0;height:3px;background:#e3dfce;z-index:40}
 .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--wine),var(--ember))}
 .nav{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:40;display:flex;gap:6px;align-items:center}
-.nav button{appearance:none;border:1px solid var(--g-border);background:linear-gradient(180deg,var(--g-card-top),var(--g-card));color:var(--white);border-radius:999px;padding:7px 12px;font:500 12px/1 "Inter",sans-serif;cursor:pointer;border-top-color:var(--g-border-hi)}
+.nav button{appearance:none;border:1px solid #d8d0c4;background:#ffffff;color:var(--ink);border-radius:999px;padding:7px 12px;font:500 12px/1 "Inter",sans-serif;cursor:pointer;border-top-color:var(--g-border-hi)}
 .nav button:hover{border-color:var(--steel-dim);color:var(--steel)}
 .nav .count{color:var(--muted);font-size:12px;min-width:118px;text-align:center;font-variant-numeric:tabular-nums}
 .hit{position:fixed;top:0;bottom:48px;width:36px;z-index:6;background:transparent;border:0;padding:0;cursor:pointer}
@@ -208,7 +208,7 @@ button.jump:hover{color:var(--steel)}
 .hint{position:fixed;left:16px;bottom:16px;z-index:40;color:var(--muted);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
 @media(prefers-reduced-motion:reduce){.slide.active{animation:none}}
 @media print{.nav,.hit,.bar,.hint{display:none !important}}
-body.export{overflow:visible;height:auto;background:var(--ink)}
+body.export{overflow:visible;height:auto;background:#f6f0e9}
 body.export #stage{position:static !important;transform:none !important;width:960px !important;height:auto !important}
 body.export .slide{display:flex !important;position:relative !important;inset:auto !important;width:960px;height:540px;page-break-after:always;break-after:page}
 body.export .slide:last-of-type{page-break-after:auto;break-after:auto}
