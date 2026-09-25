@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,500;1,8..60,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
-/* ═══ KO DECK v21 DARK BROWN — same layout as light, color-swapped ═══ */
+/* ═══ KO DECK v24 DARK BROWN — high-contrast cards + text ═══ */
 :root {
   --ink:#1c0a05;--ink-deep:#150804;--wine:#4c050c;--ember:#611609;
-  --brown:#62483e;--steel:#94b1c8;--steel-dim:#84a0b6;
-  --warm:#f6f0e9;--cream:#e3dfce;--muted:#8b8480;--white:#f6f0e9;
+  --brown:#62483e;--steel:#a0bcd2;--steel-dim:#92aec6;
+  --warm:#f6f0e9;--cream:#e3dfce;--muted:#c8bfb6;--white:#f6f0e9;
   --d-bg:#1c0a05;
-  --g-card:#2a1a14ee;--g-card-top:#352420;--g-border:#5a4e4a;--g-border-hi:#6e6058;
+  --g-card:#3d2820f2;--g-card-top:#4a332b;--g-border:#5a4e4a;--g-border-hi:#6e6058;
   --s4:4px;--s8:8px;--s12:12px;--s16:16px;--s24:24px;--s32:32px;--s48:48px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -64,14 +64,14 @@ h1 em{font-style:italic;color:var(--steel)}
 h2{font-family:"Source Serif 4",Georgia,serif;font-weight:400;font-style:italic;font-size:26px;line-height:1.05;letter-spacing:-0.02em;margin-bottom:4px}
 h2 em{color:var(--steel)}
 h3{font-size:13px;font-weight:600;margin:var(--s4) 0 var(--s4);letter-spacing:.01em}
-.lede{color:var(--muted);font-size:12.5px;line-height:1.45;max-width:620px}
+.lede{color:#d0c5bb;font-size:12.5px;line-height:1.45;max-width:620px}
 .toprow{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--s16)}
 .accent-rule{width:48px;height:3px;margin:6px 0 4px;background:linear-gradient(90deg,var(--wine),var(--ember));border-radius:2px;flex:0 0 auto}
 .rule{height:1px;width:48px;margin:var(--s8) 0;background:linear-gradient(90deg,var(--wine),transparent)}
 .fill{flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--s12);justify-content:center}
 
 /* ─── Footer ─── */
-.footer{flex:0 0 auto;margin-top:var(--s8);padding-top:6px;display:flex;justify-content:space-between;align-items:center;gap:var(--s12);border-top:none;color:var(--muted);font-size:10px;letter-spacing:.04em}
+.footer{flex:0 0 auto;margin-top:var(--s8);padding-top:6px;display:flex;justify-content:space-between;align-items:center;gap:var(--s12);border-top:none;color:#c8bfb6;font-size:10px;letter-spacing:.04em}
 .footer .ko-mark{display:flex;align-items:center;gap:6px}
 .footer .ko-mark img{height:14px;filter:brightness(0) invert(1)}
 .cover-foot img{filter:brightness(0) invert(1)}
@@ -81,16 +81,16 @@ h3{font-size:13px;font-weight:600;margin:var(--s4) 0 var(--s4);letter-spacing:.0
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-items:stretch}
 .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s8);align-items:stretch}
 
-/* ─── Glass cards: dark warm translucent, no outline, no shadow ─── */
+/* ─── Glass cards: warm brown, clearly distinct from bg, no outline ─── */
 .card{
-  background:linear-gradient(180deg,#352420 0%,#2a1a14ee 100%);
+  background:linear-gradient(180deg,#4a332b 0%,#3d2820f2 100%);
   border:none;
   border-radius:20px;
   padding:14px 16px;
   display:flex;flex-direction:column;
   box-shadow:none;
 }
-.card h3{color:#f6f0e9} .card p,.card li{color:var(--muted);font-size:12px;line-height:1.4}
+.card h3{color:#f6f0e9} .card p,.card li{color:#e8ddd3;font-size:12px;line-height:1.4}
 
 /* ─── Numbers ─── */
 .num{font-family:"Source Serif 4",Georgia,serif;font-size:36px;font-style:italic;line-height:.9;color:var(--steel);font-weight:400}
@@ -100,7 +100,7 @@ h3{font-size:13px;font-weight:600;margin:var(--s4) 0 var(--s4);letter-spacing:.0
 .ratio{display:flex;gap:2px;height:28px;border-radius:10px;overflow:hidden}
 .ratio .seg{display:flex;align-items:center;padding:0 10px;font-size:11px;font-weight:600;white-space:nowrap}
 .ratio .seg.a{background:linear-gradient(135deg,var(--wine),var(--ember));color:var(--white)}
-.ratio .seg.b{background:#2a1a14;color:var(--steel)}
+.ratio .seg.b{background:#3d2820;color:var(--steel)}
 
 /* ─── Statement ─── */
 .statement{font-family:"Source Serif 4",Georgia,serif;font-style:italic;font-size:38px;line-height:1.1;letter-spacing:-0.02em}
@@ -121,7 +121,7 @@ table.phase th{color:var(--steel-dim);font-weight:600;font-size:9px;letter-spaci
 table.phase td.who{color:var(--muted);white-space:nowrap}
 
 /* ─── Glass pills ─── */
-.pill{display:inline-block;background:linear-gradient(180deg,#352420,#2a1a14);border:none;color:var(--steel);border-radius:999px;padding:3px 9px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin:0 4px 4px 0}
+.pill{display:inline-block;background:linear-gradient(180deg,#4a332b,#3d2820);border:none;color:var(--steel);border-radius:999px;padding:3px 9px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin:0 4px 4px 0}
 .pill.solid{background:linear-gradient(135deg,var(--wine),var(--ember));color:var(--white);border:none;font-weight:600}
 
 /* ─── Cover ─── */
@@ -130,9 +130,9 @@ table.phase td.who{color:var(--muted);white-space:nowrap}
 .cover-photos{display:grid;grid-template-rows:1.15fr .85fr;gap:var(--s8);min-height:0}
 .facts{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:6px var(--s12)}
 .fact b{display:block;font-family:"Source Serif 4",Georgia,serif;font-size:22px;font-weight:400;font-style:italic;color:var(--white);line-height:1}
-.fact span{display:block;margin-top:2px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.fact span{display:block;margin-top:2px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#c8bfb6}
 .plus{margin-top:var(--s4);font-family:"Source Serif 4",Georgia,serif;font-size:22px;font-style:italic;color:#7fb09a}
-.cover-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:var(--s16);color:var(--muted);font-size:11px;line-height:1.45}
+.cover-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:var(--s16);color:#c8bfb6;font-size:11px;line-height:1.45}
 .ph{position:relative;overflow:hidden;border-radius:16px;min-height:0;background:#0a0200;box-shadow:0 4px 16px #00000014}
 .ph img{width:100%;height:100%;object-fit:cover;display:block}
 .ph span{position:absolute;left:7px;bottom:5px;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--white);text-shadow:0 1px 3px #000}
@@ -140,23 +140,23 @@ table.phase td.who{color:var(--muted);white-space:nowrap}
 /* ─── Contents ─── */
 button.jump{appearance:none;width:100%;display:flex;gap:var(--s8);align-items:baseline;text-align:left;background:transparent;color:var(--white);border:0;border-bottom:none;padding:5px 2px;cursor:pointer;font-size:12px}
 button.jump span{color:var(--steel-dim);font-variant-numeric:tabular-nums;width:16px;flex:0 0 auto;font-size:11px}
-button.jump em{font-style:normal;color:var(--muted);margin-left:auto;font-size:10px}
+button.jump em{font-style:normal;color:#c8bfb6;margin-left:auto;font-size:10px}
 button.jump:hover{color:var(--steel)}
 
 /* ─── Budget ─── */
 .giant{font-family:"Source Serif 4",Georgia,serif;font-weight:400;font-style:italic;font-size:78px;line-height:.86;letter-spacing:-0.03em}
-.eq{color:var(--muted);font-size:14px;margin:4px 0 var(--s8)} .eq b{color:var(--white);font-weight:500}
-.money{background:linear-gradient(180deg,#352420,#2a1a14ee);border:none;border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;box-shadow:none}
+.eq{color:#c8bfb6;font-size:14px;margin:4px 0 var(--s8)} .eq b{color:var(--white);font-weight:500}
+.money{background:linear-gradient(180deg,#4a332b,#3d2820f2);border:none;border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;box-shadow:none}
 .money .v{font-family:"Source Serif 4",Georgia,serif;font-size:48px;font-style:italic;color:var(--steel);line-height:1}
-.money h3{font-size:13px;margin:4px 0 2px} .money p{color:var(--muted);font-size:11.5px;line-height:1.35}
+.money h3{font-size:13px;margin:4px 0 2px} .money p{color:#e8ddd3;font-size:11.5px;line-height:1.35}
 
 /* ─── Note bar (glass) ─── */
-.note-bar{background:linear-gradient(180deg,#352420,#2a1a14ee);border:none;border-left:3px solid var(--wine);border-radius:0 16px 16px 0;padding:10px var(--s12);font-size:12.5px;line-height:1.4;display:flex;align-items:flex-start;gap:10px;flex:0 0 auto}
+.note-bar{background:linear-gradient(180deg,#4a332b,#3d2820f2);border:none;border-left:3px solid var(--wine);border-radius:0 16px 16px 0;padding:10px var(--s12);font-size:12.5px;line-height:1.4;display:flex;align-items:flex-start;gap:10px;flex:0 0 auto}
 
 /* ─── Funnel ─── */
 .frow{display:grid;grid-template-columns:100px 1fr;gap:var(--s8);align-items:center}
-.fbar{height:38px;border-radius:12px;display:flex;align-items:center;padding:0 12px;background:linear-gradient(180deg,#352420,#2a1a14);border:none;font-size:12.5px;box-shadow:none}
-.fbar strong{margin-right:8px} .fbar span{color:var(--muted)}
+.fbar{height:38px;border-radius:12px;display:flex;align-items:center;padding:0 12px;background:linear-gradient(180deg,#4a332b,#3d2820);border:none;font-size:12.5px;box-shadow:none}
+.fbar strong{margin-right:8px} .fbar span{color:#e8ddd3}
 .frow b{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel-dim)}
 .ads-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s12)}
 .ads-grid .stack{display:flex;flex-direction:column;gap:var(--s8);justify-content:center}
@@ -164,7 +164,7 @@ button.jump:hover{color:var(--steel)}
 /* ─── Calendar (glass cells) ─── */
 .cal{width:100%;border-collapse:separate;border-spacing:2px;font-size:11px}
 .cal th{color:var(--steel-dim);font-weight:600;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 3px;text-align:left}
-.cal td{padding:4px 4px;vertical-align:top;line-height:1.3;color:var(--muted);background:var(--g-card);border-radius:6px}
+.cal td{padding:4px 4px;vertical-align:top;line-height:1.3;color:#d0c5bb;background:var(--g-card);border-radius:6px}
 .cal td b{color:#f6f0e9;font-weight:500;display:block;font-size:12px}
 .cal .fw{color:var(--steel)}
 .cal .mk{color:#7fb09a}
