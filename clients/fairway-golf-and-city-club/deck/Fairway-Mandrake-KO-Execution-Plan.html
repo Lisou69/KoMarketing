@@ -3,243 +3,202 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="color-scheme" content="dark" />
+<meta name="color-scheme" content="dark light" />
 <title>Fairway Golf and City Club + Mandrake Cafe — Execution Plan · KO Marketing</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,500;1,8..60,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
-/* ═══════════════════════════════════════════════════
-   KO EXECUTION DECK THEME — extracted from komarketingagency.com
-   Fonts: Source Serif 4 (display, italic accent) + Inter (body)
-   ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   KO EXECUTION DECK v4 — komarketingagency.com palette
+   AVI light/dark rhythm · fill-stretch layout · print-safe
+   ═══════════════════════════════════════════════════════════ */
 :root {
-  /* Palette — komarketingagency.com Sep 2026 */
-  --ink:        #110300;
-  --ink-deep:   #0d0200;
-  --ink-card:   #1a0f0b;
-  --ink-subtle: #231814;
-  --wine:       #4c050c;
-  --ember:      #611609;
-  --brown:      #62483e;
-  --steel:      #94b1c8;
-  --steel-dim:  #84a0b6;
-  --warm:       #f6f0e9;
-  --cream:      #e3dfce;
-  --muted:      #8b8480;
-  --subtle:     #534e4c;
-  --white:      #ffffff;
-  /* Opaque surface blends — no transparency for print safety */
-  --card-bg:    #1f1410;
-  --card-line:  #352a25;
-  --card-green: #162018;
-  --card-green-line: #294030;
-  --card-blue:  #141c22;
-  --card-blue-line: #2a3e4c;
-  --card-wine:  #200a0e;
-  --card-wine-line: #4a1a20;
-  --note-bg:    #1a1210;
-  --note-line:  #352520;
-  /* Spacing scale (8-pt grid) */
-  --s4: 4px; --s8: 8px; --s12: 12px; --s16: 16px;
-  --s24: 24px; --s32: 32px; --s48: 48px;
+  --ink:       #110300; --ink-deep: #0d0200;
+  --wine:      #4c050c; --ember: #611609;
+  --brown:     #62483e; --steel: #94b1c8; --steel-dim: #84a0b6;
+  --warm:      #f6f0e9; --cream: #e3dfce; --muted: #8b8480;
+  --white:     #ffffff;
+  /* Dark-mode surfaces (opaque, pre-blended) */
+  --d-bg:      #110300; --d-card: #1f1410; --d-line: #352a25;
+  --d-card-g:  #162018; --d-line-g: #294030;
+  --d-card-b:  #141c22; --d-line-b: #2a3e4c;
+  --d-card-w:  #200a0e; --d-line-w: #4a1a20;
+  --d-note:    #1a1210; --d-note-l: #352520;
+  /* Light-mode surfaces (opaque, pre-blended on #f6f0e9) */
+  --l-bg:      #f6f0e9; --l-card: #ffffff; --l-line: #e3dfce;
+  --l-card-g:  #eaf2ed; --l-line-g: #b8d0c0;
+  --l-card-b:  #eaf0f4; --l-line-b: #a8c0d0;
+  --l-card-w:  #f2e8e8; --l-line-w: #d0a0a0;
+  --l-note:    #fdf9f5; --l-note-l: #e3dfce;
+  --s4: 4px; --s8: 8px; --s12: 12px; --s16: 16px; --s24: 24px; --s32: 32px; --s48: 48px;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body {
-  height: 100%;
-  background: var(--ink-deep);
-  color: var(--white);
-  font-family: "Inter", system-ui, sans-serif;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
-}
+html, body { height: 100%; background: var(--ink-deep); color: var(--white); font-family: "Inter", system-ui, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 body { overflow: hidden; }
 button, a { font-family: inherit; }
 
 /* ─── Stage ─── */
-#stage {
-  position: absolute;
-  width: 960px; height: 540px;
-  left: 0; top: 0;
-  transform-origin: top left;
-  z-index: 1;
-}
+#stage { position: absolute; width: 960px; height: 540px; left: 0; top: 0; transform-origin: top left; z-index: 1; }
+
+/* ─── Slide base (dark default) ─── */
 .slide {
-  position: absolute; inset: 0;
-  width: 960px; height: 540px;
+  position: absolute; inset: 0; width: 960px; height: 540px;
   display: none; flex-direction: column;
-  padding: 24px 40px 12px;
-  overflow: hidden;
-  background: var(--ink);
-}
-.slide.active { display: flex; animation: fadeIn .3s ease; }
-@keyframes fadeIn { from { visibility: hidden; } to { visibility: visible; } }
-
-/* Accent top bar — 3px wine gradient instead of old gold */
-.slide::before {
-  content: ""; position: absolute;
-  left: 0; right: 0; top: 0; height: 3px;
-  background: linear-gradient(90deg, var(--wine), var(--ember) 60%, transparent);
-}
-
-/* ─── Typography hierarchy ─── */
-.eyebrow {
-  font-size: 10px; font-weight: 600;
-  letter-spacing: .22em; text-transform: uppercase;
-  color: var(--steel);
-  margin-bottom: var(--s4);
-}
-h1 {
-  font-family: "Source Serif 4", Georgia, serif;
-  font-weight: 400; font-style: italic;
-  font-size: 44px; line-height: .90;
-  letter-spacing: -0.03em;
+  padding: 24px 40px 10px;
+  overflow: hidden; background: var(--d-bg);
   color: var(--white);
 }
+.slide.active { display: flex; }
+.slide::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--wine), var(--ember) 60%, transparent); }
+
+/* ─── Light slides ─── */
+.slide[data-tone="light"] { background: var(--l-bg); color: var(--ink); }
+.slide[data-tone="light"]::before { background: linear-gradient(90deg, var(--wine), var(--ember) 50%, var(--cream)); }
+.slide[data-tone="light"] .eyebrow { color: var(--brown); }
+.slide[data-tone="light"] h2 { color: var(--ink); }
+.slide[data-tone="light"] h2 em { color: var(--wine); }
+.slide[data-tone="light"] h3 { color: var(--ink); }
+.slide[data-tone="light"] .lede { color: var(--brown); }
+.slide[data-tone="light"] .muted, .slide[data-tone="light"] .card p, .slide[data-tone="light"] .card li { color: var(--brown); }
+.slide[data-tone="light"] .card { background: var(--l-card); border-color: var(--l-line); }
+.slide[data-tone="light"] .card h3 { color: var(--ink); }
+.slide[data-tone="light"] .card.green { background: var(--l-card-g); border-color: var(--l-line-g); }
+.slide[data-tone="light"] .card.blue { background: var(--l-card-b); border-color: var(--l-line-b); }
+.slide[data-tone="light"] .card.wine { background: var(--l-card-w); border-color: var(--l-line-w); }
+.slide[data-tone="light"] .num { color: var(--wine); }
+.slide[data-tone="light"] .num.green { color: #3a7a5a; }
+.slide[data-tone="light"] .num.blue { color: #4a7a9a; }
+.slide[data-tone="light"] .num.wine { color: var(--wine); }
+.slide[data-tone="light"] .kicker { color: var(--brown); }
+.slide[data-tone="light"] .kicker.green { color: #3a7a5a; }
+.slide[data-tone="light"] .kicker.blue { color: #4a7a9a; }
+.slide[data-tone="light"] .kicker.wine { color: var(--wine); }
+.slide[data-tone="light"] ul.clean li { color: var(--ink); }
+.slide[data-tone="light"] ul.clean li::before { background: var(--wine); }
+.slide[data-tone="light"] ul.clean.green li::before { background: #3a7a5a; }
+.slide[data-tone="light"] ul.clean.wine li::before { background: var(--wine); }
+.slide[data-tone="light"] table.phase th { color: var(--brown); }
+.slide[data-tone="light"] table.phase td { border-color: var(--l-line); color: var(--ink); }
+.slide[data-tone="light"] table.phase td.who, .slide[data-tone="light"] table.phase td.when { color: var(--brown); }
+.slide[data-tone="light"] table.phase tr.hot td { background: var(--l-card-w); }
+.slide[data-tone="light"] .pill { border-color: var(--l-line); color: var(--brown); }
+.slide[data-tone="light"] .pill.wine { color: var(--wine); border-color: var(--l-line-w); }
+.slide[data-tone="light"] .pill.green { color: #3a7a5a; border-color: var(--l-line-g); }
+.slide[data-tone="light"] .pill.solid { background: linear-gradient(135deg, var(--wine), var(--ember)); color: var(--white); }
+.slide[data-tone="light"] .note-bar { background: var(--l-note); border-color: var(--l-note-l); border-left-color: var(--wine); color: var(--ink); }
+.slide[data-tone="light"] .footer { border-color: var(--l-line); color: var(--brown); }
+.slide[data-tone="light"] .money { background: var(--l-card); border-color: var(--l-line); }
+.slide[data-tone="light"] .money .v { color: var(--wine); }
+.slide[data-tone="light"] .money h3 { color: var(--ink); }
+.slide[data-tone="light"] .money p { color: var(--brown); }
+.slide[data-tone="light"] .split .bit { border-color: var(--l-line); color: var(--brown); }
+.slide[data-tone="light"] .split .bit b { color: var(--ink); }
+.slide[data-tone="light"] .giant { color: var(--ink); }
+.slide[data-tone="light"] .eq { color: var(--brown); }
+.slide[data-tone="light"] .eq b { color: var(--ink); }
+.slide[data-tone="light"] .step { background: var(--l-card); border-color: var(--l-line); }
+.slide[data-tone="light"] .step .n { color: var(--wine); }
+.slide[data-tone="light"] .step h3 { color: var(--ink); }
+.slide[data-tone="light"] .step p { color: var(--brown); }
+.slide[data-tone="light"] .node b { color: var(--ink); }
+.slide[data-tone="light"] .node span { color: var(--brown); }
+.slide[data-tone="light"] .node i { border-color: var(--l-bg); }
+.slide[data-tone="light"] .rail::before { border-radius: 2px; }
+.slide[data-tone="light"] .band { border-color: var(--l-line); }
+.slide[data-tone="light"] .band .d { color: var(--wine); }
+.slide[data-tone="light"] .band .d small { color: var(--brown); }
+.slide[data-tone="light"] .band p { color: var(--ink); }
+.slide[data-tone="light"] .band p span { color: var(--brown); }
+.slide[data-tone="light"] .path .p { background: var(--l-card); border-color: var(--l-line); }
+.slide[data-tone="light"] .path .p b { color: var(--ink); }
+.slide[data-tone="light"] .path .p span { color: var(--brown); }
+.slide[data-tone="light"] .arrow { color: var(--wine); }
+.slide[data-tone="light"] .fbar { background: linear-gradient(90deg, var(--l-card-w), var(--l-card)); border-color: var(--l-line); color: var(--ink); }
+.slide[data-tone="light"] .fbar span { color: var(--brown); }
+.slide[data-tone="light"] .frow b { color: var(--wine); }
+.slide[data-tone="light"] .lock { background: var(--l-card); border-color: var(--l-line); }
+.slide[data-tone="light"] .lock .big { color: var(--wine); }
+.slide[data-tone="light"] .lock h3 { color: var(--ink); }
+.slide[data-tone="light"] .lock p { color: var(--brown); }
+.slide[data-tone="light"] .lock .own b { color: var(--ink); }
+.slide[data-tone="light"] .lock .own span { color: var(--wine); }
+.slide[data-tone="light"] button.jump { color: var(--ink); border-color: var(--l-line); }
+.slide[data-tone="light"] button.jump span { color: var(--wine); }
+.slide[data-tone="light"] button.jump em { color: var(--brown); }
+.slide[data-tone="light"] button.jump:hover { color: var(--wine); }
+.slide[data-tone="light"] .cols3 h3 { color: var(--wine); }
+
+/* ─── Typography ─── */
+.eyebrow { font-size: 10px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--steel); margin-bottom: var(--s4); }
+h1 { font-family: "Source Serif 4", Georgia, serif; font-weight: 400; font-style: italic; font-size: 44px; line-height: .90; letter-spacing: -0.03em; }
 h1 em { font-style: italic; color: var(--steel); }
-h2 {
-  font-family: "Source Serif 4", Georgia, serif;
-  font-weight: 400; font-style: italic;
-  font-size: 26px; line-height: 1.05;
-  letter-spacing: -0.02em;
-  color: var(--white);
-  margin-bottom: var(--s4);
-}
+h2 { font-family: "Source Serif 4", Georgia, serif; font-weight: 400; font-style: italic; font-size: 26px; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 0; }
 h2 em { color: var(--steel); }
-h3 {
-  font-size: 13px; font-weight: 600;
-  margin: var(--s4) 0 var(--s4);
-  letter-spacing: .01em;
-}
-.lede {
-  color: var(--muted); font-size: 12.5px;
-  line-height: 1.45; max-width: 620px;
-}
-.toprow {
-  display: flex; justify-content: space-between;
-  align-items: flex-start; gap: var(--s16);
-}
+h3 { font-size: 13px; font-weight: 600; margin: var(--s4) 0 var(--s4); letter-spacing: .01em; }
+.lede { color: var(--muted); font-size: 12.5px; line-height: 1.45; max-width: 620px; }
+.toprow { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s16); }
+.accent-rule { width: 48px; height: 3px; margin: 6px 0 4px; background: linear-gradient(90deg, var(--wine), var(--ember)); border-radius: 2px; flex: 0 0 auto; }
+.rule { height: 1px; width: 48px; margin: var(--s8) 0; background: linear-gradient(90deg, var(--wine), transparent); }
 
-/* ─── Section rule — AVI-inspired accent bar ─── */
-.accent-rule {
-  width: 48px; height: 3px; margin: var(--s8) 0;
-  background: linear-gradient(90deg, var(--wine), var(--ember));
-  border-radius: 2px;
-}
-
-/* ─── Fill (flexible content area) ─── */
+/* ─── Fill: STRETCH to use frame height ─── */
 .fill {
   flex: 1; min-height: 0;
   display: flex; flex-direction: column;
   gap: var(--s8);
-  justify-content: center;
+  justify-content: flex-start;
 }
+.fill > .grid-2, .fill > .grid-3, .fill > .grid-4,
+.fill > .locks, .fill > .steps, .fill > .ads-grid { flex: 1; min-height: 0; }
+.fill > .grid-2 > .card, .fill > .grid-3 > .card, .fill > .grid-4 > .card { min-height: 0; }
+.fill > table.phase { flex: 0 0 auto; }
+.fill > .note-bar { flex: 0 0 auto; }
+.fill > p { flex: 0 0 auto; }
 
-/* ─── Footer (branded) ─── */
-.footer {
-  margin-top: auto; padding-top: var(--s8);
-  display: flex; justify-content: space-between;
-  align-items: center; gap: var(--s12);
-  border-top: 1px solid var(--card-line);
-  color: var(--muted); font-size: 10px;
-  letter-spacing: .04em;
-}
-.footer .ko-mark {
-  display: flex; align-items: center; gap: 6px;
-}
+/* ─── Footer ─── */
+.footer { flex: 0 0 auto; margin-top: var(--s8); padding-top: 6px; display: flex; justify-content: space-between; align-items: center; gap: var(--s12); border-top: 1px solid var(--d-line); color: var(--muted); font-size: 10px; letter-spacing: .04em; }
+.footer .ko-mark { display: flex; align-items: center; gap: 6px; }
 .footer .ko-mark img { height: 14px; }
 
 /* ─── Grids ─── */
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s12); }
-.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s8); }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s12); align-content: stretch; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; align-content: stretch; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s8); align-content: stretch; }
 
-/* ─── Cards (layered surface, no shadow — per AVI) ─── */
-.card {
-  background: var(--card-bg);
-  border: 1px solid var(--card-line);
-  border-radius: 14px;
-  padding: 10px 12px;
-  display: flex; flex-direction: column;
-}
-.card.green { background: var(--card-green); border-color: var(--card-green-line); }
-.card.blue { background: var(--card-blue); border-color: var(--card-blue-line); }
-.card.wine, .card.coral { background: var(--card-wine); border-color: var(--card-wine-line); }
+/* ─── Cards ─── */
+.card { background: var(--d-card); border: 1px solid var(--d-line); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; }
+.card.green { background: var(--d-card-g); border-color: var(--d-line-g); }
+.card.blue { background: var(--d-card-b); border-color: var(--d-line-b); }
+.card.wine, .card.coral { background: var(--d-card-w); border-color: var(--d-line-w); }
 .card h3 { color: var(--white); }
 .card p, .card li { color: var(--muted); font-size: 12px; line-height: 1.4; }
 
-/* ─── Number callouts (Source Serif italic, like KO site) ─── */
-.num {
-  font-family: "Source Serif 4", Georgia, serif;
-  font-size: 28px; font-style: italic;
-  line-height: .9; color: var(--steel);
-  font-weight: 400;
-}
-.num.green { color: #7fb09a; }
-.num.blue { color: var(--steel); }
-.num.wine { color: var(--wine); }
+/* ─── Numbers ─── */
+.num { font-family: "Source Serif 4", Georgia, serif; font-size: 30px; font-style: italic; line-height: .9; color: var(--steel); font-weight: 400; }
+.num.green { color: #7fb09a; } .num.blue { color: var(--steel); } .num.wine { color: var(--wine); }
 
 /* ─── Kickers ─── */
-.kicker {
-  font-size: 9px; letter-spacing: .16em;
-  text-transform: uppercase; font-weight: 600;
-  color: var(--steel-dim);
-}
-.kicker.green { color: #7fb09a; }
-.kicker.blue { color: var(--steel); }
-.kicker.wine { color: #c45a5a; }
+.kicker { font-size: 9px; letter-spacing: .16em; text-transform: uppercase; font-weight: 600; color: var(--steel-dim); }
+.kicker.green { color: #7fb09a; } .kicker.blue { color: var(--steel); } .kicker.wine { color: #c45a5a; }
 
 /* ─── Lists ─── */
 ul.clean { list-style: none; display: grid; gap: 3px; }
-ul.clean li {
-  display: flex; gap: var(--s8);
-  align-items: flex-start;
-  font-size: 12.5px; line-height: 1.35;
-  color: var(--white);
-}
-ul.clean li::before {
-  content: ""; width: 6px; height: 6px; border-radius: 50%;
-  background: var(--steel-dim);
-  margin-top: 5px; flex: 0 0 auto;
-}
-ul.clean.green li::before { background: #7fb09a; }
-ul.clean.wine li::before { background: #c45a5a; }
+ul.clean li { display: flex; gap: var(--s8); align-items: flex-start; font-size: 12.5px; line-height: 1.35; color: var(--white); }
+ul.clean li::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--steel-dim); margin-top: 5px; flex: 0 0 auto; }
+ul.clean.green li::before { background: #7fb09a; } ul.clean.wine li::before { background: #c45a5a; }
 
 /* ─── Tables ─── */
-table.phase {
-  width: 100%; border-collapse: collapse; font-size: 12px;
-}
-table.phase th, table.phase td {
-  text-align: left; padding: 5px 8px;
-  border-bottom: 1px solid var(--card-line);
-  vertical-align: top;
-}
-table.phase th {
-  color: var(--steel-dim); font-weight: 600;
-  font-size: 9px; letter-spacing: .14em;
-  text-transform: uppercase; padding-top: 0;
-}
+table.phase { width: 100%; border-collapse: collapse; font-size: 12px; }
+table.phase th, table.phase td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--d-line); vertical-align: top; }
+table.phase th { color: var(--steel-dim); font-weight: 600; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; padding-top: 0; }
 table.phase td.who, table.phase td.when { color: var(--muted); white-space: nowrap; }
-table.phase tr.hot td { background: var(--card-wine); }
+table.phase tr.hot td { background: var(--d-card-w); }
 
-/* ─── Pills (KO website pill-button style) ─── */
-.pill {
-  display: inline-block;
-  border: 1px solid var(--card-line);
-  color: var(--steel-dim); border-radius: 999px;
-  padding: 2px 7px; font-size: 9px;
-  letter-spacing: .08em; text-transform: uppercase;
-  margin: 0 4px 4px 0;
-}
-.pill.wine { color: #c45a5a; border-color: var(--card-wine-line); }
-.pill.green { color: #7fb09a; border-color: var(--card-green-line); }
-.pill.solid {
-  background: linear-gradient(135deg, var(--wine), var(--ember));
-  color: var(--white); border-color: var(--ember); font-weight: 600;
-}
-
-/* ─── Accent rule (divider) ─── */
-.rule { height: 1px; width: 48px; margin: var(--s8) 0; background: linear-gradient(90deg, var(--wine), transparent); }
+/* ─── Pills ─── */
+.pill { display: inline-block; border: 1px solid var(--d-line); color: var(--steel-dim); border-radius: 999px; padding: 2px 7px; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; margin: 0 4px 4px 0; }
+.pill.wine { color: #c45a5a; border-color: var(--d-line-w); }
+.pill.green { color: #7fb09a; border-color: var(--d-line-g); }
+.pill.solid { background: linear-gradient(135deg, var(--wine), var(--ember)); color: var(--white); border-color: var(--ember); font-weight: 600; }
 
 /* ─── Cover ─── */
 .cover { display: grid; grid-template-columns: 1.05fr .95fr; gap: var(--s16); min-height: 0; }
@@ -250,7 +209,6 @@ table.phase tr.hot td { background: var(--card-wine); }
 .fact span { display: block; margin-top: 2px; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
 .plus { margin-top: var(--s4); font-family: "Source Serif 4", Georgia, serif; font-size: 22px; font-style: italic; color: #7fb09a; }
 .cover-foot { display: flex; justify-content: space-between; align-items: flex-end; margin-top: var(--s16); color: var(--muted); font-size: 11px; line-height: 1.45; }
-/* Photo frame */
 .ph { position: relative; overflow: hidden; border-radius: 10px; min-height: 0; background: #0a0200; }
 .ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .ph span { position: absolute; left: 7px; bottom: 5px; font-size: 8px; letter-spacing: .12em; text-transform: uppercase; color: var(--white); text-shadow: 0 1px 3px #000; }
@@ -258,111 +216,80 @@ table.phase tr.hot td { background: var(--card-wine); }
 /* ─── Contents ─── */
 .cols3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--s16); }
 .cols3 h3 { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--steel); margin-bottom: var(--s4); font-weight: 600; }
-button.jump {
-  appearance: none; width: 100%; display: flex; gap: var(--s8);
-  align-items: baseline; text-align: left;
-  background: transparent; color: var(--white);
-  border: 0; border-bottom: 1px solid var(--card-line);
-  padding: 4px 2px; cursor: pointer; font-size: 12px;
-}
+button.jump { appearance: none; width: 100%; display: flex; gap: var(--s8); align-items: baseline; text-align: left; background: transparent; color: var(--white); border: 0; border-bottom: 1px solid var(--d-line); padding: 5px 2px; cursor: pointer; font-size: 12px; }
 button.jump span { color: var(--steel-dim); font-variant-numeric: tabular-nums; width: 16px; flex: 0 0 auto; font-size: 11px; }
 button.jump em { font-style: normal; color: var(--muted); margin-left: auto; font-size: 10px; }
 button.jump:hover { color: var(--steel); }
 
-/* ─── Timeline rail ─── */
-.rail { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s8); margin-top: var(--s8); position: relative; }
+/* ─── Timeline ─── */
+.rail { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s8); position: relative; }
 .rail::before { content: ""; position: absolute; left: 8px; right: 8px; top: 15px; height: 3px; background: linear-gradient(90deg, var(--wine), var(--ember)); border-radius: 2px; }
-.node { position: relative; padding-top: 32px; }
-.node i { position: absolute; top: 8px; left: 0; width: 14px; height: 14px; border-radius: 50%; background: var(--wine); border: 3px solid var(--ink); box-shadow: 0 0 0 2px var(--wine); }
+.node { position: relative; padding-top: 30px; }
+.node i { position: absolute; top: 8px; left: 0; width: 14px; height: 14px; border-radius: 50%; background: var(--wine); border: 3px solid var(--d-bg); box-shadow: 0 0 0 2px var(--wine); }
 .node b { display: block; font-size: 13px; font-weight: 600; }
 .node span { display: block; color: var(--muted); font-size: 11.5px; line-height: 1.35; margin-top: 3px; }
 .node small { display: block; color: var(--steel-dim); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; margin-top: var(--s4); }
 
 /* ─── Steps ─── */
 .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--s8); }
-.step {
-  background: var(--card-bg); border: 1px solid var(--card-line);
-  border-radius: 14px; padding: 10px 10px; display: flex; flex-direction: column;
-}
-.step .n { font-family: "Source Serif 4", Georgia, serif; color: var(--steel-dim); font-size: 22px; font-style: italic; line-height: 1; }
+.step { background: var(--d-card); border: 1px solid var(--d-line); border-radius: 14px; padding: 12px 10px; display: flex; flex-direction: column; }
+.step .n { font-family: "Source Serif 4", Georgia, serif; color: var(--steel-dim); font-size: 24px; font-style: italic; line-height: 1; }
 .step h3 { font-size: 13px; margin: 6px 0 4px; }
 .step p { color: var(--muted); font-size: 11.5px; line-height: 1.35; }
 
 /* ─── Funnel ─── */
-.funnel { display: grid; gap: 6px; margin-top: var(--s4); }
+.funnel { display: grid; gap: 6px; }
 .frow { display: grid; grid-template-columns: 86px 1fr; gap: var(--s8); align-items: center; }
-.fbar { height: 36px; border-radius: 8px; display: flex; align-items: center; padding: 0 12px; background: linear-gradient(90deg, #2a1510, #1a0a08); border: 1px solid var(--card-line); font-size: 12.5px; }
-.fbar strong { margin-right: 8px; }
-.fbar span { color: var(--muted); }
+.fbar { height: 38px; border-radius: 8px; display: flex; align-items: center; padding: 0 12px; background: linear-gradient(90deg, #2a1510, #1a0a08); border: 1px solid var(--d-line); font-size: 12.5px; }
+.fbar strong { margin-right: 8px; } .fbar span { color: var(--muted); }
 .frow b { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--steel-dim); }
-
-/* ─── Ads layout ─── */
 .ads-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s12); }
-.ads-grid .stack { display: flex; flex-direction: column; gap: var(--s8); }
+.ads-grid .stack { display: flex; flex-direction: column; gap: var(--s8); justify-content: center; }
 
-/* ─── Channels path ─── */
-.path { display: flex; align-items: stretch; gap: 6px; margin-top: var(--s8); }
-.path .p { flex: 1; background: var(--card-bg); border: 1px solid var(--card-line); border-radius: 10px; padding: var(--s8); }
-.path .p b { display: block; font-size: 12px; margin-bottom: 3px; }
-.path .p span { color: var(--muted); font-size: 11px; line-height: 1.3; display: block; }
+/* ─── Channels ─── */
+.path { display: flex; align-items: stretch; gap: 6px; }
+.path .p { flex: 1; background: var(--d-card); border: 1px solid var(--d-line); border-radius: 10px; padding: 10px; }
+.path .p b { display: block; font-size: 12px; margin-bottom: 3px; } .path .p span { color: var(--muted); font-size: 11px; line-height: 1.3; display: block; }
 .arrow { align-self: center; color: var(--steel-dim); font-size: 14px; }
 
 /* ─── Budget ─── */
-.giant { font-family: "Source Serif 4", Georgia, serif; font-weight: 400; font-style: italic; font-size: 72px; line-height: .88; color: var(--white); letter-spacing: -0.03em; }
-.eq { color: var(--muted); font-size: 14px; margin: 6px 0 var(--s8); }
+.giant { font-family: "Source Serif 4", Georgia, serif; font-weight: 400; font-style: italic; font-size: 78px; line-height: .86; letter-spacing: -0.03em; }
+.eq { color: var(--muted); font-size: 14px; margin: 4px 0 var(--s8); }
 .eq b { color: var(--white); font-weight: 500; }
-.money { background: var(--card-bg); border: 1px solid var(--card-line); border-radius: 14px; padding: 10px 12px; }
-.money .v { font-family: "Source Serif 4", Georgia, serif; font-size: 28px; font-style: italic; color: var(--steel); line-height: 1; }
-.money h3 { font-size: 13px; margin: 3px 0; }
-.money p { color: var(--muted); font-size: 11.5px; line-height: 1.35; }
-.split { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--s8); margin-top: var(--s8); }
-.split .bit { border: 1px solid var(--card-line); border-radius: 10px; padding: 7px 10px; font-size: 11.5px; color: var(--muted); line-height: 1.35; }
+.money { background: var(--d-card); border: 1px solid var(--d-line); border-radius: 14px; padding: 12px 14px; }
+.money .v { font-family: "Source Serif 4", Georgia, serif; font-size: 30px; font-style: italic; color: var(--steel); line-height: 1; }
+.money h3 { font-size: 13px; margin: 4px 0 2px; } .money p { color: var(--muted); font-size: 11.5px; line-height: 1.35; }
+.split { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--s8); }
+.split .bit { border: 1px solid var(--d-line); border-radius: 10px; padding: 8px 10px; font-size: 11.5px; color: var(--muted); line-height: 1.35; }
 .split .bit b { color: var(--white); font-weight: 500; }
 
 /* ─── Lock-ins ─── */
 .locks { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--s8); }
-.lock {
-  border-radius: 14px; padding: 14px 14px 12px;
-  display: flex; flex-direction: column;
-  border: 1px solid var(--card-wine-line);
-  background: var(--card-wine);
-}
-.lock .big { font-family: "Source Serif 4", Georgia, serif; font-size: 40px; font-style: italic; color: var(--steel); line-height: .9; margin-bottom: var(--s4); }
-.lock h3 { font-size: 16px; margin: var(--s8) 0 6px; }
+.lock { border-radius: 14px; padding: 16px 14px 14px; display: flex; flex-direction: column; border: 1px solid var(--d-line-w); background: var(--d-card-w); }
+.lock .big { font-family: "Source Serif 4", Georgia, serif; font-size: 42px; font-style: italic; color: var(--steel); line-height: .9; margin-bottom: var(--s4); }
+.lock h3 { font-size: 15px; margin: var(--s4) 0 6px; }
 .lock p { color: var(--muted); font-size: 12.5px; line-height: 1.4; }
-.lock .own { margin-top: auto; padding-top: 10px; font-size: 12px; }
-.lock .own b { display: block; font-weight: 600; }
-.lock .own span { color: #c45a5a; font-size: 11px; letter-spacing: .04em; }
+.lock .own { margin-top: auto; padding-top: 8px; font-size: 12px; }
+.lock .own b { display: block; font-weight: 600; } .lock .own span { color: #c45a5a; font-size: 11px; letter-spacing: .04em; }
 
-/* ─── Week bands ─── */
-.band { display: grid; grid-template-columns: 92px 1fr; gap: 10px; padding: var(--s8) 0; border-bottom: 1px solid var(--card-line); }
+/* ─── Week ─── */
+.band { display: grid; grid-template-columns: 92px 1fr; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--d-line); }
 .band .d { font-family: "Source Serif 4", Georgia, serif; font-size: 20px; font-style: italic; color: var(--steel); line-height: 1; }
 .band .d small { display: block; font-family: "Inter", sans-serif; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; font-style: normal; }
-.band p { font-size: 12.5px; line-height: 1.35; }
-.band p span { color: var(--muted); }
+.band p { font-size: 12.5px; line-height: 1.35; } .band p span { color: var(--muted); }
 
-/* ─── Note bar (AVI-inspired, with left accent) ─── */
-.note-bar {
-  background: var(--note-bg); border: 1px solid var(--note-line);
-  border-left: 3px solid var(--wine); border-radius: 0 10px 10px 0;
-  padding: var(--s8) var(--s12); font-size: 12.5px; line-height: 1.4;
-  display: flex; align-items: flex-start; gap: 10px;
-}
-.note-bar .label {
-  display: inline-block; padding: 2px 8px;
-  border-radius: 999px; font-size: 8px; font-weight: 700;
-  letter-spacing: .14em; text-transform: uppercase;
-  flex: 0 0 auto; margin-top: 2px;
-}
+/* ─── Note bar ─── */
+.note-bar { background: var(--d-note); border: 1px solid var(--d-note-l); border-left: 3px solid var(--wine); border-radius: 0 10px 10px 0; padding: 10px var(--s12); font-size: 12.5px; line-height: 1.4; display: flex; align-items: flex-start; gap: 10px; flex: 0 0 auto; }
+.note-bar .label { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 8px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; flex: 0 0 auto; margin-top: 2px; }
 .note-bar .label.wine { background: var(--wine); color: var(--white); }
 .note-bar .label.green { background: #1a3a24; color: #7fb09a; }
 .note-bar .label.steel { background: #1a2a38; color: var(--steel); }
 
-/* ─── Nav chrome ─── */
+/* ─── Nav ─── */
 .bar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: #1a0a08; z-index: 40; }
 .bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--wine), var(--ember)); }
 .nav { position: fixed; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 40; display: flex; gap: 6px; align-items: center; }
-.nav button { appearance: none; border: 1px solid var(--card-line); background: #0d0200; color: var(--white); border-radius: 999px; padding: 7px 12px; font: 500 12px/1 "Inter", sans-serif; cursor: pointer; }
+.nav button { appearance: none; border: 1px solid var(--d-line); background: #0d0200; color: var(--white); border-radius: 999px; padding: 7px 12px; font: 500 12px/1 "Inter", sans-serif; cursor: pointer; }
 .nav button:hover { border-color: var(--wine); color: var(--steel); }
 .nav .count { color: var(--muted); font-size: 12px; min-width: 118px; text-align: center; font-variant-numeric: tabular-nums; }
 .hit { position: fixed; top: 0; bottom: 48px; width: 36px; z-index: 6; background: transparent; border: 0; padding: 0; cursor: pointer; }
@@ -371,10 +298,10 @@ button.jump:hover { color: var(--steel); }
 @media (prefers-reduced-motion: reduce) { .slide.active { animation: none; } }
 @media print { .nav, .hit, .bar, .hint { display: none !important; } }
 
-/* ─── Export / Print ─── */
+/* ─── Export ─── */
 body.export { overflow: visible; height: auto; background: var(--ink); }
-body.export #stage { position: static !important; transform: none !important; width: 960px !important; height: auto !important; left: auto !important; top: auto !important; }
-body.export .slide { display: flex !important; position: relative !important; inset: auto !important; width: 960px; height: 540px; page-break-after: always; break-after: page; animation: none !important; }
+body.export #stage { position: static !important; transform: none !important; width: 960px !important; height: auto !important; }
+body.export .slide { display: flex !important; position: relative !important; inset: auto !important; width: 960px; height: 540px; page-break-after: always; break-after: page; }
 body.export .slide:last-of-type { page-break-after: auto; break-after: auto; }
 body.export .nav, body.export .hit, body.export .bar, body.export .hint { display: none !important; }
 @page { size: 960px 540px; margin: 0; }
@@ -384,10 +311,10 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
 <div class="bar" aria-hidden="true"><i id="prog"></i></div>
 <div id="stage">
 
-  <!-- 01 COVER -->
-  <section class="slide active" data-tone="hero" data-title="Cover">
+  <!-- 01 COVER — dark -->
+  <section class="slide active" data-title="Cover">
     <div class="eyebrow">KO Marketing · Execution plan · Draft for decision</div>
-    <div class="cover fill" style="justify-content:stretch">
+    <div class="cover fill">
       <div class="cover-copy">
         <h1>Fairway Golf<br/><em>and City Club</em></h1>
         <p class="plus">+ Mandrake Cafe</p>
@@ -412,15 +339,14 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
     </div>
   </section>
 
-  <!-- 02 CONTENTS -->
-  <section class="slide" data-title="Contents">
+  <!-- 02 CONTENTS — light -->
+  <section class="slide" data-tone="light" data-title="Contents">
     <div class="eyebrow">02 · Contents</div>
     <h2>The plan, <em>end to end.</em></h2>
     <div class="accent-rule"></div>
     <div class="fill">
     <div class="cols3">
-      <div>
-        <h3>Plan</h3>
+      <div><h3>Plan</h3>
         <button class="jump" type="button" data-go="3"><span>03</span> Outcomes</button>
         <button class="jump" type="button" data-go="4"><span>04</span> Offer</button>
         <button class="jump" type="button" data-go="5"><span>05</span> Timeline</button>
@@ -428,8 +354,7 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
         <button class="jump" type="button" data-go="7"><span>07</span> Week 1</button>
         <button class="jump" type="button" data-go="8"><span>08</span> Monthly cadence</button>
       </div>
-      <div>
-        <h3>Production</h3>
+      <div><h3>Production</h3>
         <button class="jump" type="button" data-go="9"><span>09</span> Fairway deliverables</button>
         <button class="jump" type="button" data-go="10"><span>10</span> Mandrake deliverables</button>
         <button class="jump" type="button" data-go="11"><span>11</span> Must vs nice</button>
@@ -438,8 +363,7 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
         <button class="jump" type="button" data-go="14"><span>14</span> Mandrake ads</button>
         <button class="jump" type="button" data-go="15"><span>15</span> Channels</button>
       </div>
-      <div>
-        <h3>Decisions</h3>
+      <div><h3>Decisions</h3>
         <button class="jump" type="button" data-go="16"><span>16</span> Month-1 budget <em>฿82,000</em></button>
         <button class="jump" type="button" data-go="17"><span>17</span> Months 2–3</button>
         <button class="jump" type="button" data-go="18"><span>18</span> KPIs to lock</button>
@@ -454,39 +378,23 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
     <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>Fairway Golf and City Club + Mandrake Cafe</span><span>02 / 23</span></div>
   </section>
 
-  <!-- 03 OUTCOMES -->
+  <!-- 03 OUTCOMES — dark -->
   <section class="slide" data-title="Outcomes">
     <div class="eyebrow">03 · Outcomes</div>
     <h2>What success <em>looks like.</em></h2>
     <div class="accent-rule"></div>
     <div class="fill">
     <div class="grid-2">
-      <div class="card">
-        <div class="kicker">Fairway Golf and City Club</div>
-        <h3>Bookings, memberships, events, coaching</h3>
-        <ul class="clean">
-          <li>More bookings and memberships</li>
-          <li>A stronger pipeline for events and coaching</li>
-          <li>Content that answers how to get here, what we have, and why Fairway</li>
-        </ul>
-      </div>
-      <div class="card green">
-        <div class="kicker green">Mandrake Cafe</div>
-        <h3>Local visitors and the new menu</h3>
-        <ul class="clean green">
-          <li>More local visitors</li>
-          <li>Awareness of the new menu</li>
-          <li>Atmosphere and food content that converts nearby audiences</li>
-        </ul>
-      </div>
+      <div class="card"><div class="kicker">Fairway Golf and City Club</div><h3>Bookings, memberships, events, coaching</h3><ul class="clean"><li>More bookings and memberships</li><li>A stronger pipeline for events and coaching</li><li>Content that answers how to get here, what we have, and why Fairway</li></ul></div>
+      <div class="card green"><div class="kicker green">Mandrake Cafe</div><h3>Local visitors and the new menu</h3><ul class="clean green"><li>More local visitors</li><li>Awareness of the new menu</li><li>Atmosphere and food content that converts nearby audiences</li></ul></div>
     </div>
     <p class="lede">One KO package covers both venues. Shared monthly shoot day. Targets for these outcomes are not locked yet — see KPIs.</p>
     </div>
     <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>03 · Outcomes</span><span>03 / 23</span></div>
   </section>
 
-  <!-- 04 OFFER -->
-  <section class="slide" data-title="Offer">
+  <!-- 04 OFFER — light -->
+  <section class="slide" data-tone="light" data-title="Offer">
     <div class="eyebrow">04 · Offer</div>
     <h2>Content + paid ads. <em>KO posts.</em></h2>
     <div class="accent-rule"></div>
@@ -496,17 +404,12 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
       <div class="card blue"><div class="num blue">KO</div><h3>KO posts everything</h3><p>Instagram, TikTok repost, and the ads. No handoff of the content calendar to the venues.</p></div>
       <div class="card wine"><div class="num wine">—</div><h3>Out of scope</h3><p>Website build or redesign. Email marketing. Influencers — paid models only.</p></div>
     </div>
-    <div>
-      <span class="pill solid">In</span>
-      <span class="pill">Videos</span> <span class="pill">Graphics</span> <span class="pill">AI promo</span>
-      <span class="pill">Menu shoot</span> <span class="pill">1 shoot day</span> <span class="pill">Paid ads</span> <span class="pill">Monthly report</span>
-      <span class="pill wine">Website out</span> <span class="pill wine">Email out</span> <span class="pill wine">Influencers no</span>
-    </div>
+    <div><span class="pill solid">In</span> <span class="pill">Videos</span> <span class="pill">Graphics</span> <span class="pill">AI promo</span> <span class="pill">Menu shoot</span> <span class="pill">1 shoot day</span> <span class="pill">Paid ads</span> <span class="pill">Monthly report</span> <span class="pill wine">Website out</span> <span class="pill wine">Email out</span> <span class="pill wine">Influencers no</span></div>
     </div>
     <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>Fixed monthly fee · not a % of media</span><span>04 / 23</span></div>
   </section>
 
-  <!-- 05 TIMELINE -->
+  <!-- 05 TIMELINE — dark -->
   <section class="slide" data-title="Timeline">
     <div class="eyebrow">05 · Timeline</div>
     <h2>1 Oct kickoff. <em>4 Oct</em> go-live.</h2>
@@ -527,33 +430,21 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
     <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>05 · Timeline</span><span>05 / 23</span></div>
   </section>
 
-  <!-- 06 RUNWAY -->
-  <section class="slide" data-title="90-day runway">
+  <!-- 06 RUNWAY — light -->
+  <section class="slide" data-tone="light" data-title="90-day runway">
     <div class="eyebrow">06 · Runway · Oct – Dec</div>
     <h2>Three months. <em>Three jobs.</em></h2>
     <div class="fill">
     <div class="grid-3">
-      <div class="card">
-        <div class="kicker">Month 1 · October</div>
-        <h3>Launch</h3>
-        <ul class="clean"><li>Week 1 shoot, edit, ads, go-live 4 Oct</li><li>10 Fairway videos · 5 graphics · AI cuts</li><li>15 Mandrake videos · menu photos + graphics</li><li>KO posts all · report end of October</li><li>Money locked: ฿82,000</li></ul>
-      </div>
-      <div class="card blue">
-        <div class="kicker blue">Month 2 · November</div>
-        <h3>Optimize</h3>
-        <ul class="clean"><li>Iterate angles that moved bookings, menu, local</li><li>Shift ad weight toward best inquiries / CPI</li><li>Next 3 models, if approval is locked</li><li>Same monthly quotas · report end of November</li><li>Ads reconfirm. Baseline stays ฿45,000 unless the owner changes it</li></ul>
-      </div>
-      <div class="card green">
-        <div class="kicker green">Month 3 · December</div>
-        <h3>Scale what works</h3>
-        <ul class="clean green"><li>Fairway: booking and membership angles</li><li>Mandrake: local visitors and the menu</li><li>Coaching / events only if convenient, or if events exist</li><li>Report plus a months 4–6 recommendation</li><li>Contract end ~31 Dec</li></ul>
-      </div>
+      <div class="card"><div class="kicker">Month 1 · October</div><h3>Launch</h3><ul class="clean"><li>Week 1 shoot, edit, ads, go-live 4 Oct</li><li>10 Fairway videos · 5 graphics · AI cuts</li><li>15 Mandrake videos · menu photos + graphics</li><li>KO posts all · report end of October</li><li>Money locked: ฿82,000</li></ul></div>
+      <div class="card blue"><div class="kicker blue">Month 2 · November</div><h3>Optimize</h3><ul class="clean"><li>Iterate angles that moved bookings, menu, local</li><li>Shift ad weight toward best inquiries / CPI</li><li>Next 3 models, if approval is locked</li><li>Same monthly quotas · report end of November</li><li>Ads reconfirm. Baseline stays ฿45,000 unless the owner changes it</li></ul></div>
+      <div class="card green"><div class="kicker green">Month 3 · December</div><h3>Scale what works</h3><ul class="clean green"><li>Fairway: booking and membership angles</li><li>Mandrake: local visitors and the menu</li><li>Coaching / events only if convenient, or if events exist</li><li>Report plus a months 4–6 recommendation</li><li>Contract end ~31 Dec</li></ul></div>
     </div>
     </div>
     <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>KO package ฿30,000 / month across all three months</span><span>06 / 23</span></div>
   </section>
 
-  <!-- 07 WEEK 1 -->
+  <!-- 07 WEEK 1 — dark -->
   <section class="slide" data-title="Week 1">
     <div class="eyebrow">07 · Week 1 · 1–4 Oct</div>
     <h2>Four days to <em>go live.</em></h2>
@@ -564,18 +455,14 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
         <div class="band"><div class="d"><small>Block</small>1–4</div><p><strong>Produce.</strong> <span>Re-edit existing Fairway footage. Shoot how to get here, what we have, why Fairway. Mandrake menu, BTS, atmosphere. One shoot day, 3 models. Ads setup. First post calendars.</span></p></div>
         <div class="band" style="border-bottom:0"><div class="d"><small>Sun</small>4 Oct</div><p><strong>Go-live.</strong> <span>Start posting both venues. Ads can start as soon as creatives are ready. Owner: KO.</span></p></div>
       </div>
-      <div class="card wine">
-        <div class="kicker wine">Owner brings · 1 Oct</div>
-        <h3>Week 1 does not start without these</h3>
-        <ul class="clean wine"><li>Spelling confirmed: Fairway Golf and City Club</li><li>Ad access: Facebook, Instagram, Google</li><li>LINE admin for @fairwaygolf</li><li>Logos, fonts, photos, existing footage</li><li>Mandrake menu status, and launch date if any</li><li>Model approval: yes or no, and lead time</li></ul>
-      </div>
+      <div class="card wine"><div class="kicker wine">Owner brings · 1 Oct</div><h3>Week 1 does not start without these</h3><ul class="clean wine"><li>Spelling confirmed: Fairway Golf and City Club</li><li>Ad access: Facebook, Instagram, Google</li><li>LINE admin for @fairwaygolf</li><li>Logos, fonts, photos, existing footage</li><li>Mandrake menu status, and launch date if any</li><li>Model approval: yes or no, and lead time</li></ul></div>
     </div>
     </div>
     <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>Shoot clock time is set at kickoff · not pinned yet</span><span>07 / 23</span></div>
   </section>
 
-  <!-- 08 CADENCE -->
-  <section class="slide" data-title="Monthly cadence">
+  <!-- 08 CADENCE — light -->
+  <section class="slide" data-tone="light" data-title="Monthly cadence">
     <div class="eyebrow">08 · Cadence · every month</div>
     <h2>Same machine. <em>Oct, Nov, Dec.</em></h2>
     <div class="fill">
@@ -595,7 +482,7 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
     <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>08 · Monthly cadence</span><span>08 / 23</span></div>
   </section>
 
-  <!-- 09 FAIRWAY -->
+  <!-- 09 FAIRWAY — dark -->
   <section class="slide" data-title="Fairway deliverables">
     <div class="eyebrow">09 · Fairway Golf and City Club · monthly</div>
     <h2>10 videos. 5 graphics. <em>AI included.</em></h2>
@@ -614,8 +501,8 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
     <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>09 · Fairway deliverables</span><span>09 / 23</span></div>
   </section>
 
-  <!-- 10 MANDRAKE -->
-  <section class="slide" data-title="Mandrake deliverables">
+  <!-- 10 MANDRAKE — light -->
+  <section class="slide" data-tone="light" data-title="Mandrake deliverables">
     <div class="eyebrow">10 · Mandrake Cafe · monthly</div>
     <h2>15 videos. Menu shoot. <em>Menu graphics.</em></h2>
     <div class="fill">
@@ -632,7 +519,7 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
     <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>10 · Mandrake deliverables</span><span>10 / 23</span></div>
   </section>
 
-  <!-- 11 MUST VS NICE -->
+  <!-- 11 MUST VS NICE — dark -->
   <section class="slide" data-title="Must vs nice">
     <div class="eyebrow">11 · Scope line</div>
     <h2>Must every month. <em>Nice if it fits.</em></h2>
@@ -640,14 +527,14 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
     <div class="fill">
     <div class="grid-2">
       <div class="card"><div class="kicker">Must</div><h3>This is the package</h3><ul class="clean"><li>Ad budgets live, including the Fairway 3-step funnel</li><li>10 Fairway videos</li><li>15 Mandrake videos</li><li>Monthly model shoot — 3 models</li><li>5 Fairway graphics</li><li>Mandrake menu photos and graphics</li><li>KO posting</li></ul></div>
-      <div class="card" style="background:transparent; border-color:var(--card-line)"><div class="kicker">Nice</div><h3>Only when it is actually there</h3><ul class="clean"><li>Coaching videos — only if convenient</li><li>Event videos — only if there are events that month</li></ul><p class="lede" style="margin-top:6px">Skipping nice items is not a missed deliverable. Adding them does not add a fee inside this package.</p></div>
+      <div class="card" style="background:transparent; border-color:var(--d-line)"><div class="kicker">Nice</div><h3>Only when it is actually there</h3><ul class="clean"><li>Coaching videos — only if convenient</li><li>Event videos — only if there are events that month</li></ul><p class="lede" style="margin-top:6px">Skipping nice items is not a missed deliverable. Adding them does not add a fee inside this package.</p></div>
     </div>
     </div>
     <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>11 · Must vs nice</span><span>11 / 23</span></div>
   </section>
 
-  <!-- 12 PRODUCTION -->
-  <section class="slide" data-title="Shoot and models">
+  <!-- 12 PRODUCTION — light -->
+  <section class="slide" data-tone="light" data-title="Shoot and models">
     <div class="eyebrow">12 · Shared production</div>
     <h2>One shoot day. <em>Three models.</em> No influencers.</h2>
     <div class="fill">
@@ -665,7 +552,7 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
     <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>Owner to lock approval · before first shoot</span><span>12 / 23</span></div>
   </section>
 
-  <!-- 13 ADS FAIRWAY -->
+  <!-- 13 ADS FAIRWAY — dark -->
   <section class="slide" data-title="Fairway ads">
     <div class="eyebrow">13 · Paid · Fairway Golf and City Club · month 1</div>
     <h2>฿35,000. KO runs the <em>3-step funnel.</em></h2>
@@ -680,14 +567,7 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
         <p class="lede">The ฿20,000 is one pool. Step-level splits are not locked. Themes above are the content already in the plan.</p>
       </div>
       <div class="stack">
-        <table class="phase">
-          <thead><tr><th>Channel</th><th>Month 1</th><th></th></tr></thead>
-          <tbody>
-            <tr><td>Facebook / Instagram</td><td>฿20,000</td><td class="who">3-step funnel</td></tr>
-            <tr><td>Google</td><td>฿15,000</td><td class="who">KO runs</td></tr>
-            <tr><td><strong>Fairway subtotal</strong></td><td><strong>฿35,000</strong></td><td class="who">Media only</td></tr>
-          </tbody>
-        </table>
+        <table class="phase"><thead><tr><th>Channel</th><th>Month 1</th><th></th></tr></thead><tbody><tr><td>Facebook / Instagram</td><td>฿20,000</td><td class="who">3-step funnel</td></tr><tr><td>Google</td><td>฿15,000</td><td class="who">KO runs</td></tr><tr><td><strong>Fairway subtotal</strong></td><td><strong>฿35,000</strong></td><td class="who">Media only</td></tr></tbody></table>
         <p class="lede">KO fee is separate. Media is not a percent on top.</p>
       </div>
     </div>
@@ -696,21 +576,14 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
     <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>13 · Fairway ads</span><span>13 / 23</span></div>
   </section>
 
-  <!-- 14 ADS MANDRAKE -->
-  <section class="slide" data-title="Mandrake ads">
+  <!-- 14 ADS MANDRAKE — light -->
+  <section class="slide" data-tone="light" data-title="Mandrake ads">
     <div class="eyebrow">14 · Paid · Mandrake Cafe · month 1</div>
     <h2>฿10,000. <em>Nearby</em> only.</h2>
     <div class="fill">
     <div class="ads-grid">
       <div class="stack">
-        <table class="phase">
-          <thead><tr><th>Channel</th><th>Month 1</th><th>Target</th></tr></thead>
-          <tbody>
-            <tr><td>Facebook</td><td>฿5,000</td><td class="who">Nearby</td></tr>
-            <tr><td>Google</td><td>฿5,000</td><td class="who">Nearby</td></tr>
-            <tr><td><strong>Mandrake subtotal</strong></td><td><strong>฿10,000</strong></td><td class="who">KO runs</td></tr>
-          </tbody>
-        </table>
+        <table class="phase"><thead><tr><th>Channel</th><th>Month 1</th><th>Target</th></tr></thead><tbody><tr><td>Facebook</td><td>฿5,000</td><td class="who">Nearby</td></tr><tr><td>Google</td><td>฿5,000</td><td class="who">Nearby</td></tr><tr><td><strong>Mandrake subtotal</strong></td><td><strong>฿10,000</strong></td><td class="who">KO runs</td></tr></tbody></table>
       </div>
       <div class="stack">
         <div class="card wine"><div class="kicker wine">Radius not locked</div><p>Kilometres around the cafe are set when ads are built in week 1. No radius is assumed in this deck.</p></div>
@@ -722,7 +595,7 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
     <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>Both venues · ad spend month 1 = ฿45,000</span><span>14 / 23</span></div>
   </section>
 
-  <!-- 15 CHANNELS -->
+  <!-- 15 CHANNELS — dark -->
   <section class="slide" data-title="Channels">
     <div class="eyebrow">15 · Owned channels</div>
     <h2>Instagram. TikTok repost. <em>LINE @fairwaygolf.</em></h2>
@@ -733,12 +606,9 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
       <div class="card"><div class="kicker">LINE @fairwaygolf</div><h3>Likely primary inquiry</h3><p>Fairway already has the handle. Tracking needs LINE admin.</p></div>
     </div>
     <div class="path">
-      <div class="p"><b>1 · Content + ads</b><span>Fairway and Mandrake creatives</span></div>
-      <div class="arrow">→</div>
-      <div class="p"><b>2 · Instagram</b><span>KO posts. TikTok repost sits beside this.</span></div>
-      <div class="arrow">→</div>
-      <div class="p"><b>3 · Inquiry</b><span>IG DM or LINE @fairwaygolf</span></div>
-      <div class="arrow">→</div>
+      <div class="p"><b>1 · Content + ads</b><span>Fairway and Mandrake creatives</span></div><div class="arrow">→</div>
+      <div class="p"><b>2 · Instagram</b><span>KO posts. TikTok repost sits beside this.</span></div><div class="arrow">→</div>
+      <div class="p"><b>3 · Inquiry</b><span>IG DM or LINE @fairwaygolf</span></div><div class="arrow">→</div>
       <div class="p"><b>4 · Booking</b><span>Fairway ops. Mandrake: visit.</span></div>
     </div>
     <p class="lede">Website visits can be a demand signal if analytics exist. Building or redesigning the site is out of scope. Email is out of scope.</p>
@@ -746,14 +616,11 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
     <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>15 · Channels</span><span>15 / 23</span></div>
   </section>
 
-  <!-- 16 BUDGET HERO -->
-  <section class="slide" data-title="Month-1 budget">
+  <!-- 16 BUDGET — light -->
+  <section class="slide" data-tone="light" data-title="Month-1 budget">
     <div class="eyebrow">16 · Budget · month 1 · locked total</div>
     <div class="fill">
-    <div class="toprow">
-      <div><div class="giant">฿82,000</div><p class="eq"><b>฿30,000</b> KO &nbsp;+&nbsp; <b>฿45,000</b> ads &nbsp;+&nbsp; <b>฿7,000</b> models</p></div>
-      <div style="text-align:right"><div class="kicker">October</div><div style="font-size:13px;margin-top:4px;color:var(--muted)">Both venues<br/>Not a % of media</div></div>
-    </div>
+    <div class="toprow"><div><div class="giant">฿82,000</div><p class="eq"><b>฿30,000</b> KO &nbsp;+&nbsp; <b>฿45,000</b> ads &nbsp;+&nbsp; <b>฿7,000</b> models</p></div><div style="text-align:right"><div class="kicker">October</div><div style="font-size:13px;margin-top:4px">Both venues<br/>Not a % of media</div></div></div>
     <div class="grid-3">
       <div class="money"><div class="v">฿30,000</div><h3>KO package</h3><p>Both venues. Fixed fee. Pays company KO. Not a percent of ad spend.</p></div>
       <div class="money"><div class="v">฿45,000</div><h3>Ad spend</h3><p>Media only. KO runs it. Fairway ฿35,000 + Mandrake ฿10,000.</p></div>
@@ -767,19 +634,12 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
     <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>Payee company KO · THB assumed · billing terms TBD</span><span>16 / 23</span></div>
   </section>
 
-  <!-- 17 MONTHS 2-3 -->
+  <!-- 17 MONTHS 2-3 — dark -->
   <section class="slide" data-title="Months 2–3">
     <div class="eyebrow">17 · Money after month 1</div>
     <h2>Package holds. <em>Ads get reconfirmed.</em></h2>
     <div class="fill">
-    <table class="phase">
-      <thead><tr><th>Month</th><th>KO package</th><th>Models</th><th>Ads</th><th>Total</th></tr></thead>
-      <tbody>
-        <tr><td>Oct · month 1</td><td>฿30,000</td><td>฿7,000</td><td>฿45,000 locked</td><td><strong>฿82,000</strong></td></tr>
-        <tr><td>Nov · month 2</td><td>฿30,000</td><td>฿7,000</td><td class="who">฿45,000 baseline · reconfirm</td><td>฿82,000 only if ads stay</td></tr>
-        <tr><td>Dec · month 3</td><td>฿30,000</td><td>฿7,000</td><td class="who">฿45,000 baseline · reconfirm</td><td>฿82,000 only if ads stay</td></tr>
-      </tbody>
-    </table>
+    <table class="phase"><thead><tr><th>Month</th><th>KO package</th><th>Models</th><th>Ads</th><th>Total</th></tr></thead><tbody><tr><td>Oct · month 1</td><td>฿30,000</td><td>฿7,000</td><td>฿45,000 locked</td><td><strong>฿82,000</strong></td></tr><tr><td>Nov · month 2</td><td>฿30,000</td><td>฿7,000</td><td class="who">฿45,000 baseline · reconfirm</td><td>฿82,000 only if ads stay</td></tr><tr><td>Dec · month 3</td><td>฿30,000</td><td>฿7,000</td><td class="who">฿45,000 baseline · reconfirm</td><td>฿82,000 only if ads stay</td></tr></tbody></table>
     <div class="grid-2">
       <div class="card"><div class="kicker">If the baseline holds</div><h3>฿246,000 across three months</h3><p>82,000 × 3. This is arithmetic, not a locked contract total. It is true only if November and December ads stay at ฿45,000.</p></div>
       <div class="card wine"><div class="kicker wine">What can move</div><h3>Ad spend, monthly</h3><p>Owner can change the media number. KO fee and the model baseline do not float with that change. Fee is not a percent of media.</p></div>
@@ -788,8 +648,8 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
     <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>17 · Months 2–3</span><span>17 / 23</span></div>
   </section>
 
-  <!-- 18 KPIs -->
-  <section class="slide" data-title="KPIs to lock">
+  <!-- 18 KPIs — light -->
+  <section class="slide" data-tone="light" data-title="KPIs to lock">
     <div class="eyebrow">18 · KPIs · propose, then agree</div>
     <h2>No targets yet. <em>Four to lock.</em></h2>
     <div class="fill">
@@ -807,7 +667,7 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
     <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>Status: TBD · not locked</span><span>18 / 23</span></div>
   </section>
 
-  <!-- 19 REPORT -->
+  <!-- 19 REPORT — dark -->
   <section class="slide" data-title="Report contents">
     <div class="eyebrow">19 · Monthly report · proposed, not agreed</div>
     <h2>What the end-of-month <em>note contains.</em></h2>
@@ -821,51 +681,30 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
     <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>One report per month · both venues</span><span>19 / 23</span></div>
   </section>
 
-  <!-- 20 BILLING -->
-  <section class="slide" data-title="Billing TBD">
+  <!-- 20 BILLING — light -->
+  <section class="slide" data-tone="light" data-title="Billing TBD">
     <div class="eyebrow">20 · Billing · open on purpose</div>
     <h2>Pay company KO. <em>Terms are TBD.</em></h2>
     <div class="fill">
-    <table class="phase">
-      <thead><tr><th>Item</th><th>Status</th><th>Note</th></tr></thead>
-      <tbody>
-        <tr><td>Payee</td><td>Company KO</td><td class="who">Locked</td></tr>
-        <tr class="hot"><td>Currency</td><td>THB assumed — confirm</td><td class="who">Not written into a contract yet</td></tr>
-        <tr class="hot"><td>Payment terms</td><td>TBD</td><td class="who">Net 7 / Net 15 / upfront — not chosen</td></tr>
-        <tr class="hot"><td>Invoice schedule</td><td>TBD</td><td class="who">Monthly in advance is an example, not agreed</td></tr>
-        <tr class="hot"><td>PO required?</td><td>TBD</td><td class="who">Owner</td></tr>
-        <tr class="hot"><td>One invoice or split?</td><td>TBD</td><td class="who">Fairway and Mandrake, or one bill</td></tr>
-      </tbody>
-    </table>
+    <table class="phase"><thead><tr><th>Item</th><th>Status</th><th>Note</th></tr></thead><tbody><tr><td>Payee</td><td>Company KO</td><td class="who">Locked</td></tr><tr class="hot"><td>Currency</td><td>THB assumed — confirm</td><td class="who">Not written into a contract yet</td></tr><tr class="hot"><td>Payment terms</td><td>TBD</td><td class="who">Net 7 / Net 15 / upfront — not chosen</td></tr><tr class="hot"><td>Invoice schedule</td><td>TBD</td><td class="who">Monthly in advance is an example, not agreed</td></tr><tr class="hot"><td>PO required?</td><td>TBD</td><td class="who">Owner</td></tr><tr class="hot"><td>One invoice or split?</td><td>TBD</td><td class="who">Fairway and Mandrake, or one bill</td></tr></tbody></table>
     <p class="lede">The ฿82,000 is the month-1 amount. It is not a payment schedule. Lock terms before the first invoice. Owner + KO.</p>
     </div>
     <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>20 · Billing · TBD</span><span>20 / 23</span></div>
   </section>
 
-  <!-- 21 NEXT STEPS -->
+  <!-- 21 NEXT STEPS — dark -->
   <section class="slide" data-title="Next steps">
     <div class="eyebrow">21 · Next steps</div>
     <h2>Owners and dates. <em>Nothing vague.</em></h2>
     <div class="accent-rule"></div>
     <div class="fill">
-    <table class="phase">
-      <thead><tr><th>#</th><th>Action</th><th>Owner</th><th>By</th></tr></thead>
-      <tbody>
-        <tr><td>1</td><td>Confirm the name Fairway Golf and City Club</td><td class="who">Owner</td><td class="when">Kickoff · 1 Oct</td></tr>
-        <tr><td>2</td><td>Lock KPI targets — bookings, inquiries, CPI, site visits</td><td class="who">Owner + KO</td><td class="when">Week 1</td></tr>
-        <tr><td>3</td><td>Confirm how models get approved</td><td class="who">Owner</td><td class="when">Before first shoot</td></tr>
-        <tr><td>4</td><td>Lock billing — terms, schedule, PO, THB</td><td class="who">Owner + KO</td><td class="when">Before first invoice</td></tr>
-        <tr><td>5</td><td>Agree monthly report contents</td><td class="who">Owner + KO</td><td class="when">First report</td></tr>
-        <tr><td>6</td><td>Kickoff, week-1 production, ads setup</td><td class="who">KO</td><td class="when">1–4 Oct</td></tr>
-        <tr><td>7</td><td>Go-live posting</td><td class="who">KO</td><td class="when">4 Oct</td></tr>
-      </tbody>
-    </table>
+    <table class="phase"><thead><tr><th>#</th><th>Action</th><th>Owner</th><th>By</th></tr></thead><tbody><tr><td>1</td><td>Confirm the name Fairway Golf and City Club</td><td class="who">Owner</td><td class="when">Kickoff · 1 Oct</td></tr><tr><td>2</td><td>Lock KPI targets — bookings, inquiries, CPI, site visits</td><td class="who">Owner + KO</td><td class="when">Week 1</td></tr><tr><td>3</td><td>Confirm how models get approved</td><td class="who">Owner</td><td class="when">Before first shoot</td></tr><tr><td>4</td><td>Lock billing — terms, schedule, PO, THB</td><td class="who">Owner + KO</td><td class="when">Before first invoice</td></tr><tr><td>5</td><td>Agree monthly report contents</td><td class="who">Owner + KO</td><td class="when">First report</td></tr><tr><td>6</td><td>Kickoff, week-1 production, ads setup</td><td class="who">KO</td><td class="when">1–4 Oct</td></tr><tr><td>7</td><td>Go-live posting</td><td class="who">KO</td><td class="when">4 Oct</td></tr></tbody></table>
     <div class="note-bar"><span class="label steel">Kickoff</span> 1 Oct is a Thursday. Week 1 runs Thu–Sun (1–4 Oct). The first creatives go live on the 4th.</div>
     </div>
     <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>21 · Next steps</span><span>21 / 23</span></div>
   </section>
 
-  <!-- 22 LOCK-INS -->
+  <!-- 22 LOCK-INS — dark (closing hero) -->
   <section class="slide" data-title="Three lock-ins">
     <div class="eyebrow">22 · Close · three decisions</div>
     <h2>Lock these three. <em>Then we run.</em></h2>
@@ -880,8 +719,8 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
     <div class="footer"><div class="ko-mark"><img src="assets/ko-logo.png" alt="KO" /></div><span>Kickoff 1 Oct · go-live 4 Oct</span><span>22 / 23</span></div>
   </section>
 
-  <!-- 23 APPENDIX -->
-  <section class="slide" data-title="Appendix">
+  <!-- 23 APPENDIX — light -->
+  <section class="slide" data-tone="light" data-title="Appendix">
     <div class="eyebrow">23 · Appendix</div>
     <h2>Quotas, out of scope, <em>still open.</em></h2>
     <div class="fill">
@@ -899,7 +738,6 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
   </section>
 
 </div>
-
 <button type="button" class="hit hit-left" id="hitPrev" aria-label="Previous slide"></button>
 <button type="button" class="hit hit-right" id="hitNext" aria-label="Next slide"></button>
 <div class="hint">← →</div>
@@ -910,7 +748,6 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
   <span class="count" id="count">1 / 23</span>
   <button type="button" id="next" aria-label="Next">→</button>
 </div>
-
 <script>
 (function () {
   var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
@@ -923,10 +760,8 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
     if (exporting || document.body.classList.contains("export")) { stage.style.transform = "none"; stage.style.position = "static"; return; }
     var vw = window.innerWidth, vh = window.innerHeight;
     var s = Math.min(vw / 960, (vh - 56) / 540);
-    stage.style.position = "absolute";
-    stage.style.transform = "scale(" + s + ")";
-    stage.style.left = ((vw - 960 * s) / 2) + "px";
-    stage.style.top = Math.max(8, (vh - 56 - 540 * s) / 2) + "px";
+    stage.style.position = "absolute"; stage.style.transform = "scale(" + s + ")";
+    stage.style.left = ((vw - 960 * s) / 2) + "px"; stage.style.top = Math.max(8, (vh - 56 - 540 * s) / 2) + "px";
   }
   function show(n) {
     i = (n + slides.length) % slides.length;
@@ -936,31 +771,19 @@ body.export .nav, body.export .hit, body.export .bar, body.export .hint { displa
     prog.style.width = ((i + 1) / slides.length * 100) + "%";
     if (!exporting && history.replaceState) history.replaceState(null, "", "#" + (i + 1));
   }
-  function next() { show(i + 1); }
-  function prev() { show(i - 1); }
+  function next() { show(i + 1); } function prev() { show(i - 1); }
   document.getElementById("prev").addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); prev(); });
   document.getElementById("next").addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); next(); });
   document.getElementById("hitPrev").addEventListener("click", function (e) { e.preventDefault(); prev(); });
   document.getElementById("hitNext").addEventListener("click", function (e) { e.preventDefault(); next(); });
   stage.addEventListener("click", function (e) { var t = e.target.closest("[data-go]"); if (!t) return; e.preventDefault(); e.stopPropagation(); show(parseInt(t.getAttribute("data-go"), 10) - 1); });
-  document.addEventListener("keydown", function (e) {
-    var tag = (e.target && e.target.tagName) || "";
-    if (tag === "INPUT" || tag === "TEXTAREA") return;
-    if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") { e.preventDefault(); next(); }
-    else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); prev(); }
-    else if (e.key === "Home") { e.preventDefault(); show(0); }
-    else if (e.key === "End") { e.preventDefault(); show(slides.length - 1); }
-  });
-  document.getElementById("dl").addEventListener("click", function (e) {
-    e.preventDefault(); e.stopPropagation();
-    try { var html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML; var blob = new Blob([html], { type: "text/html;charset=utf-8" }); var url = URL.createObjectURL(blob); var a = document.createElement("a"); a.href = url; a.download = "Fairway-Mandrake-KO-Execution-Plan.html"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(url); }, 1200); } catch (err) { window.print(); }
-  });
+  document.addEventListener("keydown", function (e) { var tag = (e.target && e.target.tagName) || ""; if (tag === "INPUT" || tag === "TEXTAREA") return; if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") { e.preventDefault(); next(); } else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); prev(); } else if (e.key === "Home") { e.preventDefault(); show(0); } else if (e.key === "End") { e.preventDefault(); show(slides.length - 1); } });
+  document.getElementById("dl").addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); try { var html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML; var blob = new Blob([html], { type: "text/html;charset=utf-8" }); var url = URL.createObjectURL(blob); var a = document.createElement("a"); a.href = url; a.download = "Fairway-Mandrake-KO-Execution-Plan.html"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(url); }, 1200); } catch (err) { window.print(); } });
   document.getElementById("print").addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); window.print(); });
   window.addEventListener("beforeprint", function () { document.body.classList.add("export"); fit(); });
   window.addEventListener("afterprint", function () { if (!exporting) document.body.classList.remove("export"); fit(); show(i); });
   window.addEventListener("resize", fit);
-  if (exporting) { document.body.classList.add("export"); for (var s = 0; s < slides.length; s++) slides[s].classList.add("active"); }
-  else { var hash = (location.hash || "").replace("#", ""); var start = /^\d+$/.test(hash) ? parseInt(hash, 10) - 1 : 0; fit(); show(start); }
+  if (exporting) { document.body.classList.add("export"); for (var s = 0; s < slides.length; s++) slides[s].classList.add("active"); } else { var hash = (location.hash || "").replace("#", ""); var start = /^\d+$/.test(hash) ? parseInt(hash, 10) - 1 : 0; fit(); show(start); }
 })();
 </script>
 </body>

@@ -53,8 +53,10 @@ Loaded from Google Fonts. If offline, embed as base64 `@font-face`.
 ## Design rules
 
 - **Slide size:** 960 × 540 px (16:9)
-- **Padding:** 24px top, 40px sides, 12px bottom (top ≥ 20px is Lisa's rule)
+- **Padding:** 24px top, 40px sides, 10px bottom (top ≥ 20px is Lisa's rule)
 - **Spacing scale:** 4 / 8 / 12 / 16 / 24 / 32 / 48 px (8-pt grid)
+- **Light/dark rhythm:** AVI-style alternation. ~11 light slides (`data-tone="light"`, bg `#f6f0e9`) and ~12 dark slides (bg `#110300`). Light surfaces use white cards with cream borders; dark surfaces use pre-blended opaque card fills.
+- **Fill-stretch layout:** `.fill` uses `flex: 1` with grids set to `flex: 1` so content fills the frame height. No floating content islands.
 - **Cards:** `border-radius: 14px`, 1px solid border, opaque fill
 - **Accent bar:** 48 × 3px gradient (wine → ember) under section titles
 - **Note bar:** AVI-style left-accent strip, 3px wine, rounded right corners
@@ -64,6 +66,7 @@ Loaded from Google Fonts. If offline, embed as base64 `@font-face`.
 - **Pills:** 999px radius (pill shape), 9px uppercase
 - **No shadows** — depth from borders and background layers only
 - **No CSS transparency** in the PDF — all colors pre-blended to opaque
+- **Max content gap:** ≤ 48px between consecutive blocks (measured, not by eye)
 
 ## Slide map (~20–24 slides)
 
