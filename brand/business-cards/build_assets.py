@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Opaque card art: silk photograph on the front, burgundy backs with a silk corner."""
+"""Opaque card art: silk photograph on the front, satin backs in logo burgundy."""
 
 from pathlib import Path
 import subprocess
@@ -16,7 +16,7 @@ ASSETS = ROOT / "assets"
 DPI = int(os.environ.get("CARD_DPI", "600"))
 
 # Millimetres from the bleed origin. cards.html uses the same numbers.
-# The symbol includes a 4-module quiet zone. It sits on flat burgundy.
+# The symbol includes a 4-module quiet zone. It sits on the satin ground.
 QR_SYMBOL = (60.7, 21.0, 24.2, 24.2)
 # Front. Bleed coordinates. The wordmark is 56 mm wide and centered. The tagline stays lower left.
 FRONT_LOGO = (20.0, 23.94, 56.0, 13.13)
@@ -52,52 +52,51 @@ def contrast_white(rgb):
     return 1.05 / (rel_lum(rgb) + 0.05)
 
 
-def field(w, h):
-    """Clean deep burgundy with a very slight vertical falloff."""
-    y = np.linspace(0.0, 1.0, h, dtype=np.float32)[:, None]
-    top = np.array([84.0, 6.0, 14.0], dtype=np.float32)
-    bot = np.array([54.0, 3.0, 8.0], dtype=np.float32)
-    col = top * (1.0 - y) + bot * y
-    rgb = np.empty((h, w, 3), dtype=np.float32)
-    rgb[:] = col[:, None, :]
-    return rgb
+def _srgb_to_lin(c):
+    c = np.asarray(c, np.float32) / 255.0
+    return np.where(c <= 0.04045, c / 12.92, ((c + 0.055) / 1.055) ** 2.4)
 
 
-def load_silk():
-    return Image.open(ASSETS / "silk-element.png").convert("RGBA")
+def _lin_to_srgb(c):
+    c = np.clip(c, 0.0, None)
+    return np.where(c <= 0.0031308, c * 12.92, 1.055 * np.power(c, 1.0 / 2.4) - 0.055) * 255.0
 
 
-def composite_ribbon(base, silk, center_mm, width_mm, angle, tone=0.95, thickness_mm=None):
-    """Bake the ribbon's own alpha onto the opaque ground. No alpha remains.
+def _linear_y(rgb):
+    lin = _srgb_to_lin(rgb)
+    return 0.2126 * lin[..., 0] + 0.7152 * lin[..., 1] + 0.0722 * lin[..., 2]
 
-    thickness_mm sets the cross-axis size independently so the sweep can be a
-    thin ribbon instead of a slab of the source artwork.
+
+def recolor_satin(rgb):
+    """Keep the satin folds, paint them in the logo burgundy #4c050c.
+
+    Median lightness becomes that exact color. Darker cloth walks toward
+    black along the same hue. Brighter folds stay a lighter burgundy; a soft
+    shoulder stops the hottest highlight from turning pale or pink.
     """
-    h, w = base.shape[:2]
-    target_w = max(1, int(round(px(width_mm))))
-    if thickness_mm is None:
-        target_h = max(1, int(round(silk.height * target_w / silk.width)))
-    else:
-        target_h = max(1, int(round(px(thickness_mm))))
-    resized = silk.resize((target_w, target_h), Image.Resampling.LANCZOS)
-    arr = np.asarray(resized).astype(np.float32)
-    arr[..., :3] *= tone
-    im = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8), "RGBA")
-    rot = im.rotate(angle, resample=Image.Resampling.BICUBIC, expand=True)
-    r = np.asarray(rot).astype(np.float32)
-    rh, rw = r.shape[:2]
-    cx, cy = int(round(px(center_mm[0]))), int(round(px(center_mm[1])))
-    x0, y0 = cx - rw // 2, cy - rh // 2
-    x1, y1 = max(0, x0), max(0, y0)
-    x2, y2 = min(w, x0 + rw), min(h, y0 + rh)
-    if x2 <= x1 or y2 <= y1:
-        return base
-    sx1, sy1 = x1 - x0, y1 - y0
-    patch = r[sy1:sy1 + (y2 - y1), sx1:sx1 + (x2 - x1)]
-    a = patch[..., 3:4] / 255.0
-    dst = base[y1:y2, x1:x2]
-    base[y1:y2, x1:x2] = dst * (1.0 - a) + patch[..., :3] * a
-    return base
+    logo_lin = _srgb_to_lin(INK)
+    tone = _linear_y(rgb)
+    mid = float(np.median(tone))
+    if mid <= 0:
+        raise SystemExit("satin luminance is empty")
+    t = tone / mid
+    knee, high = 1.15, 4.4
+    span = high - knee
+    bright = t > knee
+    t = np.where(bright, high - span * np.exp(-(t - knee) / span), t)
+    painted = _lin_to_srgb(logo_lin * t[..., None])
+    print(
+        f"satin recolor #4c050c mid {INK.astype(int).tolist()} "
+        f"lightest {painted.reshape(-1, 3)[int(np.argmax(_linear_y(painted)))].round(0).tolist()}"
+    )
+    return painted.astype(np.float32)
+
+
+def add_grain(rgb):
+    """Break 8-bit steps in the smooth folds. The amplitude stays under 1 level."""
+    rng = np.random.default_rng(7)
+    noise = rng.normal(0.0, 0.55, rgb.shape).astype(np.float32)
+    return np.clip(rgb + noise, 0.0, 255.0)
 
 
 def css_mm(px_at_96):
@@ -525,25 +524,35 @@ def build_front():
     return np.asarray(cropped).astype(np.float32)
 
 
-def build_back(silk):
+def build_back():
+    """Cover the bleed with the satin, turned so the text and QR sit in calmer cloth.
+
+    Clockwise lays the darker sweep under the contact column and the code, and
+    leaves a diagonal fold across the card. Lanczos scales it to 600 dpi. The
+    extra width is the minimum cover crop, taken equally from both sides.
+    """
     h, w = int(round(px(61))), int(round(px(96)))
-    plain = field(w, h)
-    # Corner ribbon above the code. The symbol, quiet zone included, stays the field.
-    base = composite_ribbon(
-        plain.copy(), silk, (88.0, 10.0), 170.0, -8.0, tone=0.97, thickness_mm=24.0
+    src = Image.open(ASSETS / "satin-back-bg.jpg")
+    if src.mode != "RGB":
+        src = src.convert("RGB")
+    rot = src.transpose(Image.Transpose.ROTATE_270)
+    scale = max(w / rot.width, h / rot.height)
+    nw = int(round(rot.width * scale))
+    nh = int(round(rot.height * scale))
+    if nw < w or nh < h:
+        raise SystemExit(f"satin cover undershoots {(nw, nh)} vs {(w, h)}")
+    resized = rot.resize((nw, nh), Image.Resampling.LANCZOS)
+    left = (nw - w) // 2
+    top = (nh - h) // 2
+    cropped = resized.crop((left, top, left + w, top + h))
+    if cropped.size != (w, h) or cropped.mode != "RGB":
+        raise SystemExit(f"satin crop is {cropped.size} {cropped.mode}")
+    print(
+        f"satin {src.size[0]}x{src.size[1]} rot270 {rot.size[0]}x{rot.size[1]} "
+        f"-> {nw}x{nh} crop {left}px left, {top}px top "
+        f"({left / px(1):.2f}mm / {top / px(1):.2f}mm)"
     )
-    x, y, s, _ = (int(round(px(v))) for v in QR_SYMBOL)
-    delta = float(np.abs(base[y:y + s, x:x + s] - plain[y:y + s, x:x + s]).max())
-    diff = np.abs(base - plain).max(axis=2) > 2.0
-    ys, xs = np.where(diff)
-    dx = np.where(xs < x, x - xs, np.where(xs >= x + s, xs - (x + s - 1), 0))
-    dy = np.where(ys < y, y - ys, np.where(ys >= y + s, ys - (y + s - 1), 0))
-    gap = float(np.hypot(dx, dy).min()) / px(1)
-    print(f"silk clears the QR by {gap:.2f}mm; quiet-zone delta {delta:.3f}")
-    if delta > 0.75:
-        raise SystemExit(f"silk enters the QR quiet zone (delta {delta:.2f})")
-    if gap < 1.5:
-        raise SystemExit(f"silk is {gap:.2f}mm from the QR")
+    base = add_grain(recolor_satin(np.asarray(cropped).astype(np.float32)))
     apply_phone_button(base, PHONE_BTN)
     apply_glass_disc(base, BADGE_MAIL)
     apply_glass_disc(base, BADGE_WEB)
@@ -552,10 +561,9 @@ def build_back(silk):
 
 def main():
     ASSETS.mkdir(parents=True, exist_ok=True)
-    silk = load_silk()
     print("canvas", int(round(px(96))), int(round(px(61))), "dpi", DPI)
     front = build_front()
-    back = build_back(silk)
+    back = build_back()
     if os.environ.get("CARD_PREVIEW"):
         for name, rgb in (("front", front), ("back", back)):
             im = Image.fromarray(np.clip(rgb, 0, 255).astype(np.uint8), "RGB")
@@ -570,9 +578,13 @@ def main():
         print("front-bg.png unchanged")
     else:
         save_rgb(front_path, front)
-    contrast_in(back, (7.5, 14.5, 50.0, 12.6), "back name")
-    contrast_in(back, (16.5, 30.6, 22.4, 3.1), "phone label")
-    contrast_in(back, (14.5, 38.9, 43.0, 16.4), "back contacts")
+    # Each line, both backs. The name box fits the longer name.
+    contrast_in(back, (8.2, 14.9, 46.0, 6.4), "name")
+    contrast_in(back, (8.2, 22.5, 16.5, 3.6), "role")
+    contrast_in(back, (16.6, 30.4, 22.5, 3.3), "phone")
+    contrast_in(back, (14.5, 38.9, 44.0, 3.6), "email")
+    contrast_in(back, (14.5, 45.2, 32.0, 3.6), "website")
+    contrast_in(back, (14.5, 51.4, 24.0, 3.6), "address")
     trace_wordmark()
     n = build_qr_svg()
     module = QR_SYMBOL[2] / n
