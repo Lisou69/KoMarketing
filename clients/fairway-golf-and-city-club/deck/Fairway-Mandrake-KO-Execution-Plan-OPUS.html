@@ -29,10 +29,11 @@ button{font-family:inherit}
 .slide{position:absolute;inset:0;width:960px;height:540px;display:none;flex-direction:column;padding:24px 40px 16px;overflow:hidden;background:var(--bg);color:var(--text)}
 .slide.active{display:flex}
 .slide>*{position:relative;z-index:2}
-.photo{position:absolute;inset:0;z-index:0;overflow:hidden;background:#0a0807}
+.photo{position:absolute;inset:0;z-index:0;overflow:hidden;background:#0b0a09}
 .photo img{width:100%;height:100%;object-fit:cover;display:block}
-/* neutral near-black veil (no red hue) so the photos keep their true colors */
-.veil{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(10,8,7,.72) 0,rgba(10,8,7,.4) 44px,rgba(10,8,7,0) 76px),linear-gradient(0deg,rgba(10,8,7,.7) 0,rgba(10,8,7,0) 60px),linear-gradient(90deg,rgba(10,8,7,.9) 0%,rgba(10,8,7,.88) 52%,rgba(10,8,7,.78) 64%,rgba(10,8,7,.35) 74%,rgba(10,8,7,0) 88%)}
+/* photo slides: solid neutral black panel behind the text, 140px fade, photo side untouched */
+.slide.cover{background:#0b0a09}
+.veil{position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,#0b0a09 0,#0b0a09 var(--solid),rgba(11,10,9,0) calc(var(--solid) + 140px))}
 
 /* header + footer */
 .top{flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;height:20px}
@@ -102,8 +103,14 @@ table.bym td.amt.s{font-family:var(--sans);font-size:11px;line-height:1.4;color:
 
 /* cover */
 .cover .eyebrow{color:#ecc988}
-.cover .sec{color:var(--text)}
-.cover .body{justify-content:center;gap:14px}
+.cover .sec{color:var(--text);background:rgba(11,10,9,.62);border-radius:999px;padding:4px 10px;margin-right:-10px}
+.cover .body{max-width:var(--col)}
+.cover .foot i{max-width:var(--col)}
+.cover .foot b{background:rgba(11,10,9,.62);border-radius:999px;padding:3px 9px;margin-right:-9px}
+.cover .pill{background:#1f1d1b;border-color:#2e2b28;color:#f3f1ee}
+.cover .facts{grid-template-columns:repeat(3,auto);gap:14px 26px}
+.cover .body{justify-content:center;gap:12px}
+.cover h1{line-height:.96}
 .facts{display:grid;grid-template-columns:repeat(5,auto);justify-content:start;gap:22px;margin-top:6px}
 .fact b{display:block;font-family:var(--serif);font-size:22px;font-weight:400;line-height:1;color:var(--text)}
 .fact span{display:block;margin-top:4px;font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
@@ -178,7 +185,7 @@ body.export .nav,body.export .hit{display:none !important}
 </head>
 <body>
 <div id="stage">
-<section class="slide cover" data-title="Cover"><div class="photo"><img src="assets/fairway-trackman-group.jpg" alt="" style="object-position:right center" /></div><div class="veil"></div><div class="top"><span class="logo" role="img" aria-label="KO Marketing Agency"></span><span class="sec">Execution plan</span></div><div class="body">
+<section class="slide cover" data-title="Cover" style="--solid:390px;--col:350px"><div class="photo"><img src="assets/fairway-trackman-group.jpg" alt="" style="object-position:right center" /></div><div class="veil"></div><div class="top"><span class="logo" role="img" aria-label="KO Marketing Agency"></span><span class="sec">Execution plan</span></div><div class="body">
   <div>
     <div class="eyebrow">Fairway Golf and City Club + Mandrake Cafe × KO · Oct – Dec 2026 · Bangkok</div>
     <h1>The <em>execution</em> plan.</h1>
@@ -296,12 +303,12 @@ body.export .nav,body.export .hit{display:none !important}
   <div class="g g5"><div class="card"><div class="n">01</div><div class="kick">Before 1 Oct</div><h3>Kickoff + prep</h3><p>Goals, access, brand assets, LINE and Instagram. Content plan, casting, shot list.</p></div><div class="card"><div class="n">02</div><div class="kick">1 Oct</div><h3>Posting starts</h3><p>Fairway and Mandrake calendars go live with already-made videos.</p></div><div class="card"><div class="n">03</div><div class="kick">2 Oct</div><h3>First shoot</h3><p>Already-made videos carry the first week of posts.</p></div><div class="card"><div class="n">04</div><div class="kick">7 Oct</div><h3>Model shoot</h3><p>Full set-up day with 3 models, both venues.</p></div><div class="card"><div class="n">05</div><div class="kick">End of Oct</div><h3>First report</h3><p>Results, costs and next month’s plan.</p></div></div>
   <div class="strip"><span class="tag">Your part</span><span>Share access and brand assets at kickoff, then <b>approve the plan and the posts.</b> KO handles the rest.</span></div>
 </div><div class="foot"><i>KO Marketing Agency · Fairway Golf and City Club + Mandrake Cafe</i><b>15 / 16</b></div></section>
-<section class="slide cover" data-title="Let's get started"><div class="photo"><img src="assets/fairway-trackman-putting.jpg" alt="" style="object-position:center 55%" /></div><div class="veil"></div><div class="top"><span class="logo" role="img" aria-label="KO Marketing Agency"></span><span class="sec">Next steps</span></div><div class="body">
+<section class="slide cover" data-title="Let's get started" style="--solid:330px;--col:290px"><div class="photo"><img src="assets/fairway-trackman-putting.jpg" alt="" style="object-position:center 55%" /></div><div class="veil"></div><div class="top"><span class="logo" role="img" aria-label="KO Marketing Agency"></span><span class="sec">Next steps</span></div><div class="body">
   <div>
     <div class="eyebrow">16 · Fairway Golf and City Club + Mandrake Cafe</div>
     <h1>Let's get <em>started.</em></h1>
   </div>
-  <p class="lede" style="max-width:400px">Posting starts <b>1 Oct</b>. First shoot <b>2 Oct</b>, model shoot <b>7 Oct</b>, first report at the end of October. Three months, one team for both venues.</p>
+  <p class="lede">Posting starts <b>1 Oct</b>. First shoot <b>2 Oct</b>, model shoot <b>7 Oct</b>, first report at the end of October. Three months, one team for both venues.</p>
   <div class="pills"><span class="pill">฿82,000 / month</span><span class="pill">Oct – Dec 2026</span><span class="pill">Sukhumvit 24 · Bangkok</span></div>
 </div><div class="foot"><i>KO Marketing Agency · komarketingagency.com</i><b>16 / 16</b></div></section>
 </div>
