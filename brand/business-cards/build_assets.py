@@ -67,29 +67,125 @@ def _linear_y(rgb):
     return 0.2126 * lin[..., 0] + 0.7152 * lin[..., 1] + 0.0722 * lin[..., 2]
 
 
-def recolor_satin(rgb):
-    """Keep the satin folds, paint them in the logo burgundy #4c050c.
+# Duotone stops. Hue stays on #4c050c; these are the lightness anchors.
+SHADOW = np.array([26.0, 2.0, 4.0], dtype=np.float32)    # #1A0204
+HIGHLIGHT = np.array([110.0, 14.0, 22.0], dtype=np.float32)  # #6E0E16
+LUM_CAP = np.array([122.0, 20.0, 32.0], dtype=np.float32)    # #7A1420
 
-    Median lightness becomes that exact color. Darker cloth walks toward
-    black along the same hue. Brighter folds stay a lighter burgundy; a soft
-    shoulder stops the hottest highlight from turning pale or pink.
-    """
-    logo_lin = _srgb_to_lin(INK)
-    tone = _linear_y(rgb)
-    mid = float(np.median(tone))
-    if mid <= 0:
-        raise SystemExit("satin luminance is empty")
-    t = tone / mid
-    knee, high = 1.15, 4.4
-    span = high - knee
-    bright = t > knee
-    t = np.where(bright, high - span * np.exp(-(t - knee) / span), t)
-    painted = _lin_to_srgb(logo_lin * t[..., None])
-    print(
-        f"satin recolor #4c050c mid {INK.astype(int).tolist()} "
-        f"lightest {painted.reshape(-1, 3)[int(np.argmax(_linear_y(painted)))].round(0).tolist()}"
+
+def _lin_to_xyz(lin):
+    matrix = np.array(
+        [
+            [0.4124564, 0.3575761, 0.1804375],
+            [0.2126729, 0.7151522, 0.0721750],
+            [0.0193339, 0.1191920, 0.9503041],
+        ],
+        dtype=np.float64,
     )
-    return painted.astype(np.float32)
+    return np.asarray(lin, np.float64) @ matrix.T
+
+
+def _xyz_to_lab(xyz):
+    white = np.array([0.95047, 1.0, 1.08883], dtype=np.float64)
+    ratio = np.asarray(xyz, np.float64) / white
+    eps = 216.0 / 24389.0
+    kappa = 24389.0 / 27.0
+
+    def f(t):
+        return np.where(t > eps, np.cbrt(t), (kappa * t + 16.0) / 116.0)
+
+    fx, fy, fz = f(ratio[..., 0]), f(ratio[..., 1]), f(ratio[..., 2])
+    return np.stack([116.0 * fy - 16.0, 500.0 * (fx - fy), 200.0 * (fy - fz)], axis=-1)
+
+
+def _lab_to_rgb(lab):
+    lab = np.asarray(lab, np.float64)
+    light, a, b = lab[..., 0], lab[..., 1], lab[..., 2]
+    fy = (light + 16.0) / 116.0
+    fx = fy + a / 500.0
+    fz = fy - b / 200.0
+    eps = 216.0 / 24389.0
+    kappa = 24389.0 / 27.0
+
+    def finv(t):
+        cubed = t ** 3
+        return np.where(cubed > eps, cubed, (116.0 * t - 16.0) / kappa)
+
+    xyz = np.stack([finv(fx), finv(fy), finv(fz)], axis=-1) * np.array([0.95047, 1.0, 1.08883])
+    matrix = np.array(
+        [
+            [3.2404542, -1.5371385, -0.4985314],
+            [-0.9692660, 1.8760108, 0.0415560],
+            [0.0556434, -0.2040259, 1.0572252],
+        ],
+        dtype=np.float64,
+    )
+    lin = np.clip(xyz @ matrix.T, 0.0, None)
+    encoded = np.where(lin <= 0.0031308, 12.92 * lin, 1.055 * np.power(lin, 1.0 / 2.4) - 0.055)
+    return np.clip(encoded, 0.0, 1.0) * 255.0
+
+
+def _rgb_to_lab(rgb):
+    return _xyz_to_lab(_lin_to_xyz(_srgb_to_lin(rgb)))
+
+
+def _delta_e(lab_a, lab_b):
+    return float(np.sqrt(np.sum((np.asarray(lab_a) - np.asarray(lab_b)) ** 2)))
+
+
+def _hex(rgb):
+    channels = [int(np.clip(round(float(c)), 0, 255)) for c in rgb]
+    return "#" + "".join(f"{c:02X}" for c in channels)
+
+
+def _hue_locked(light, chroma, hue):
+    return np.array(
+        [light, chroma * np.cos(hue), chroma * np.sin(hue)],
+        dtype=np.float64,
+    )
+
+
+def recolor_satin(rgb):
+    """Map satin lightness onto a burgundy duotone, hue locked to #4c050c.
+
+    Shadows go to #1A0204, the median fold is exactly #4c050c, and the
+    brightest fold stops at #6E0E16. Nothing on the cloth is brighter than
+    that stop.
+    """
+    mid_lab = _rgb_to_lab(INK)
+    hue = float(np.arctan2(mid_lab[2], mid_lab[1]))
+    shadow_src = _rgb_to_lab(SHADOW)
+    high_src = _rgb_to_lab(HIGHLIGHT)
+    shadow_lab = _hue_locked(float(shadow_src[0]), float(np.hypot(shadow_src[1], shadow_src[2])), hue)
+    high_lab = _hue_locked(float(high_src[0]), float(np.hypot(high_src[1], high_src[2])), hue)
+
+    light = _rgb_to_lab(rgb)[..., 0]
+    lo, hi = np.percentile(light, [1.0, 99.0])
+    if hi <= lo:
+        raise SystemExit("satin lightness has no range")
+    span = np.clip((light - lo) / (hi - lo), 0.0, 1.0)
+    median = float(np.median(span))
+    gamma = np.log(0.5) / np.log(max(median, 1e-4))
+    t = np.power(span, gamma)[..., None]
+    lower = t <= 0.5
+    mix = np.where(lower, t / 0.5, (t - 0.5) / 0.5)
+    start = np.where(lower, shadow_lab, mid_lab)
+    end = np.where(lower, mid_lab, high_lab)
+    painted = _lab_to_rgb(start * (1.0 - mix) + end * mix).astype(np.float32)
+    # The highlight stop is a hard ceiling. Grain added later stays under the
+    # #7A1420 measurement cap; the cloth itself never passes #6E0E16.
+    cap_y = float(_linear_y(HIGHLIGHT))
+    over = _linear_y(painted) > cap_y
+    if np.any(over):
+        painted[over] = _lab_to_rgb(high_lab)
+    shadow_rgb = _lab_to_rgb(shadow_lab)
+    high_rgb = _lab_to_rgb(high_lab)
+    print(
+        f"satin duotone #4C050C gamma {gamma:.3f} "
+        f"shadow {_hex(shadow_rgb)} highlight {_hex(high_rgb)} "
+        f"L* std {float(np.std(_rgb_to_lab(painted)[..., 0])):.2f}"
+    )
+    return painted
 
 
 def add_grain(rgb):
@@ -392,6 +488,62 @@ def apply_glass_disc(canvas, box):
     return canvas
 
 
+def _glass_keep_mask(shape):
+    """True on cloth. Glass, caustic, and drop shadow are left out of the sample."""
+    keep = np.ones(shape[:2], dtype=bool)
+
+    def blank(box, pad, extra_below=0.0):
+        x, y, w, h = box
+        x0 = max(0, int(np.floor(px(x - pad))))
+        y0 = max(0, int(np.floor(px(y - pad))))
+        x1 = min(shape[1], int(np.ceil(px(x + w + pad))))
+        y1 = min(shape[0], int(np.ceil(px(y + h + pad + extra_below))))
+        keep[y0:y1, x0:x1] = False
+
+    blank(PHONE_BTN, 3.5, 0.8)
+    blank(BADGE_MAIL, 2.6, 0.6)
+    blank(BADGE_WEB, 2.6, 0.6)
+    return keep
+
+
+def _percentile_pixel(pixels, y, pct):
+    order = np.argsort(y)
+    index = order[int(round((len(order) - 1) * pct / 100.0))]
+    return pixels[index]
+
+
+def measure_cloth(rgb):
+    """Mean cloth colour versus #4C050C, with glass painted out of the sample."""
+    keep = _glass_keep_mask(rgb.shape)
+    pixels = np.clip(rgb, 0, 255)[keep].reshape(-1, 3).astype(np.float64)
+    if pixels.shape[0] < 1000:
+        raise SystemExit("cloth sample is too small")
+    y = _linear_y(pixels)
+    mean = pixels.mean(axis=0)
+    median = _percentile_pixel(pixels, y, 50)
+    p95 = _percentile_pixel(pixels, y, 95)
+    p99 = _percentile_pixel(pixels, y, 99)
+    mean_lab = _rgb_to_lab(mean)
+    ink_lab = _rgb_to_lab(INK)
+    delta = _delta_e(mean_lab, ink_lab)
+    cap_y = float(_linear_y(LUM_CAP))
+    p99_y = float(_linear_y(p99))
+    light = _rgb_to_lab(pixels)[..., 0]
+    print(
+        f"cloth mean {_hex(mean)} {mean.round(1)} "
+        f"median {_hex(median)} p95 {_hex(p95)} p99 {_hex(p99)}"
+    )
+    print(
+        f"cloth deltaE {delta:.2f} p99 Y {p99_y:.4f} cap Y {cap_y:.4f} "
+        f"L* std {float(light.std()):.2f} kept {pixels.shape[0]}"
+    )
+    if delta > 6.0:
+        raise SystemExit(f"cloth mean is deltaE {delta:.2f} from #4C050C")
+    if p99_y > cap_y + 1e-6:
+        raise SystemExit(f"p99 cloth {_hex(p99)} is brighter than #7A1420")
+    return {"mean": mean, "median": median, "p95": p95, "p99": p99, "delta": delta}
+
+
 def save_rgb(path, rgb):
     im = Image.fromarray(np.clip(rgb, 0, 255).astype(np.uint8), "RGB")
     im.save(path, "PNG", optimize=True)
@@ -594,6 +746,7 @@ def main():
     # White modules on burgundy. The worst pixel is the lightest ground under them.
     contrast_in(back, data_box, "under the QR")
     contrast_in(back, QR_SYMBOL, "QR quiet zone")
+    measure_cloth(back)
     save_rgb(ASSETS / "back-bg.png", back)
     data_mm = data_box[2]
     print(f"qr modules {n} symbol {ss}mm quiet {quiet:.2f}mm data {data_mm:.2f}mm")
