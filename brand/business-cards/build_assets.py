@@ -8,7 +8,7 @@ import os
 
 import numpy as np
 from PIL import Image
-from scipy.ndimage import gaussian_filter
+from scipy.ndimage import gaussian_filter, map_coordinates
 import segno
 
 ROOT = Path(__file__).resolve().parent
@@ -25,7 +25,7 @@ INK = np.array([76.0, 5.0, 12.0], dtype=np.float32)
 # Phone pill, bleed millimetres. Height is the 8.5 pt em plus 2.5 mm above and
 # below (~30 px at 96 dpi). Width fits the longer number, a 3 mm icon, and 4 mm
 # of side padding. cards.html places the icon and the number on this shape.
-PHONE_BTN = (8.2, 28.2, 35.1, 8.0)
+PHONE_BTN = (8.2, 27.5, 35.1, 9.0)
 DEEP = np.array([16.0, 0.0, 3.0], dtype=np.float32)
 
 
@@ -110,27 +110,27 @@ def capsule_dist(xx, yy, left, top, width, height):
     return outside + inside - rad
 
 
-def apply_phone_button(canvas, box):
-    """Bake the frosted phone pill. The canvas stays opaque RGB.
+def _sample_rgb(img, ys, xs):
+    out = np.empty(xs.shape + (3,), np.float32)
+    for c in range(3):
+        out[..., c] = map_coordinates(img[..., c], [ys, xs], order=1, mode="nearest")
+    return out
 
-    Screen recipe, at 96 px per inch: 15% white over a 20 px backdrop blur,
-    a 1 px 30% white border, and an inset shadow of 0 8 px 24 px at 10% white.
-    A thin lip runs along the top inner edge. A tight dark shadow sits under
-    the pill only, so it does not halo.
+
+def apply_phone_button(canvas, box):
+    """Bake a thick refractive glass pill. The canvas stays opaque RGB.
+
+    Drawn at twice the card resolution, then resampled to 600 dpi. The rim is
+    a beveled slab: background pixels are displaced along the surface normal
+    (with a faint chromatic split), and specular lines follow a top-left light.
     """
     x_mm, y_mm, w_mm, h_mm = box
-    blur_sigma = float(px(css_mm(20)))
-    border_w = float(px(css_mm(1)))
-    inset_dy = float(px(css_mm(8)))
-    # Chrome turns a box-shadow blur radius into this Gaussian sigma.
-    inset_sigma = float(px((0.288675 * 24.0 + 0.5) * 25.4 / 96.0))
-    shadow_dy = float(px(0.45))
-    shadow_sigma = float(px(0.62))
-
+    ss = 2
+    rim = float(px(1.45))
     H, W = canvas.shape[:2]
     left, top = px(x_mm), px(y_mm)
     width, height = px(w_mm), px(h_mm)
-    pad = int(np.ceil(blur_sigma * 3.2 + inset_sigma * 3.2 + inset_dy + shadow_sigma * 4 + shadow_dy)) + 6
+    pad = int(px(7.0)) + 8
     x0 = int(np.floor(left)) - pad
     y0 = int(np.floor(top)) - pad
     x1 = int(np.ceil(left + width)) + pad
@@ -139,50 +139,104 @@ def apply_phone_button(canvas, box):
     sx1, sy1 = min(W, x1), min(H, y1)
     src = canvas[sy0:sy1, sx0:sx1]
     window = np.pad(src, ((sy0 - y0, y1 - sy1), (sx0 - x0, x1 - sx1), (0, 0)), mode="edge")
+    big = np.asarray(
+        Image.fromarray(np.clip(window, 0, 255).astype(np.uint8), "RGB").resize(
+            (window.shape[1] * ss, window.shape[0] * ss), Image.Resampling.LANCZOS
+        )
+    ).astype(np.float32)
 
-    yy, xx = np.mgrid[0:window.shape[0], 0:window.shape[1]].astype(np.float32)
-    xx = x0 + xx + 0.5
-    yy = y0 + yy + 0.5
+    bh, bw = big.shape[:2]
+    row, col = np.mgrid[0:bh, 0:bw].astype(np.float32)
+    xx = x0 + (col + 0.5) / ss
+    yy = y0 + (row + 0.5) / ss
     dist = capsule_dist(xx, yy, left, top, width, height)
-    # A little wider than one pixel, so the curve does not stair-step at 600 dpi.
-    cover = np.clip(0.5 - dist / 1.55, 0.0, 1.0).astype(np.float32)
-
-    blurred = gaussian_filter(window, sigma=(blur_sigma, blur_sigma, 0), mode="nearest")
-    glass = blurred * 0.85 + 255.0 * 0.15
-
-    outside = np.clip(dist + 0.5, 0.0, 1.0).astype(np.float32)
-    spread = gaussian_filter(outside, sigma=inset_sigma, mode="nearest")
-    oy = int(round(inset_dy))
-    shifted = np.zeros_like(spread)
-    if oy > 0:
-        shifted[oy:, :] = spread[:-oy, :]
-    else:
-        shifted = spread
-    inset = shifted * cover * 0.10
-    glass = glass * (1.0 - inset[..., None]) + 255.0 * inset[..., None]
-
     gy, gx = np.gradient(dist)
-    ny = gy / (np.sqrt(gx * gx + gy * gy) + 1e-6)
-    lip_w = max(float(px(0.20)), 1.2)
-    lip = np.clip(1.0 - np.clip(-dist, 0.0, None) / lip_w, 0.0, 1.0)
-    lip *= np.clip(-ny, 0.0, 1.0) * cover
-    glass = glass * (1.0 - lip[..., None] * 0.50) + 255.0 * (lip[..., None] * 0.50)
+    nlen = np.sqrt(gx * gx + gy * gy) + 1e-6
+    nx, ny = gx / nlen, gy / nlen
+    depth = np.clip(-dist, 0.0, None)
+    cover = np.clip(0.5 - dist * ss / 1.35, 0.0, 1.0).astype(np.float32)
 
-    outer = cover
-    inner = np.clip(0.5 - (dist + border_w) / 1.55, 0.0, 1.0)
-    stroke = np.clip(outer - inner, 0.0, 1.0)
-    glass = glass * (1.0 - stroke[..., None] * 0.30) + 255.0 * (stroke[..., None] * 0.30)
+    # Convex bezel. u is 0 at the outer edge and 1 where the flat interior starts.
+    u = np.clip(depth / rim, 0.0, 1.0)
+    in_rim = depth < rim
+    bevel = np.where(in_rim, np.clip(np.sin(np.clip(u, 0.0, 1.0) * np.pi), 0.0, 1.0) ** 0.55, 0.0).astype(np.float32)
+    interior = np.clip((depth - rim) / max(px(0.35), 1.0), 0.0, 1.0)
 
+    light = np.array([-0.42, -0.78], np.float32)
+    light /= np.linalg.norm(light)
+    facing = np.clip(nx * light[0] + ny * light[1], 0.0, 1.0)
+    down = np.clip(ny, 0.0, 1.0)
+    up = np.clip(-ny, 0.0, 1.0)
+
+    # Grounding, painted before refraction so the rim can bend it.
+    shadow_sigma = max(px(0.55) * ss, 1.0)
     shade = gaussian_filter(cover, sigma=shadow_sigma, mode="nearest")
-    dy = max(1, int(round(shadow_dy)))
+    dy = max(1, int(round(px(0.42) * ss)))
     dropped = np.zeros_like(shade)
     dropped[dy:, :] = shade[:-dy, :]
-    fade = np.clip((yy - (top + height - px(0.20))) / px(0.85), 0.0, 1.0)
-    dropped *= fade * 0.34
-    base = window * (1.0 - dropped[..., None]) + DEEP * dropped[..., None]
-    base = base * (1.0 - cover[..., None]) + glass * cover[..., None]
+    # Shadow starts below a gap so a light caustic can sit against the glass.
+    below = np.clip((yy - (top + height + px(0.32))) / px(0.85), 0.0, 1.0)
+    dropped *= below * 0.48
+    ground = big * (1.0 - dropped[..., None]) + DEEP * dropped[..., None]
+    gap = yy - (top + height)
+    band = np.exp(-((gap - px(0.16)) ** 2) / (2.0 * px(0.13) ** 2))
+    band *= np.clip(1.0 - np.abs(xx - (left + width * 0.5)) / (width * 0.46), 0.0, 1.0)
+    band *= np.clip(1.0 - cover, 0.0, 1.0)
+    glow = np.array([196.0, 168.0, 176.0], np.float32)
+    ground = ground * (1.0 - band[..., None] * 0.62) + glow * (band[..., None] * 0.62)
 
-    canvas[sy0:sy1, sx0:sx1] = base[(sy0 - y0):(sy0 - y0) + (sy1 - sy0), (sx0 - x0):(sx0 - x0) + (sx1 - sx0)]
+    # Refraction lives in the bezel. A convex rim pulls samples outward, and the
+    # smooth burgundy gradient is gained so the bend stays visible at card size.
+    shift = bevel * px(3.4)
+    refr = _sample_rgb(ground, (yy + ny * shift - y0) * ss - 0.5, (xx + nx * shift - x0) * ss - 0.5)
+    delta = refr - ground
+    refr = np.clip(ground + delta * 5.5, 0.0, 255.0)
+    # Faint dispersion: red bends a little further than blue.
+    red = _sample_rgb(ground, (yy + ny * shift * 1.22 - y0) * ss - 0.5, (xx + nx * shift * 1.22 - x0) * ss - 0.5)
+    blue = _sample_rgb(ground, (yy + ny * shift * 0.78 - y0) * ss - 0.5, (xx + nx * shift * 0.78 - x0) * ss - 0.5)
+    refr[..., 0] = np.clip(refr[..., 0] * 0.55 + red[..., 0] * 0.45, 0.0, 255.0)
+    refr[..., 2] = np.clip(refr[..., 2] * 0.55 + blue[..., 2] * 0.45, 0.0, 255.0)
+
+    frost = max(px(0.45) * ss, 1.0)
+    blurred = gaussian_filter(ground, sigma=(frost, frost, 0), mode="nearest")
+    v = np.clip((yy - top) / height, 0.0, 1.0)
+    lift = 0.045 + 0.05 * (1.0 - v)
+    body = blurred * (1.0 - lift[..., None]) + 255.0 * lift[..., None]
+    body *= (1.0 - 0.05 * v)[..., None]
+
+    # Slab: lighter than the interior all the way around, brighter toward the light.
+    slab = np.clip(0.16 + 0.20 * facing + 0.14 * down, 0.0, 0.46)
+    rim_col = refr * (1.0 - slab[..., None]) + 255.0 * slab[..., None]
+    glass = body * (1.0 - bevel[..., None]) + rim_col * bevel[..., None]
+
+    # Dark groove where the bevel meets the flat face, so the rim has thickness.
+    groove_w = max(px(0.16), 0.8)
+    groove = np.exp(-((depth - rim) ** 2) / (2.0 * groove_w ** 2)) * cover
+    glass = glass * (1.0 - groove[..., None] * 0.28) + DEEP * (groove[..., None] * 0.28)
+
+    # Specular. Bottom inner edge is the crisp line; the top edge is softer.
+    bottom_w = max(px(0.07), 0.6)
+    bottom = np.exp(-((depth - rim * 0.90) ** 2) / (2.0 * bottom_w ** 2))
+    bottom *= down ** 0.45 * cover
+    top_w = max(px(0.16), 0.8)
+    top_line = np.exp(-((depth - rim * 0.18) ** 2) / (2.0 * top_w ** 2))
+    top_line *= up * (0.45 + 0.55 * facing) * cover
+    hot = (facing ** 1.6) * bevel * (0.35 + 0.65 * (up + 0.35 * np.clip(-nx, 0, 1)))
+    glass = glass + (255.0 - glass) * (
+        bottom[..., None] * 0.82 + top_line[..., None] * 0.40 + hot[..., None] * 0.28
+    )
+    # Outer lip, a hairline on the glass edge.
+    lip_w = max(px(0.06), 0.5)
+    lip = np.exp(-(depth ** 2) / (2.0 * lip_w ** 2)) * cover * (0.35 + 0.65 * facing)
+    glass = glass + (255.0 - glass) * lip[..., None] * 0.55
+
+    out = ground * (1.0 - cover[..., None]) + np.clip(glass, 0.0, 255.0) * cover[..., None]
+    small = np.asarray(
+        Image.fromarray(np.clip(out, 0, 255).astype(np.uint8), "RGB").resize(
+            (window.shape[1], window.shape[0]), Image.Resampling.LANCZOS
+        )
+    ).astype(np.float32)
+    canvas[sy0:sy1, sx0:sx1] = small[(sy0 - y0):(sy0 - y0) + (sy1 - sy0), (sx0 - x0):(sx0 - x0) + (sx1 - sx0)]
     qx, qy, qs, _ = QR_SYMBOL
     gap_x = qx - (x_mm + w_mm)
     if gap_x < 2.0:
@@ -377,9 +431,9 @@ def main():
         print("front-bg.png unchanged")
     else:
         save_rgb(front_path, front)
-    contrast_in(back, (7.5, 14.5, 50.0, 13.0), "back name")
-    contrast_in(back, (12.2, 30.4, 27.0, 3.6), "phone label")
-    contrast_in(back, (8.0, 37.6, 50.0, 14.0), "back contacts")
+    contrast_in(back, (7.5, 14.5, 50.0, 12.6), "back name")
+    contrast_in(back, (16.5, 30.6, 22.4, 3.1), "phone label")
+    contrast_in(back, (8.0, 38.3, 50.0, 13.5), "back contacts")
     trace_wordmark()
     n = build_qr_svg()
     module = QR_SYMBOL[2] / n
