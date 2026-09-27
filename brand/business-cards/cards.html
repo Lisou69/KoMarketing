@@ -9,7 +9,8 @@
     Preview (?preview) shows the trim only.
     The front is the silk photograph, cover-cropped to the bleed.
     Backs are burgundy with a silk corner. The phone number sits on a narrow glass
-    pill baked into the background. The QR is white modules on the burgundy.
+    pill baked into the background. Mail and globe icons match the phone outline.
+    The QR is white modules on the burgundy.
     Logo, type, icon, and QR are vectors. No opacity, masks, or blend modes.
   -->
   <style>
@@ -136,10 +137,10 @@
 
     .phone-icon {
       position: absolute;
-      left: 12.2mm;
-      top: 30.5mm;
-      width: 3mm;
-      height: 3mm;
+      left: 12.8mm;
+      top: 30.8mm;
+      width: 2.4mm;
+      height: 2.4mm;
       display: block;
     }
 
@@ -163,6 +164,9 @@
       width: 48mm;
     }
     .contacts p {
+      display: flex;
+      align-items: center;
+      gap: 1.5mm;
       font-family: Manrope, sans-serif;
       font-weight: 400;
       font-size: 8.5pt;
@@ -170,6 +174,17 @@
       letter-spacing: -0.01em;
       color: #ffffff;
       white-space: nowrap;
+    }
+    .contacts img {
+      width: 2.4mm;
+      height: 2.4mm;
+      flex: 0 0 2.4mm;
+      display: block;
+      position: relative;
+      top: -0.18mm;
+    }
+    .contacts .place {
+      padding-left: 3.9mm;
     }
 
     .qr {
@@ -211,9 +226,9 @@
       <img class="phone-icon" src="assets/phone.svg" alt="">
       <p class="phone">+66 65 073 9612</p>
       <div class="contacts">
-        <p>lisa@komarketingagency.com</p>
-        <p>komarketingagency.com</p>
-        <p>Bangkok, Thailand</p>
+        <p><img src="assets/mail.svg" alt=""><span>lisa@komarketingagency.com</span></p>
+        <p><img src="assets/globe.svg" alt=""><span>komarketingagency.com</span></p>
+        <p class="place">Bangkok, Thailand</p>
       </div>
       <div class="qr"><img src="assets/qr.svg" alt=""></div>
     </div>
@@ -231,9 +246,9 @@
       <img class="phone-icon" src="assets/phone.svg" alt="">
       <p class="phone">+66 99 119 7242</p>
       <div class="contacts">
-        <p>kristina@komarketingagency.com</p>
-        <p>komarketingagency.com</p>
-        <p>Bangkok, Thailand</p>
+        <p><img src="assets/mail.svg" alt=""><span>kristina@komarketingagency.com</span></p>
+        <p><img src="assets/globe.svg" alt=""><span>komarketingagency.com</span></p>
+        <p class="place">Bangkok, Thailand</p>
       </div>
       <div class="qr"><img src="assets/qr.svg" alt=""></div>
     </div>
