@@ -85,29 +85,27 @@
     .h-br { left: 102mm; top: 63.95mm; }
     .v-br { left: 98.95mm; top: 67mm; }
 
-    .front {
+    .wordmark {
       position: absolute;
-      left: 58mm;
+      left: 64mm;
       top: 8mm;
-      width: 30mm;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
+      width: 24mm;
+      height: auto;
+      display: block;
     }
 
-    .wordmark { width: 30mm; height: auto; display: block; }
-
     .tagline {
-      margin-top: 1.6mm;
+      position: absolute;
+      left: 13mm;
+      top: 47.05mm;
       font-family: "Source Serif 4", serif;
       font-style: italic;
       font-weight: 500;
-      font-size: 11pt;
+      font-size: 8pt;
       line-height: 1.05;
       letter-spacing: -0.05em;
       color: #4c050c;
-      text-align: center;
+      text-align: left;
     }
 
     .name {
@@ -174,10 +172,8 @@
   <section class="sheet" data-face="front">
     <div class="bleed">
       <img class="bg" src="assets/front-bg.png" alt="">
-      <div class="front">
-        <img class="wordmark" src="assets/ko-wordmark.svg" alt="KO Marketing Agency">
-        <p class="tagline">Marketing that<br>converts.</p>
-      </div>
+      <img class="wordmark" src="assets/ko-wordmark.svg" alt="KO Marketing Agency">
+      <p class="tagline">Marketing that<br>converts.</p>
     </div>
     <div class="mark h h-tl"></div><div class="mark v v-tl"></div>
     <div class="mark h h-tr"></div><div class="mark v v-tr"></div>

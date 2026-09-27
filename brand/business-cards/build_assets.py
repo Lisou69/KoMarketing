@@ -27,10 +27,11 @@ QR_GLASS = (57.6, 15.0, 30.4, 31.0)
 QR_GLASS_R = 2.8
 QR_SYMBOL = (60.7, 21.0, 24.2, 24.2)
 # Front type sits on the cream, clear of the silk. Bleed coordinates.
-# The silk file is placed whole: 68 mm wide, source aspect, 5 mm inside the trim.
-FRONT_LOGO = (58.0, 8.0, 30.0, 7.1)
-FRONT_TAG = (61.0, 16.6, 24.1, 8.3)
-FRONT_SILK = (8.0, 20.3, 68.0)  # bleed x, y, width. Height follows the file.
+# The silk file is wider than the bleed so both straight ends fall off the card.
+# Wordmark sits in the upper-right opening; the tagline sits in the lower-left opening.
+FRONT_LOGO = (64.0, 8.0, 24.0, 5.7)
+FRONT_TAG = (13.0, 47.05, 17.6, 6.0)
+FRONT_SILK = (-13.0, 3.35, 114.0)  # bleed x, y, width. Height follows the file.
 CREAM = np.array([243.0, 238.0, 231.0], dtype=np.float32)
 SILK_SHADOW = np.array([124.0, 108.0, 96.0], dtype=np.float32)
 BACK_TEXT = (7.5, 14.5, 50.0, 32.0)
@@ -372,9 +373,10 @@ def build_qr_svg():
 
 
 def place_whole_silk(base, silk, origin_mm, width_mm):
-    """Scale the silk file uniformly and bake it, with a soft cast shadow.
+    """Scale the silk file uniformly so both straight ends run off the bleed.
 
-    The whole image is placed. Nothing is cropped, stretched, tinted, or blurred.
+    The pixels are not tinted, blurred, or reshaped. The cast shadow uses the
+    wavy top and bottom only; the straight end columns are left out of it.
     """
     H, W = base.shape[:2]
     target_w = int(round(px(width_mm)))
@@ -382,37 +384,49 @@ def place_whole_silk(base, silk, origin_mm, width_mm):
     resized = silk.resize((target_w, target_h), Image.Resampling.LANCZOS)
     arr = np.asarray(resized).astype(np.float32)
     alpha = arr[..., 3] / 255.0
-    sigma = float(px(1.25))
-    dx = int(round(px(0.30)))
-    dy = int(round(px(0.65)))
-    pad = int(np.ceil(sigma * 3.0 + abs(dx) + abs(dy))) + 4
-    buf = np.zeros((target_h + 2 * pad, target_w + 2 * pad), np.float32)
-    buf[pad:pad + target_h, pad:pad + target_w] = alpha
-    blur = gaussian_filter(buf, sigma=sigma, mode="constant", cval=0.0)
-    x0 = int(round(px(origin_mm[0]))) - pad + dx
-    y0 = int(round(px(origin_mm[1]))) - pad + dy
-    bh, bw = blur.shape
-    x1, y1 = max(0, x0), max(0, y0)
-    x2, y2 = min(W, x0 + bw), min(H, y0 + bh)
-    if x2 > x1 and y2 > y1:
-        shad = (blur[y1 - y0:y1 - y0 + (y2 - y1), x1 - x0:x1 - x0 + (x2 - x1)] * 0.20)[..., None]
-        view = base[y1:y2, x1:x2]
-        base[y1:y2, x1:x2] = view * (1.0 - shad) + SILK_SHADOW * shad
     x0 = int(round(px(origin_mm[0])))
     y0 = int(round(px(origin_mm[1])))
-    if x0 < 0 or y0 < 0 or x0 + target_w > W or y0 + target_h > H:
-        raise SystemExit("silk image does not fit on the bleed")
-    # The opaque silhouette must sit inside the trim, 5 mm clear of the cut.
-    opaque = alpha > 0.04
-    ys, xs = np.where(opaque)
-    trim_x0, trim_y0 = px(3.0 + 5.0), px(3.0 + 5.0)
-    trim_x1, trim_y1 = px(96.0 - 3.0 - 5.0), px(61.0 - 3.0 - 5.0)
-    if xs.min() + x0 < trim_x0 or ys.min() + y0 < trim_y0 or xs.max() + x0 > trim_x1 or ys.max() + y0 > trim_y1:
-        raise SystemExit("silk silhouette is closer than 5 mm to the trim")
-    cover = alpha[..., None]
-    base[y0:y0 + target_h, x0:x0 + target_w] = (
-        base[y0:y0 + target_h, x0:x0 + target_w] * (1.0 - cover) + arr[..., :3] * cover
-    )
+    if x0 > -px(4) or x0 + target_w < W + px(4):
+        raise SystemExit("silk ends do not clear the bleed")
+    if x0 + 0.072 * target_w > -px(4):
+        raise SystemExit("straight top cut is inside the bleed")
+
+    end = max(2, int(round(px(6.0))))
+    shadow_a = alpha.copy()
+    shadow_a[:, :end] = 0.0
+    shadow_a[:, -end:] = 0.0
+    sigma = float(px(1.15))
+    dx = int(round(px(0.25)))
+    dy = int(round(px(0.55)))
+    pad = int(np.ceil(sigma * 3.0 + abs(dx) + abs(dy))) + 4
+    buf = np.zeros((target_h + 2 * pad, target_w + 2 * pad), np.float32)
+    buf[pad:pad + target_h, pad:pad + target_w] = shadow_a
+    blur = gaussian_filter(buf, sigma=sigma, mode="constant", cval=0.0) * 0.18
+    sx0, sy0 = x0 - pad + dx, y0 - pad + dy
+    sx1, sy1 = max(0, -sx0), max(0, -sy0)
+    sx2 = min(blur.shape[1], W - sx0)
+    sy2 = min(blur.shape[0], H - sy0)
+    if sx2 > sx1 and sy2 > sy1:
+        wgt = blur[sy1:sy2, sx1:sx2][..., None]
+        view = base[sy0 + sy1:sy0 + sy2, sx0 + sx1:sx0 + sx2]
+        base[sy0 + sy1:sy0 + sy2, sx0 + sx1:sx0 + sx2] = view * (1.0 - wgt) + SILK_SHADOW * wgt
+
+    ix1, iy1 = max(0, -x0), max(0, -y0)
+    ix2, iy2 = min(target_w, W - x0), min(target_h, H - y0)
+    patch_a = alpha[iy1:iy2, ix1:ix2][..., None]
+    patch_rgb = arr[iy1:iy2, ix1:ix2, :3]
+    view = base[y0 + iy1:y0 + iy2, x0 + ix1:x0 + ix2]
+    base[y0 + iy1:y0 + iy2, x0 + ix1:x0 + ix2] = view * (1.0 - patch_a) + patch_rgb * patch_a
+
+    opaque = alpha > 0.08
+    trim_x0, trim_x1 = int(round(px(3))), int(round(px(93)))
+    local = opaque[:, max(0, trim_x0 - x0):max(0, trim_x1 - x0)]
+    rows = np.where(local.any(axis=1))[0]
+    top = y0 + int(rows.min())
+    bot = y0 + int(rows.max())
+    if top < px(3) or bot > px(58):
+        raise SystemExit(f"silk wave crosses the trim vertically ({top / px(1):.1f}, {bot / px(1):.1f} mm)")
+    print(f"silk ends off-bleed by {-x0 / px(1):.1f}mm and {(x0 + target_w - W) / px(1):.1f}mm")
     return base
 
 
