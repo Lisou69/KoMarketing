@@ -21,14 +21,14 @@ DEEP = np.array([36.0, 2.0, 6.0], dtype=np.float32)
 HIGHLIGHT = np.array([255.0, 248.0, 242.0], dtype=np.float32)
 
 # Millimetres from the bleed origin. cards.html uses the same numbers.
-# Taller than the code so the silk can cross the top of the tile.
-QR_GLASS = (61.0, 12.2, 29.6, 32.8)
+# The tile matches the height of the back text block. Insets stay past the 2.8 mm radius.
+QR_GLASS = (57.6, 15.0, 30.4, 31.0)
 QR_GLASS_R = 2.8
-QR_WHITE = (63.9, 18.3, 23.8, 23.8)
+QR_WHITE = (60.7, 18.4, 24.2, 24.2)
 QR_WHITE_R = 1.6
 # Type sits in these boxes. The silk must stay outside them.
-FRONT_TEXT = (11.0, 31.5, 50.0, 22.0)
-BACK_TEXT = (8.0, 8.0, 52.0, 36.0)
+FRONT_TEXT = (10.0, 8.0, 46.0, 23.0)
+BACK_TEXT = (7.5, 14.5, 50.0, 32.0)
 SHADOW = np.array([16.0, 1.0, 4.0], dtype=np.float32)
 WHITE = np.array([255.0, 255.0, 255.0], dtype=np.float32)
 
@@ -76,12 +76,18 @@ def load_silk():
     return Image.open(ASSETS / "silk-element.png").convert("RGBA")
 
 
-def composite_ribbon(base, silk, center_mm, width_mm, angle, tone=0.95):
-    """Bake the ribbon's own alpha onto the opaque ground. No alpha remains."""
+def composite_ribbon(base, silk, center_mm, width_mm, angle, tone=0.95, thickness_mm=None):
+    """Bake the ribbon's own alpha onto the opaque ground. No alpha remains.
+
+    thickness_mm sets the cross-axis size independently so the sweep can be a
+    thin ribbon instead of a slab of the source artwork.
+    """
     h, w = base.shape[:2]
     target_w = max(1, int(round(px(width_mm))))
-    scale = target_w / silk.width
-    target_h = max(1, int(round(silk.height * scale)))
+    if thickness_mm is None:
+        target_h = max(1, int(round(silk.height * target_w / silk.width)))
+    else:
+        target_h = max(1, int(round(px(thickness_mm))))
     resized = silk.resize((target_w, target_h), Image.Resampling.LANCZOS)
     arr = np.asarray(resized).astype(np.float32)
     arr[..., :3] *= tone
@@ -343,16 +349,20 @@ def build_qr_svg():
 def build_front(silk):
     h, w = int(round(px(61))), int(round(px(96)))
     base = field(w, h)
-    # Crisp sweep across the top. The lower area stays burgundy for the wordmark.
-    base = composite_ribbon(base, silk, (30.0, -8.0), 200.0, 16.0, tone=0.97)
+    # Thin diagonal from the lower-left bleed toward the upper-right, clear of the wordmark.
+    base = composite_ribbon(
+        base, silk, (28.0, 58.0), 170.0, 38.0, tone=0.97, thickness_mm=23.0
+    )
     return base, base
 
 
 def build_back(silk):
     h, w = int(round(px(61))), int(round(px(96)))
     base = field(w, h)
-    # The ribbon enters from the top right, crosses the QR glass, and stays off the type and the code.
-    base = composite_ribbon(base, silk, (124.0, 8.0), 155.0, -14.0, tone=0.97)
+    # Enters from the top edge, crosses the QR glass, and stays off the type and the code.
+    base = composite_ribbon(
+        base, silk, (88.0, 10.0), 170.0, -8.0, tone=0.97, thickness_mm=24.0
+    )
     scene = base.copy()
     clear_blurs()
     apply_glass(scene, base, QR_GLASS, QR_GLASS_R)
