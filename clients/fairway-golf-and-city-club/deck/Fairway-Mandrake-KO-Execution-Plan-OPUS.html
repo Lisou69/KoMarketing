@@ -29,10 +29,11 @@ button{font-family:inherit}
 .slide{position:absolute;inset:0;width:960px;height:540px;display:none;flex-direction:column;padding:24px 40px 16px;overflow:hidden;background:var(--bg);color:var(--text)}
 .slide.active{display:flex}
 .slide>*{position:relative;z-index:2}
-.photo{position:absolute;inset:0;z-index:0;overflow:hidden;background:var(--bg)}
+/* page beneath the photo: #0e0502 panel, turning neutral near-black under the fade so partial opacity cannot warm skin or whites */
+.photo{position:absolute;inset:0;z-index:0;overflow:hidden;background:linear-gradient(to right,var(--bg) var(--b0),#0b0a09 calc(var(--b0) + (var(--b1) - var(--b0)) * .3))}
 .photo img{width:100%;height:100%;object-fit:cover;display:block}
 /* nothing is layered over the photo: the panel is the page itself, the photo fades in by its own mask */
-.photo img{-webkit-mask-image:linear-gradient(to right,transparent var(--m0),#000 var(--m1));mask-image:linear-gradient(to right,transparent var(--m0),#000 var(--m1))}
+.photo img{position:absolute;left:var(--ix);top:var(--iy);width:var(--iw);height:var(--ih);-webkit-mask-image:linear-gradient(to right,transparent calc(var(--b0) - var(--ix)),rgba(0,0,0,0.043) calc(var(--b0) - var(--ix) + (var(--b1) - var(--b0)) * 0.125),rgba(0,0,0,0.156) calc(var(--b0) - var(--ix) + (var(--b1) - var(--b0)) * 0.250),rgba(0,0,0,0.316) calc(var(--b0) - var(--ix) + (var(--b1) - var(--b0)) * 0.375),rgba(0,0,0,0.500) calc(var(--b0) - var(--ix) + (var(--b1) - var(--b0)) * 0.500),rgba(0,0,0,0.684) calc(var(--b0) - var(--ix) + (var(--b1) - var(--b0)) * 0.625),rgba(0,0,0,0.844) calc(var(--b0) - var(--ix) + (var(--b1) - var(--b0)) * 0.750),rgba(0,0,0,0.957) calc(var(--b0) - var(--ix) + (var(--b1) - var(--b0)) * 0.875),#000 calc(var(--b1) - var(--ix)));mask-image:linear-gradient(to right,transparent calc(var(--b0) - var(--ix)),rgba(0,0,0,0.043) calc(var(--b0) - var(--ix) + (var(--b1) - var(--b0)) * 0.125),rgba(0,0,0,0.156) calc(var(--b0) - var(--ix) + (var(--b1) - var(--b0)) * 0.250),rgba(0,0,0,0.316) calc(var(--b0) - var(--ix) + (var(--b1) - var(--b0)) * 0.375),rgba(0,0,0,0.500) calc(var(--b0) - var(--ix) + (var(--b1) - var(--b0)) * 0.500),rgba(0,0,0,0.684) calc(var(--b0) - var(--ix) + (var(--b1) - var(--b0)) * 0.625),rgba(0,0,0,0.844) calc(var(--b0) - var(--ix) + (var(--b1) - var(--b0)) * 0.750),rgba(0,0,0,0.957) calc(var(--b0) - var(--ix) + (var(--b1) - var(--b0)) * 0.875),#000 calc(var(--b1) - var(--ix)))}
 
 /* header + footer */
 .top{flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;height:20px}
@@ -185,7 +186,7 @@ body.export .nav,body.export .hit{display:none !important}
 </head>
 <body>
 <div id="stage">
-<section class="slide cover" data-title="Cover" style="--m0:460px;--m1:472px;--col:350px"><div class="photo"><img src="assets/fairway-trackman-group.jpg" alt="" style="object-position:right center" /></div><div class="top"><span class="logo" role="img" aria-label="KO Marketing Agency"></span><span class="sec">Execution plan</span></div><div class="body">
+<section class="slide cover" data-title="Cover" style="--b0:390px;--b1:560px;--ix:141px;--iy:-18px;--iw:864px;--ih:576px;--col:350px"><div class="photo"><img src="assets/fairway-trackman-group.jpg" alt="" style="object-position:right center" /></div><div class="top"><span class="logo" role="img" aria-label="KO Marketing Agency"></span><span class="sec">Execution plan</span></div><div class="body">
   <div>
     <div class="eyebrow">Fairway Golf and City Club + Mandrake Cafe × KO · Oct – Dec 2026 · Bangkok</div>
     <h1>The <em>execution</em> plan.</h1>
@@ -303,7 +304,7 @@ body.export .nav,body.export .hit{display:none !important}
   <div class="g g5"><div class="card"><div class="n">01</div><div class="kick">Before 1 Oct</div><h3>Kickoff + prep</h3><p>Goals, access, brand assets, LINE and Instagram. Content plan, casting, shot list.</p></div><div class="card"><div class="n">02</div><div class="kick">1 Oct</div><h3>Posting starts</h3><p>Fairway and Mandrake calendars go live with already-made videos.</p></div><div class="card"><div class="n">03</div><div class="kick">2 Oct</div><h3>First shoot</h3><p>Already-made videos carry the first week of posts.</p></div><div class="card"><div class="n">04</div><div class="kick">7 Oct</div><h3>Model shoot</h3><p>Full set-up day with 3 models, both venues.</p></div><div class="card"><div class="n">05</div><div class="kick">End of Oct</div><h3>First report</h3><p>Results, costs and next month’s plan.</p></div></div>
   <div class="strip"><span class="tag">Your part</span><span>Share access and brand assets at kickoff, then <b>approve the plan and the posts.</b> KO handles the rest.</span></div>
 </div><div class="foot"><i>KO Marketing Agency · Fairway Golf and City Club + Mandrake Cafe</i><b>15 / 16</b></div></section>
-<section class="slide cover" data-title="Let's get started" style="--m0:304px;--m1:346px;--col:290px"><div class="photo"><img src="assets/fairway-trackman-putting.jpg" alt="" style="object-position:center 55%" /></div><div class="top"><span class="logo" role="img" aria-label="KO Marketing Agency"></span><span class="sec">Next steps</span></div><div class="body">
+<section class="slide cover" data-title="Let's get started" style="--b0:180px;--b1:350px;--ix:0px;--iy:0px;--iw:960px;--ih:540px;--col:290px"><div class="photo"><img src="assets/fairway-trackman-putting.jpg" alt="" style="object-position:center 55%" /></div><div class="top"><span class="logo" role="img" aria-label="KO Marketing Agency"></span><span class="sec">Next steps</span></div><div class="body">
   <div>
     <div class="eyebrow">16 · Fairway Golf and City Club + Mandrake Cafe</div>
     <h1>Let's get <em>started.</em></h1>
