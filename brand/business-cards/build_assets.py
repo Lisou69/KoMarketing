@@ -21,11 +21,11 @@ DEEP = np.array([36.0, 2.0, 6.0], dtype=np.float32)
 HIGHLIGHT = np.array([255.0, 248.0, 242.0], dtype=np.float32)
 
 # Millimetres from the bleed origin. cards.html uses the same numbers.
-# The tile matches the height of the back text block. Insets stay past the 2.8 mm radius.
+# The tile matches the height of the back text block. The symbol sits low in the
+# tile so the silk across the top stays out of the quiet zone.
 QR_GLASS = (57.6, 15.0, 30.4, 31.0)
 QR_GLASS_R = 2.8
-QR_WHITE = (60.7, 18.4, 24.2, 24.2)
-QR_WHITE_R = 1.6
+QR_SYMBOL = (60.7, 21.0, 24.2, 24.2)
 # Front type sits on the silk. Back type stays on open burgundy.
 FRONT_LOGO = (28.0, 21.5, 40.0, 10.2)
 FRONT_TAG = (35.0, 32.8, 26.0, 9.2)
@@ -267,18 +267,6 @@ def apply_glass(canvas, source, box, radius_mm):
     return canvas
 
 
-def paint_round(canvas, box, radius_mm, color):
-    x = int(round(px(box[0])))
-    y = int(round(px(box[1])))
-    w = int(round(px(box[2])))
-    h = int(round(px(box[3])))
-    dist, _, _, _, _ = sdf_round_box(h, w, float(px(radius_mm)))
-    cov = np.clip(-dist / 1.2, 0, 1).astype(np.float32)[..., None]
-    color = np.array(color, dtype=np.float32)
-    canvas[y:y + h, x:x + w] = canvas[y:y + h, x:x + w] * (1.0 - cov) + color * cov
-    return canvas
-
-
 def save_rgb(path, rgb):
     im = Image.fromarray(np.clip(rgb, 0, 255).astype(np.uint8), "RGB")
     im.save(path, "PNG", optimize=True)
@@ -355,11 +343,11 @@ def build_qr_svg():
                 x1 += 1
             parts.append(f"M{x} {yy}h{x1 - x}v1h-{x1 - x}z")
             x = x1
+    # Inverted: white modules, no plate. The 4-module border is clear glass.
     svg = (
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {n} {n}" '
         f'width="{n}" height="{n}">'
-        f'<rect width="{n}" height="{n}" fill="#ffffff"/>'
-        f'<path fill="#1a0905" d="{"".join(parts)}"/>'
+        f'<path fill="#ffffff" d="{"".join(parts)}"/>'
         f"</svg>"
     )
     (ASSETS / "qr.svg").write_text(svg)
@@ -386,7 +374,6 @@ def build_back(silk):
     scene = base.copy()
     clear_blurs()
     apply_glass(scene, base, QR_GLASS, QR_GLASS_R)
-    paint_round(scene, QR_WHITE, QR_WHITE_R, (255, 255, 255))
     return scene, base
 
 
@@ -409,18 +396,22 @@ def main():
     contrast_on_silk(front, FRONT_TAG, "front tagline", 4.5)
     save_rgb(ASSETS / "front-bg.png", front)
     contrast_in(back, BACK_TEXT, "back type")
-    # The code itself sits on burgundy, then a solid white square. Silk stays outside it.
-    contrast_in(back_base, QR_WHITE, "under the QR")
+    trace_wordmark()
+    n = build_qr_svg()
+    module = QR_SYMBOL[2] / n
+    quiet = 4 * module
+    sx, sy, ss, _ = QR_SYMBOL
+    data_box = (sx + quiet, sy + quiet, ss - 2 * quiet, ss - 2 * quiet)
+    # White modules on the glass. The worst pixel is the lightest glass under them.
+    contrast_in(back, data_box, "under the QR")
+    contrast_in(back, QR_SYMBOL, "QR quiet zone")
     qx, qy, qw, qh = QR_GLASS
     rim = back_base[int(px(qy)):int(px(qy + 3.2)), int(px(qx)):int(px(qx + qw))]
     rim_l = 0.2126 * rim[..., 0] + 0.7152 * rim[..., 1] + 0.0722 * rim[..., 2]
     print(f"qr glass top band silk fraction {(rim_l > 100).mean():.2f}")
     save_rgb(ASSETS / "back-bg.png", back)
-
-    trace_wordmark()
-    n = build_qr_svg()
-    data_mm = QR_WHITE[2] * 29 / n
-    print(f"qr modules {n} white tile {QR_WHITE[2]}mm data {data_mm:.2f}mm")
+    data_mm = data_box[2]
+    print(f"qr modules {n} symbol {ss}mm quiet {quiet:.2f}mm data {data_mm:.2f}mm")
     if data_mm < 18:
         raise SystemExit("QR data area is under 18 mm")
     print("wrote assets")
