@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Opaque card art: whole site silk on cream, one frosted QR tile on the back."""
+"""Opaque card art: silk photograph across the front, one frosted QR tile on the back."""
 
 from pathlib import Path
 import subprocess
@@ -26,15 +26,9 @@ HIGHLIGHT = np.array([255.0, 248.0, 242.0], dtype=np.float32)
 QR_GLASS = (57.6, 15.0, 30.4, 31.0)
 QR_GLASS_R = 2.8
 QR_SYMBOL = (60.7, 21.0, 24.2, 24.2)
-# Front. Bleed coordinates. The silk file runs past both sides of the bleed.
-# The wordmark is centered on the card, on the ribbon. The tagline stays lower left.
+# Front. Bleed coordinates. The wordmark is centered on the card. The tagline stays lower left.
 FRONT_LOGO = (14.0, 22.53, 68.0, 15.94)
 FRONT_TAG = (13.0, 47.05, 17.6, 6.0)
-FRONT_SILK = (-13.0, 3.35, 114.0)  # bleed x, y, width. Height follows the file.
-# Warm greige: blanc cassé, greyed. #E6E2DC
-CREAM = np.array([230.0, 226.0, 220.0], dtype=np.float32)
-# A deeper greige, so the cast shadow belongs to this ground.
-SILK_SHADOW = np.array([156.0, 146.0, 134.0], dtype=np.float32)
 BACK_TEXT = (7.5, 14.5, 50.0, 32.0)
 INK = np.array([76.0, 5.0, 12.0], dtype=np.float32)
 SHADOW = np.array([16.0, 1.0, 4.0], dtype=np.float32)
@@ -373,70 +367,36 @@ def build_qr_svg():
     return n
 
 
-def place_whole_silk(base, silk, origin_mm, width_mm):
-    """Scale the silk file uniformly so both straight ends run off the bleed.
+def build_front():
+    """Cover the bleed with the silk photograph, including its own ground.
 
-    The pixels are not tinted, blurred, or reshaped. The cast shadow uses the
-    wavy top and bottom only; the straight end columns are left out of it.
+    The file is portrait. A 90° counterclockwise turn lays the quieter ground
+    under the tagline and the folds across the wordmark. Lanczos scales it
+    uniformly so the photo covers 96×61 mm; the extra width is cropped equally
+    from both sides. No tint, sharpen, shadow, or second background.
     """
-    H, W = base.shape[:2]
-    target_w = int(round(px(width_mm)))
-    target_h = int(round(target_w * silk.height / silk.width))
-    resized = silk.resize((target_w, target_h), Image.Resampling.LANCZOS)
-    arr = np.asarray(resized).astype(np.float32)
-    alpha = arr[..., 3] / 255.0
-    x0 = int(round(px(origin_mm[0])))
-    y0 = int(round(px(origin_mm[1])))
-    if x0 > -px(4) or x0 + target_w < W + px(4):
-        raise SystemExit("silk ends do not clear the bleed")
-    if x0 + 0.072 * target_w > -px(4):
-        raise SystemExit("straight top cut is inside the bleed")
-
-    end = max(2, int(round(px(6.0))))
-    shadow_a = alpha.copy()
-    shadow_a[:, :end] = 0.0
-    shadow_a[:, -end:] = 0.0
-    sigma = float(px(1.15))
-    dx = int(round(px(0.25)))
-    dy = int(round(px(0.55)))
-    pad = int(np.ceil(sigma * 3.0 + abs(dx) + abs(dy))) + 4
-    buf = np.zeros((target_h + 2 * pad, target_w + 2 * pad), np.float32)
-    buf[pad:pad + target_h, pad:pad + target_w] = shadow_a
-    blur = gaussian_filter(buf, sigma=sigma, mode="constant", cval=0.0) * 0.24
-    sx0, sy0 = x0 - pad + dx, y0 - pad + dy
-    sx1, sy1 = max(0, -sx0), max(0, -sy0)
-    sx2 = min(blur.shape[1], W - sx0)
-    sy2 = min(blur.shape[0], H - sy0)
-    if sx2 > sx1 and sy2 > sy1:
-        wgt = blur[sy1:sy2, sx1:sx2][..., None]
-        view = base[sy0 + sy1:sy0 + sy2, sx0 + sx1:sx0 + sx2]
-        base[sy0 + sy1:sy0 + sy2, sx0 + sx1:sx0 + sx2] = view * (1.0 - wgt) + SILK_SHADOW * wgt
-
-    ix1, iy1 = max(0, -x0), max(0, -y0)
-    ix2, iy2 = min(target_w, W - x0), min(target_h, H - y0)
-    patch_a = alpha[iy1:iy2, ix1:ix2][..., None]
-    patch_rgb = arr[iy1:iy2, ix1:ix2, :3]
-    view = base[y0 + iy1:y0 + iy2, x0 + ix1:x0 + ix2]
-    base[y0 + iy1:y0 + iy2, x0 + ix1:x0 + ix2] = view * (1.0 - patch_a) + patch_rgb * patch_a
-
-    opaque = alpha > 0.08
-    trim_x0, trim_x1 = int(round(px(3))), int(round(px(93)))
-    local = opaque[:, max(0, trim_x0 - x0):max(0, trim_x1 - x0)]
-    rows = np.where(local.any(axis=1))[0]
-    top = y0 + int(rows.min())
-    bot = y0 + int(rows.max())
-    if top < px(3) or bot > px(58):
-        raise SystemExit(f"silk wave crosses the trim vertically ({top / px(1):.1f}, {bot / px(1):.1f} mm)")
-    print(f"silk ends off-bleed by {-x0 / px(1):.1f}mm and {(x0 + target_w - W) / px(1):.1f}mm")
-    return base
-
-
-def build_front(silk):
     h, w = int(round(px(61))), int(round(px(96)))
-    base = np.empty((h, w, 3), dtype=np.float32)
-    base[:] = CREAM
-    base = place_whole_silk(base, silk, FRONT_SILK[:2], FRONT_SILK[2])
-    return base, base
+    src = Image.open(ASSETS / "silk-full-bg.jpg")
+    if src.mode != "RGB":
+        raise SystemExit(f"silk photograph is {src.mode}, expected RGB")
+    rot = src.transpose(Image.Transpose.ROTATE_90)
+    scale = max(w / rot.width, h / rot.height)
+    nw = int(round(rot.width * scale))
+    nh = int(round(rot.height * scale))
+    if nw < w or nh < h:
+        raise SystemExit(f"cover scale undershoots {(nw, nh)} vs {(w, h)}")
+    resized = rot.resize((nw, nh), Image.Resampling.LANCZOS)
+    left = (nw - w) // 2
+    top = (nh - h) // 2
+    cropped = resized.crop((left, top, left + w, top + h))
+    if cropped.size != (w, h) or cropped.mode != "RGB":
+        raise SystemExit(f"front crop is {cropped.size} {cropped.mode}")
+    print(
+        f"front photo {src.size[0]}x{src.size[1]} rot90 {rot.size[0]}x{rot.size[1]} "
+        f"-> {nw}x{nh} crop {left}px left, {top}px top "
+        f"({left / px(1):.2f}mm / {top / px(1):.2f}mm)"
+    )
+    return np.asarray(cropped).astype(np.float32)
 
 
 def build_back(silk):
@@ -460,7 +420,7 @@ def main():
         "radius", QR_GLASS_R,
     )
     print("canvas", int(round(px(96))), int(round(px(61))), "dpi", DPI)
-    front, _ = build_front(silk)
+    front = build_front()
     back, back_base = build_back(silk)
     if os.environ.get("CARD_PREVIEW"):
         for name, rgb in (("front", front), ("back", back)):
