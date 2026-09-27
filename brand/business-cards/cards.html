@@ -85,21 +85,21 @@
 
     .front {
       position: absolute;
-      left: 8mm;
-      top: 8mm;
-      width: 80mm;
-      height: 45mm;
+      left: 12mm;
+      top: 13.2mm;
+      width: 48mm;
+      height: 34.6mm;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
-      text-align: center;
+      text-align: left;
     }
 
-    .wordmark { width: 58mm; height: auto; display: block; }
+    .wordmark { width: 44mm; height: auto; display: block; }
 
     .tagline {
-      margin-top: 3.4mm;
+      margin-top: 2.6mm;
       font-family: "Source Serif 4", serif;
       font-style: italic;
       font-weight: 500;
@@ -111,12 +111,12 @@
 
     .name {
       position: absolute;
-      left: 8mm;
-      top: 7.2mm;
+      left: 11.2mm;
+      top: 8.0mm;
       font-family: "Source Serif 4", serif;
       font-style: italic;
       font-weight: 500;
-      font-size: 14.5pt;
+      font-size: 13.5pt;
       line-height: 1.05;
       letter-spacing: -0.03em;
       color: #ffffff;
@@ -124,8 +124,8 @@
 
     .role {
       position: absolute;
-      left: 8mm;
-      top: 13.6mm;
+      left: 11.4mm;
+      top: 14.15mm;
       font-family: Manrope, sans-serif;
       font-weight: 500;
       font-size: 8pt;
@@ -134,33 +134,37 @@
       color: #ffffff;
     }
 
-    .contacts {
+    .line {
       position: absolute;
-      left: 10mm;
-      top: 24.2mm;
-      width: 48mm;
-    }
-    .contacts p {
+      left: 10.6mm;
+      width: 45.2mm;
+      height: 5.15mm;
+      display: flex;
+      align-items: center;
+      padding-left: 3.3mm;
       font-family: Manrope, sans-serif;
-      font-weight: 400;
-      font-size: 8pt;
-      line-height: 1.45;
-      letter-spacing: -0.01em;
+      font-weight: 500;
+      font-size: 7.5pt;
+      line-height: 1;
+      letter-spacing: -0.015em;
       color: #ffffff;
       white-space: nowrap;
     }
-    .contacts .place { margin-top: 1.5mm; }
+    .l1 { top: 19.4mm; }
+    .l2 { top: 25.55mm; }
+    .l3 { top: 31.7mm; }
+    .l4 { top: 37.85mm; }
 
     .qr {
       position: absolute;
-      left: 61.7mm;
-      top: 23.95mm;
-      width: 23.6mm;
-      height: 23.6mm;
+      left: 61mm;
+      top: 18.6mm;
+      width: 23.8mm;
+      height: 23.8mm;
     }
     .qr img {
-      width: 23.6mm;
-      height: 23.6mm;
+      width: 23.8mm;
+      height: 23.8mm;
       display: block;
     }
 
@@ -189,12 +193,10 @@
       <img class="bg" src="assets/back-bg.png" alt="">
       <p class="name">Lisa Maretti</p>
       <p class="role">Co-founder</p>
-      <div class="contacts">
-        <p>+66 65 073 9612</p>
-        <p>lisa@komarketingagency.com</p>
-        <p class="place">komarketingagency.com</p>
-        <p>Sukhumvit 24, Bangkok</p>
-      </div>
+      <p class="line l1">+66 65 073 9612</p>
+      <p class="line l2">lisa@komarketingagency.com</p>
+      <p class="line l3">komarketingagency.com</p>
+      <p class="line l4">Sukhumvit 24, Bangkok</p>
       <div class="qr"><img src="assets/qr.svg" alt=""></div>
     </div>
     <div class="mark h h-tl"></div><div class="mark v v-tl"></div>
@@ -208,12 +210,10 @@
       <img class="bg" src="assets/back-bg.png" alt="">
       <p class="name">Kristina Ostapenko</p>
       <p class="role">Co-founder</p>
-      <div class="contacts">
-        <p>+66 99 119 7242</p>
-        <p>kristina@komarketingagency.com</p>
-        <p class="place">komarketingagency.com</p>
-        <p>Sukhumvit 24, Bangkok</p>
-      </div>
+      <p class="line l1">+66 99 119 7242</p>
+      <p class="line l2">kristina@komarketingagency.com</p>
+      <p class="line l3">komarketingagency.com</p>
+      <p class="line l4">Sukhumvit 24, Bangkok</p>
       <div class="qr"><img src="assets/qr.svg" alt=""></div>
     </div>
     <div class="mark h h-tl"></div><div class="mark v v-tl"></div>

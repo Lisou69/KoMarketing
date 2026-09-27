@@ -1,26 +1,37 @@
 #!/usr/bin/env python3
-"""Build opaque card art: traced white wordmark, burgundy silk, baked glass, QR."""
+"""Opaque card art: site silk ribbon on burgundy, liquid glass baked in."""
 
 from pathlib import Path
 import subprocess
 
+import os
+
 import numpy as np
-from PIL import Image, ImageDraw, ImageFilter
-from scipy.ndimage import gaussian_filter
+from PIL import Image
+from scipy.ndimage import gaussian_filter, map_coordinates
 import segno
 
 ROOT = Path(__file__).resolve().parent
 ASSETS = ROOT / "assets"
-DPI = 600
-BLEED_W_MM = 96.0
-BLEED_H_MM = 61.0
+DPI = int(os.environ.get("CARD_DPI", "600"))
 
-# Logo burgundy sampled from the site wordmark.
-BURGUNDY = np.array([76, 5, 12], dtype=np.float32)
+# Site wordmark burgundy, kept deep rather than bright red.
+BURGUNDY = np.array([76.0, 5.0, 12.0], dtype=np.float32)
+DEEP = np.array([36.0, 2.0, 6.0], dtype=np.float32)
+HIGHLIGHT = np.array([255.0, 248.0, 242.0], dtype=np.float32)
 
-# Glass panel and QR tile, millimetres from the bleed origin.
-PANEL = dict(x=6.5, y=18.5, w=83.0, h=34.5, radius=2.4)
-TILE = dict(x=61.7, y=23.95, w=23.6, h=23.6)
+# Millimetres from the bleed origin. cards.html uses the same numbers.
+FRONT_PILL = (8.0, 13.2, 80.0, 34.6)
+FRONT_PILL_R = 17.3
+BACK_CARD = (6.4, 4.8, 83.2, 51.4)
+BACK_CARD_R = 6.4
+PILL_X, PILL_W, PILL_H = 10.6, 45.2, 5.15
+PILL_YS = (19.4, 25.55, 31.7, 37.85)
+QR_GLASS = (58.6, 16.2, 28.6, 28.6)
+QR_GLASS_R = 7.0
+QR_WHITE = (61.0, 18.6, 23.8, 23.8)
+QR_WHITE_R = 2.2
+SHADOW = np.array([16.0, 1.0, 4.0], dtype=np.float32)
 
 
 def px(mm):
@@ -29,158 +40,233 @@ def px(mm):
 
 def rel_lum(rgb):
     def f(c):
-        c = c / 255.0
+        c = float(c) / 255.0
         return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
-    r, g, b = (f(float(c)) for c in rgb)
+    r, g, b = (f(v) for v in rgb)
     return 0.2126 * r + 0.7152 * g + 0.0722 * b
 
 
 def contrast_white(rgb):
-    return (1.05) / (rel_lum(rgb) + 0.05)
+    return 1.05 / (rel_lum(rgb) + 0.05)
 
 
-def fbm(h, w, rng, octaves=5):
-    acc = np.zeros((h, w), np.float32)
-    amp = 1.0
-    total = 0.0
-    for i in range(octaves):
-        sh = max(3, h // (2 ** (i + 2)))
-        sw = max(3, w // (2 ** (i + 2)))
-        noise = rng.random((sh, sw), dtype=np.float32)
-        img = Image.fromarray(noise, mode="F").resize((w, h), Image.Resampling.BICUBIC)
-        acc += np.asarray(img, dtype=np.float32) * amp
-        total += amp
-        amp *= 0.55
-    return acc / total
-
-
-def make_silk(w, h, seed, base, amp):
-    """Tone-on-tone burgundy silk. Lightness stays on the wine axis, not pink."""
-    rng = np.random.default_rng(seed)
-    ys = np.linspace(0, 1, h, dtype=np.float32)
-    xs = np.linspace(0, 1, w, dtype=np.float32)
-    y, x = np.meshgrid(ys, xs, indexing="ij")
-    n1 = fbm(h, w, rng)
-    n2 = fbm(h, w, rng)
-    xw = x + (n1 - 0.5) * 0.07
-    yw = y + (n2 - 0.5) * 0.045
-
-    fold = np.sin((xw * 1.35 + yw * 2.6) * np.pi * 2.0)
-    fold += 0.42 * np.sin((xw * 2.4 - yw * 1.15) * np.pi * 2.6 + 0.8)
-    fold += 0.18 * np.sin((yw * 4.2 + n2 * 1.4) * np.pi + 0.4)
-    fold = fold / (np.max(np.abs(fold)) + 1e-6)
-    fold = gaussian_filter(fold, sigma=2.2).astype(np.float32)
-
-    gy, gx = np.gradient(fold.astype(np.float32))
-    sheen = gx * 0.55 - gy * 0.85
-    lim = np.percentile(np.abs(sheen), 98) + 1e-6
-    sheen = np.clip(sheen / lim, -1, 1)
-
-    # Fine weave, a fraction of a millimetre, kept very quiet.
-    weave = np.sin((xw * 210.0 + yw * 36.0) * np.pi)
-    weave = gaussian_filter(weave, sigma=0.8).astype(np.float32)
-
-    hi = np.clip(sheen, 0, 1)
-    sh = np.clip(-sheen, 0, 1)
-    delta = fold * amp + weave * (amp * 0.08)
-    r = base[0] + delta * 1.00 + hi * amp * 0.55 - sh * amp * 0.42
-    g = base[1] + delta * 0.07 + hi * amp * 0.05 - sh * amp * 0.04
-    b = base[2] + delta * 0.16 + hi * amp * 0.09 - sh * amp * 0.08
-    rgb = np.clip(np.stack([r, g, b], axis=-1), 0, 255)
+def field(w, h):
+    """Clean deep burgundy with a very slight vertical falloff."""
+    y = np.linspace(0.0, 1.0, h, dtype=np.float32)[:, None]
+    top = np.array([84.0, 6.0, 14.0], dtype=np.float32)
+    bot = np.array([54.0, 3.0, 8.0], dtype=np.float32)
+    col = top * (1.0 - y) + bot * y
+    rgb = np.empty((h, w, 3), dtype=np.float32)
+    rgb[:] = col[:, None, :]
     return rgb
 
 
-def rounded_mask(h, w, radius_px):
-    mask = Image.new("L", (w, h), 0)
-    draw = ImageDraw.Draw(mask)
-    draw.rounded_rectangle((0, 0, w - 1, h - 1), radius=radius_px, fill=255)
-    # Soften only the coverage edge, then bake. The saved image has no alpha.
-    mask = mask.filter(ImageFilter.GaussianBlur(radius=0.7))
-    return np.asarray(mask, dtype=np.float32) / 255.0
+def load_silk():
+    return Image.open(ASSETS / "silk-element.png").convert("RGBA")
 
 
-def bake_glass(rgb):
-    """Frost the panel: blurred silk, thin light rim, soft top highlight, white QR tile."""
-    h, w = rgb.shape[:2]
-    x0 = int(round(px(PANEL["x"])))
-    y0 = int(round(px(PANEL["y"])))
-    pw = int(round(px(PANEL["w"])))
-    ph = int(round(px(PANEL["h"])))
-    radius = int(round(px(PANEL["radius"])))
+def composite_ribbon(base, silk, center_mm, width_mm, angle, tone=0.95):
+    """Bake the ribbon's own alpha onto the opaque ground. No alpha remains."""
+    h, w = base.shape[:2]
+    target_w = max(1, int(round(px(width_mm))))
+    scale = target_w / silk.width
+    target_h = max(1, int(round(silk.height * scale)))
+    resized = silk.resize((target_w, target_h), Image.Resampling.LANCZOS)
+    arr = np.asarray(resized).astype(np.float32)
+    arr[..., :3] *= tone
+    im = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8), "RGBA")
+    rot = im.rotate(angle, resample=Image.Resampling.BICUBIC, expand=True)
+    r = np.asarray(rot).astype(np.float32)
+    rh, rw = r.shape[:2]
+    cx, cy = int(round(px(center_mm[0]))), int(round(px(center_mm[1])))
+    x0, y0 = cx - rw // 2, cy - rh // 2
+    x1, y1 = max(0, x0), max(0, y0)
+    x2, y2 = min(w, x0 + rw), min(h, y0 + rh)
+    if x2 <= x1 or y2 <= y1:
+        return base
+    sx1, sy1 = x1 - x0, y1 - y0
+    patch = r[sy1:sy1 + (y2 - y1), sx1:sx1 + (x2 - x1)]
+    a = patch[..., 3:4] / 255.0
+    dst = base[y1:y2, x1:x2]
+    base[y1:y2, x1:x2] = dst * (1.0 - a) + patch[..., :3] * a
+    return base
 
-    crop = rgb[y0:y0 + ph, x0:x0 + pw].copy()
-    blurred = np.asarray(
-        Image.fromarray(crop.astype(np.uint8), mode="RGB").filter(ImageFilter.GaussianBlur(radius=28)),
-        dtype=np.float32,
-    )
-    # Lift along the same hue. Do not mix toward white.
-    blurred *= 1.10
-    yy = np.linspace(0, 1, ph, dtype=np.float32)[:, None]
-    highlight = np.clip(1.0 - yy / 0.42, 0, 1) ** 1.6
-    blurred[..., 0] += highlight * 16.0
-    blurred[..., 1] += highlight * 1.4
-    blurred[..., 2] += highlight * 2.6
-    blurred = np.clip(blurred, 0, 255)
 
-    mask = rounded_mask(ph, pw, radius)
-    base = crop.astype(np.float32)
-    panel = base * (1.0 - mask[..., None]) + blurred * mask[..., None]
+def sdf_round_box(h, w, rad):
+    yy, xx = np.mgrid[0:h, 0:w].astype(np.float32)
+    cx, cy = (w - 1) / 2.0, (h - 1) / 2.0
+    rad = min(rad, w / 2.0 - 0.5, h / 2.0 - 0.5)
+    qx = np.abs(xx - cx) - (w / 2.0 - rad)
+    qy = np.abs(yy - cy) - (h / 2.0 - rad)
+    outside = np.sqrt(np.maximum(qx, 0) ** 2 + np.maximum(qy, 0) ** 2)
+    inside = np.minimum(np.maximum(qx, qy), 0)
+    dist = outside + inside - rad
+    gy, gx = np.gradient(dist)
+    nlen = np.sqrt(gx * gx + gy * gy) + 1e-6
+    return dist, gx / nlen, gy / nlen, xx, yy
 
-    # Thin light rim, baked opaque.
-    rim = Image.new("L", (pw, ph), 0)
-    draw = ImageDraw.Draw(rim)
-    inset = max(1, int(round(px(0.16))))
-    draw.rounded_rectangle(
-        (inset, inset, pw - 1 - inset, ph - 1 - inset),
-        radius=max(1, radius - inset),
-        outline=255,
-        width=max(2, int(round(px(0.15)))),
-    )
-    rim_a = np.asarray(rim, dtype=np.float32) / 255.0
-    rim_a *= mask
-    light = np.array([226, 216, 208], dtype=np.float32)
-    panel = panel * (1.0 - rim_a[..., None]) + light * rim_a[..., None]
 
-    # QR tile, solid white, inside the glass.
-    tx = int(round(px(TILE["x"]))) - x0
-    ty = int(round(px(TILE["y"]))) - y0
-    tw = int(round(px(TILE["w"])))
-    th = int(round(px(TILE["h"])))
-    panel[ty:ty + th, tx:tx + tw] = (255, 255, 255)
+def sample(img, ys, xs):
+    out = np.empty(xs.shape + (3,), np.float32)
+    for c in range(3):
+        out[..., c] = map_coordinates(img[..., c], [ys, xs], order=1, mode="nearest")
+    return out
 
-    out = rgb.copy()
-    out[y0:y0 + ph, x0:x0 + pw] = np.clip(panel, 0, 255)
-    return out.astype(np.uint8)
+
+def blit_shadow(canvas, x, y, mask, opacity=0.5):
+    """Offset, blur, and darken. The result stays opaque."""
+    h, w = mask.shape
+    H, W = canvas.shape[:2]
+    blurred = gaussian_filter(mask, sigma=max(px(1.05), 0.8))
+    oy, ox = int(round(px(0.95))), int(round(px(0.28)))
+    y1, x1 = y + oy, x + ox
+    sy1, sx1 = 0, 0
+    if y1 < 0:
+        sy1 = -y1
+        y1 = 0
+    if x1 < 0:
+        sx1 = -x1
+        x1 = 0
+    y2, x2 = min(H, y1 + h - sy1), min(W, x1 + w - sx1)
+    if y2 <= y1 or x2 <= x1:
+        return
+    sh = blurred[sy1:sy1 + (y2 - y1), sx1:sx1 + (x2 - x1)] * opacity
+    sh = sh[..., None]
+    canvas[y1:y2, x1:x2] = canvas[y1:y2, x1:x2] * (1.0 - sh) + SHADOW * sh
+
+
+def apply_glass(canvas, source, box, radius_mm, *, blur_mm=1.2, tint=0.2,
+                bulge=0.07, bend_mm=1.6, zone_mm=6.0, lens_mm=1.8, rim_mm=1.8,
+                shadow=True, darken=None):
+    """Thick liquid glass: blurred refraction, lens bend, lit rim. Opaque."""
+    H, W = canvas.shape[:2]
+    x = int(round(px(box[0])))
+    y = int(round(px(box[1])))
+    w = int(round(px(box[2])))
+    h = int(round(px(box[3])))
+    x = max(0, min(W - 2, x))
+    y = max(0, min(H - 2, y))
+    w = min(w, W - x)
+    h = min(h, H - y)
+    if w < 4 or h < 4:
+        return canvas
+    rad = float(px(radius_mm))
+    dist, nx, ny, xx, yy = sdf_round_box(h, w, rad)
+    inside = np.clip(-dist / 1.35, 0, 1).astype(np.float32)
+
+    if shadow:
+        blit_shadow(canvas, x, y, inside)
+
+    blur_px = max(float(px(blur_mm)), 0.6)
+    bend = float(px(bend_mm))
+    fringe_px = float(px(0.28))
+    pad = int(np.ceil(blur_px * 3.2 + bend + float(px(lens_mm)) + fringe_px + 8))
+    x0, y0 = max(0, x - pad), max(0, y - pad)
+    x1, y1 = min(W, x + w + pad), min(H, y + h + pad)
+    blurred = gaussian_filter(source[y0:y1, x0:x1], sigma=(blur_px, blur_px, 0))
+
+    lcx, lcy = (w - 1) / 2.0, (h - 1) / 2.0
+    lx = xx - lcx
+    ly = yy - lcy
+    rnorm = np.sqrt((lx / (w / 2.0)) ** 2 + (ly / (h / 2.0)) ** 2)
+    rad_len = np.sqrt(lx * lx + ly * ly) + 1e-6
+    # Magnify the middle, bow the picture across the lens, and bend hard at the rim.
+    zoom = 1.0 - bulge * np.clip(1.05 - rnorm, 0, 1) ** 0.8
+    radial = (np.clip(rnorm, 0, 1) ** 1.45) * float(px(lens_mm))
+    edge = np.clip(1.0 + dist / max(px(zone_mm), 1.0), 0, 1) ** 0.9
+    gx = x + lcx + lx * zoom + (lx / rad_len) * radial + nx * edge * bend - x0
+    gy = y + lcy + ly * zoom + (ly / rad_len) * radial + ny * edge * bend - y0
+    rgb = sample(blurred, gy, gx)
+    fringe = edge * fringe_px
+    rgb_r = sample(blurred, gy + ny * fringe, gx + nx * fringe)
+    rgb_b = sample(blurred, gy - ny * fringe, gx - nx * fringe)
+    rgb = rgb.copy()
+    mix = edge * 0.55
+    rgb[..., 0] = rgb[..., 0] * (1.0 - mix) + rgb_r[..., 0] * mix
+    rgb[..., 2] = rgb[..., 2] * (1.0 - mix) + rgb_b[..., 2] * mix
+
+    glass = rgb * (1.0 - tint) + BURGUNDY * tint
+
+    if darken:
+        # Local millimetres: x, y, w, h, feather, amount. Core stays fully deep.
+        vx, vy, vw, vh, feather_mm, amount = darken
+        vx, vy, vw, vh = px(vx), px(vy), px(vw), px(vh)
+        dx = np.maximum(np.maximum(vx - xx, xx - (vx + vw)), 0.0)
+        dy = np.maximum(np.maximum(vy - yy, yy - (vy + vh)), 0.0)
+        dist_out = np.sqrt(dx * dx + dy * dy)
+        m = np.clip(1.0 - dist_out / max(px(feather_mm), 1.0), 0, 1)
+        glass = glass * (1.0 - m[..., None] * amount) + BURGUNDY * (m[..., None] * amount)
+
+    # Convex rim: bright where the surface faces up-left, dark along the bottom.
+    rim_px = min(float(px(rim_mm)), min(h, w) * 0.2)
+    depth = np.maximum(-dist, 0.0)
+    edge_zone = np.clip(1.0 - depth / max(rim_px, 1.0), 0, 1)
+    edge_zone = edge_zone ** 0.72
+    nx3 = nx * edge_zone
+    ny3 = ny * edge_zone
+    nz = np.sqrt(np.clip(1.0 - edge_zone * edge_zone, 0, 1))
+    light = np.array([-0.28, -0.82, 0.50], dtype=np.float32)
+    light /= np.linalg.norm(light)
+    view = np.array([0.0, 0.0, 1.0], dtype=np.float32)
+    half = light + view
+    half /= np.linalg.norm(half)
+    ndotl = np.clip(nx3 * light[0] + ny3 * light[1] + nz * light[2], 0, 1)
+    ndoth = np.clip(nx3 * half[0] + ny3 * half[1] + nz * half[2], 0, 1)
+    fresnel = edge_zone ** 1.35
+    groove = np.exp(-((edge_zone - 0.62) ** 2) / (2.0 * 0.07 ** 2)) * fresnel
+    glass = glass * (1.0 - groove[..., None] * 0.28) + DEEP * (groove[..., None] * 0.28)
+    down = np.clip(ny3, 0, 1) ** 1.15
+    glass = glass * (1.0 - down[..., None] * 0.5) + DEEP * (down[..., None] * 0.5)
+    spec = (ndoth ** 46) * fresnel
+    sheen = (ndotl ** 0.65) * (0.18 + 0.82 * fresnel)
+    gain = np.clip(spec * 1.05 + sheen * 0.72, 0, 1)
+    glass = glass * (1.0 - gain[..., None] * 0.86) + HIGHLIGHT * (gain[..., None] * 0.86)
+    # Light iridescent fringe, stronger on the lit rim.
+    cool = fresnel * np.clip(-ny * 0.75 + -nx * 0.45, 0, 1)
+    warm = fresnel * np.clip(ny * 0.65 + nx * 0.35, 0, 1)
+    glass[..., 0] += warm * 16.0 - cool * 6.0
+    glass[..., 1] += cool * 8.0 - warm * 3.0
+    glass[..., 2] += cool * 18.0 - warm * 4.0
+
+    cov = inside[..., None]
+    canvas[y:y + h, x:x + w] = canvas[y:y + h, x:x + w] * (1.0 - cov) + glass * cov
+    return canvas
+
+
+def paint_round(canvas, box, radius_mm, color):
+    x = int(round(px(box[0])))
+    y = int(round(px(box[1])))
+    w = int(round(px(box[2])))
+    h = int(round(px(box[3])))
+    dist, _, _, _, _ = sdf_round_box(h, w, float(px(radius_mm)))
+    cov = np.clip(-dist / 1.2, 0, 1).astype(np.float32)[..., None]
+    color = np.array(color, dtype=np.float32)
+    canvas[y:y + h, x:x + w] = canvas[y:y + h, x:x + w] * (1.0 - cov) + color * cov
+    return canvas
 
 
 def save_rgb(path, rgb):
-    im = Image.fromarray(rgb.astype(np.uint8), mode="RGB")
+    im = Image.fromarray(np.clip(rgb, 0, 255).astype(np.uint8), "RGB")
     im.save(path, "PNG", optimize=True)
     check = Image.open(path)
     if check.mode != "RGB":
-        raise SystemExit(f"{path} is {check.mode}, expected RGB")
+        raise SystemExit(f"{path.name} saved as {check.mode}")
 
 
-def report(name, rgb):
-    flat = rgb.reshape(-1, 3)
-    lum = 0.2126 * flat[:, 0] + 0.7152 * flat[:, 1] + 0.0722 * flat[:, 2]
-    light = flat[int(np.argmax(lum))]
-    dark = flat[int(np.argmin(lum))]
-    ratio = flat[:, 1] / np.maximum(flat[:, 0], 1)
-    print(
-        f"{name}: mean {flat.mean(0).round(1)} light {light.round(1)} dark {dark.round(1)} "
-        f"white-contrast {contrast_white(light):.2f} max G/R {ratio.max():.3f}"
-    )
-    if contrast_white(light) < 4.5:
-        raise SystemExit(f"{name} fails AA for white text")
-    if ratio.max() > 0.22:
-        raise SystemExit(f"{name} drifts pink")
+def contrast_in(rgb, box, label):
+    x, y, w, h = (int(round(px(v))) for v in box)
+    crop = rgb[y:y + h, x:x + w].reshape(-1, 3)
+    lum = 0.2126 * crop[:, 0] + 0.7152 * crop[:, 1] + 0.0722 * crop[:, 2]
+    light = crop[int(np.argmax(lum))]
+    ratio = contrast_white(light)
+    print(f"{label}: lightest {light.round(1)} white-contrast {ratio:.2f}")
+    if ratio < 4.5:
+        raise SystemExit(f"{label} fails AA ({ratio:.2f})")
+    return ratio
 
 
 def trace_wordmark():
     source = ASSETS / "ko-wordmark-source.png"
-    if not source.exists():
-        raise SystemExit("missing assets/ko-wordmark-source.png")
     src = Image.open(source).convert("RGBA")
     alpha = src.getchannel("A")
     up = alpha.resize((alpha.width * 4, alpha.height * 4), Image.Resampling.LANCZOS)
@@ -191,22 +277,14 @@ def trace_wordmark():
     subprocess.check_call(
         ["potrace", "-s", "-o", str(raw), "--flat", "-t", "12", "-a", "1.05", "-O", "0.18", str(pbm)]
     )
-    text = raw.read_text()
-    text = text.replace('fill="#000000"', 'fill="#ffffff"')
-    start = text.find("<svg")
-    svg = text[start:]
-    # Drop the legacy doctype; keep potrace paths.
-    out = ASSETS / "ko-wordmark.svg"
-    out.write_text(
+    text = raw.read_text().replace('fill="#000000"', 'fill="#ffffff"')
+    svg = text[text.find("<svg"):]
+    (ASSETS / "ko-wordmark.svg").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
-        + svg.replace(
-            'width="2356.000000pt" height="552.000000pt"',
-            'width="2356" height="552"',
-        )
+        + svg.replace('width="2356.000000pt" height="552.000000pt"', 'width="2356" height="552"')
     )
     pbm.unlink()
     raw.unlink()
-    return out.read_text()
 
 
 def build_qr_svg():
@@ -214,7 +292,7 @@ def build_qr_svg():
     modules = list(qr.matrix_iter(scale=1, border=4))
     n = len(modules)
     parts = []
-    for y, row in enumerate(modules):
+    for yy, row in enumerate(modules):
         x = 0
         while x < n:
             if not row[x]:
@@ -223,56 +301,97 @@ def build_qr_svg():
             x1 = x
             while x1 < n and row[x1]:
                 x1 += 1
-            parts.append(f"M{x} {y}h{x1 - x}v1h-{x1 - x}z")
+            parts.append(f"M{x} {yy}h{x1 - x}v1h-{x1 - x}z")
             x = x1
-    body = "".join(parts)
     svg = (
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {n} {n}" '
-        f'width="{n}" height="{n}" fill="none">'
+        f'width="{n}" height="{n}">'
         f'<rect width="{n}" height="{n}" fill="#ffffff"/>'
-        f'<path fill="#1a0905" d="{body}"/>'
+        f'<path fill="#1a0905" d="{"".join(parts)}"/>'
         f"</svg>"
     )
     (ASSETS / "qr.svg").write_text(svg)
-    return svg, n
+    return n
+
+
+def build_front(silk):
+    h, w = int(round(px(61))), int(round(px(96)))
+    base = field(w, h)
+    # Broad diagonal sweep. The pill sits on top of it.
+    # The silk's edge crosses the right of the pill. The logo sits on the burgundy side.
+    base = composite_ribbon(base, silk, (74.0, 0.0), 198.0, -14.0, tone=0.97)
+    scene = base.copy()
+    apply_glass(
+        scene, base, FRONT_PILL, FRONT_PILL_R,
+        blur_mm=0.9, tint=0.08, bulge=0.13, bend_mm=5.5, zone_mm=11.0,
+        lens_mm=6.5, rim_mm=3.2,
+        darken=(3.5, 6.2, 50.0, 22.0, 4.0, 0.82),
+    )
+    return scene, base
+
+
+def build_back(silk):
+    h, w = int(round(px(61))), int(round(px(96)))
+    base = field(w, h)
+    # The ribbon crosses the card so the glass can refract it.
+    base = composite_ribbon(base, silk, (78.0, 6.0), 162.0, -12.0, tone=0.97)
+    scene = base.copy()
+    apply_glass(
+        scene, base, BACK_CARD, BACK_CARD_R,
+        blur_mm=1.05, tint=0.1, bulge=0.08, bend_mm=3.6, zone_mm=8.0,
+        lens_mm=4.2, rim_mm=2.6,
+        darken=(3.4, 2.4, 48.5, 42.5, 4.5, 0.72),
+    )
+    for py in PILL_YS:
+        apply_glass(
+            scene, base, (PILL_X, py, PILL_W, PILL_H), PILL_H / 2.0,
+            blur_mm=0.65, tint=0.08, bulge=0.06, bend_mm=0.7, zone_mm=1.8,
+            lens_mm=0.45, rim_mm=0.85,
+            darken=(2.8, 1.2, 39.6, 2.75, 0.65, 0.78),
+        )
+    apply_glass(
+        scene, base, QR_GLASS, QR_GLASS_R,
+        blur_mm=0.8, tint=0.06, bulge=0.1, bend_mm=2.4, zone_mm=5.5,
+        lens_mm=2.4, rim_mm=1.7,
+    )
+    paint_round(scene, QR_WHITE, QR_WHITE_R, (255, 255, 255))
+    return scene, base
 
 
 def main():
     ASSETS.mkdir(parents=True, exist_ok=True)
-    w = int(round(px(BLEED_W_MM)))
-    h = int(round(px(BLEED_H_MM)))
-    print("canvas", w, h, "dpi", DPI)
-
-    front = make_silk(w, h, seed=7, base=BURGUNDY, amp=26.0)
-    report("front", front)
-    save_rgb(ASSETS / "front-bg.png", front.astype(np.uint8))
-
-    back_base = np.array([98, 7, 16], dtype=np.float32)
-    back = make_silk(w, h, seed=11, base=back_base, amp=20.0)
-    back = bake_glass(back)
-    tx = int(round(px(TILE["x"])))
-    ty = int(round(px(TILE["y"])))
-    tw = int(round(px(TILE["w"])))
-    th = int(round(px(TILE["h"])))
-    silk_only = back.copy()
-    x0 = int(round(px(PANEL["x"])))
-    y0 = int(round(px(PANEL["y"])))
-    pw = int(round(px(PANEL["w"])))
-    ph = int(round(px(PANEL["h"])))
-    silk_only[y0:y0 + ph, x0:x0 + pw] = back_base
-    report("back silk", silk_only)
-    inset = int(round(px(1.2)))
-    interior = back[y0 + inset:y0 + ph - inset, x0 + inset:x0 + pw - inset].copy()
-    # Ignore the white QR tile when judging text contrast on the glass.
-    ix = tx - (x0 + inset)
-    iy = ty - (y0 + inset)
-    interior[iy:iy + th, ix:ix + tw] = back_base
-    report("glass interior", interior)
+    silk = load_silk()
+    print("canvas", int(round(px(96))), int(round(px(61))), "dpi", DPI)
+    front, front_base = build_front(silk)
+    back, back_base = build_back(silk)
+    if os.environ.get("CARD_PREVIEW"):
+        for name, rgb in (
+            ("front", front),
+            ("back", back),
+            ("front-base", front_base),
+            ("back-base", back_base),
+        ):
+            im = Image.fromarray(np.clip(rgb, 0, 255).astype(np.uint8), "RGB")
+            im.thumbnail((1100, 800), Image.Resampling.LANCZOS)
+            im.save(f"/tmp/ko-{name}.jpg", quality=90)
+    fx, fy, fw, fh = FRONT_PILL
+    contrast_in(front, (fx + 6, fy + 9, 42.0, 16.5), "front text")
+    save_rgb(ASSETS / "front-bg.png", front)
+    contrast_in(back, (11.2, 7.6, 44.0, 8.8), "back name")
+    for py in PILL_YS:
+        contrast_in(
+            back,
+            (PILL_X + 3.2, py + 1.15, PILL_W - 6.4, PILL_H - 2.3),
+            f"pill {py}",
+        )
     save_rgb(ASSETS / "back-bg.png", back)
 
     trace_wordmark()
-    svg, n = build_qr_svg()
-    print("qr modules", n, "tile mm", TILE["w"], "data mm", TILE["w"] * 29 / n)
+    n = build_qr_svg()
+    data_mm = QR_WHITE[2] * 29 / n
+    print(f"qr modules {n} white tile {QR_WHITE[2]}mm data {data_mm:.2f}mm")
+    if data_mm < 18:
+        raise SystemExit("QR data area is under 18 mm")
     print("wrote assets")
 
 
