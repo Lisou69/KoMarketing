@@ -30,7 +30,7 @@ PHONE_BTN = (8.2, 27.5, 35.1, 9.0)
 # cards.html centers a 2.4 mm icon on each circle and starts the contact text
 # on one shared left edge. The address has no badge.
 BADGE_D = 5.2
-BADGE_LEFT = 6.80
+BADGE_LEFT = 8.2
 BADGE_MAIL = (BADGE_LEFT, 38.05, BADGE_D, BADGE_D)
 BADGE_WEB = (BADGE_LEFT, 44.30, BADGE_D, BADGE_D)
 DEEP = np.array([16.0, 0.0, 3.0], dtype=np.float32)
@@ -573,7 +573,7 @@ def main():
         save_rgb(front_path, front)
     contrast_in(back, (7.5, 14.5, 50.0, 12.6), "back name")
     contrast_in(back, (16.5, 30.6, 22.4, 3.1), "phone label")
-    contrast_in(back, (13.1, 38.9, 46.2, 16.6), "back contacts")
+    contrast_in(back, (14.5, 38.9, 43.0, 16.4), "back contacts")
     trace_wordmark()
     n = build_qr_svg()
     module = QR_SYMBOL[2] / n
