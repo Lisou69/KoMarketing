@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Opaque card art: site silk ribbon on burgundy, liquid glass baked in."""
+"""Opaque card art: crisp site silk on burgundy, one frosted QR tile."""
 
 from pathlib import Path
 import subprocess
@@ -21,18 +21,18 @@ DEEP = np.array([36.0, 2.0, 6.0], dtype=np.float32)
 HIGHLIGHT = np.array([255.0, 248.0, 242.0], dtype=np.float32)
 
 # Millimetres from the bleed origin. cards.html uses the same numbers.
-FRONT_PILL = (8.0, 13.2, 80.0, 34.6)
-BACK_CARD = (6.4, 4.8, 83.2, 51.4)
-PILL_X, PILL_W, PILL_H = 10.6, 45.2, 5.15
-PILL_YS = (19.4, 25.55, 31.7, 37.85)
-QR_GLASS = (58.0, 15.6, 30.2, 30.2)
-QR_WHITE = (61.0, 18.6, 24.2, 24.2)
+# Taller than the code so the silk can cross the top of the tile.
+QR_GLASS = (61.0, 12.2, 29.6, 32.8)
+QR_GLASS_R = 2.8
+QR_WHITE = (63.9, 18.3, 23.8, 23.8)
 QR_WHITE_R = 1.6
+# Type sits in these boxes. The silk must stay outside them.
+FRONT_TEXT = (11.0, 31.5, 50.0, 22.0)
+BACK_TEXT = (8.0, 8.0, 52.0, 36.0)
 SHADOW = np.array([16.0, 1.0, 4.0], dtype=np.float32)
 WHITE = np.array([255.0, 255.0, 255.0], dtype=np.float32)
 
-# One frosted-glass recipe for every shape. Pills share a radius ratio;
-# the card and the QR tile share the 24–32px-equivalent radius.
+# Frosted recipe for the single QR tile.
 GLASS_FILL = 0.15
 GLASS_BLUR_MM = 1.75
 GLASS_BORDER_PT = 0.28
@@ -43,12 +43,6 @@ GLASS_INNER = 0.10
 GLASS_SHADOW_MM = 2.0
 GLASS_SHADOW_OPACITY = 0.16
 GLASS_SHADOW_DY = 0.6
-PILL_RADIUS_RATIO = 0.45
-CARD_RADIUS_MM = 2.8
-FRONT_PILL_R = round(FRONT_PILL[3] * PILL_RADIUS_RATIO, 2)
-BACK_CARD_R = CARD_RADIUS_MM
-QR_GLASS_R = CARD_RADIUS_MM
-PILL_R = round(PILL_H * PILL_RADIUS_RATIO, 2)
 
 
 def px(mm):
@@ -285,15 +279,15 @@ def save_rgb(path, rgb):
         raise SystemExit(f"{path.name} saved as {check.mode}")
 
 
-def contrast_in(rgb, box, label):
+def contrast_in(rgb, box, label, minimum=7.0):
     x, y, w, h = (int(round(px(v))) for v in box)
     crop = rgb[y:y + h, x:x + w].reshape(-1, 3)
     lum = 0.2126 * crop[:, 0] + 0.7152 * crop[:, 1] + 0.0722 * crop[:, 2]
     light = crop[int(np.argmax(lum))]
     ratio = contrast_white(light)
     print(f"{label}: lightest {light.round(1)} white-contrast {ratio:.2f}")
-    if ratio < 4.5:
-        raise SystemExit(f"{label} fails AA ({ratio:.2f})")
+    if ratio < minimum:
+        raise SystemExit(f"{label} contrast {ratio:.2f} is under {minimum:.1f}")
     return ratio
 
 
@@ -349,25 +343,18 @@ def build_qr_svg():
 def build_front(silk):
     h, w = int(round(px(61))), int(round(px(96)))
     base = field(w, h)
-    # Broad diagonal sweep. The pill sits on top of it.
-    # The silk's edge crosses the right of the pill. The logo sits on the burgundy side.
-    base = composite_ribbon(base, silk, (130.0, 32.0), 120.0, 14.0, tone=0.97)
-    scene = base.copy()
-    clear_blurs()
-    apply_glass(scene, base, FRONT_PILL, FRONT_PILL_R)
-    return scene, base
+    # Crisp sweep across the top. The lower area stays burgundy for the wordmark.
+    base = composite_ribbon(base, silk, (30.0, -8.0), 200.0, 16.0, tone=0.97)
+    return base, base
 
 
 def build_back(silk):
     h, w = int(round(px(61))), int(round(px(96)))
     base = field(w, h)
-    # The ribbon crosses the card so the glass can refract it.
-    base = composite_ribbon(base, silk, (130.0, 32.0), 120.0, 14.0, tone=0.97)
+    # The ribbon enters from the top right, crosses the QR glass, and stays off the type and the code.
+    base = composite_ribbon(base, silk, (124.0, 8.0), 155.0, -14.0, tone=0.97)
     scene = base.copy()
     clear_blurs()
-    apply_glass(scene, base, BACK_CARD, BACK_CARD_R)
-    for py in PILL_YS:
-        apply_glass(scene, base, (PILL_X, py, PILL_W, PILL_H), PILL_R)
     apply_glass(scene, base, QR_GLASS, QR_GLASS_R)
     paint_round(scene, QR_WHITE, QR_WHITE_R, (255, 255, 255))
     return scene, base
@@ -377,36 +364,26 @@ def main():
     ASSETS.mkdir(parents=True, exist_ok=True)
     silk = load_silk()
     print(
-        "recipe fill", GLASS_FILL,
-        "blur_mm", GLASS_BLUR_MM,
-        "border_pt", GLASS_BORDER_PT,
-        "inner", GLASS_INNER_DY_MM, GLASS_INNER_BLUR_MM, GLASS_INNER,
-        "shadow", GLASS_SHADOW_MM, GLASS_SHADOW_OPACITY, GLASS_SHADOW_DY,
-        "radii", FRONT_PILL_R, PILL_R, BACK_CARD_R, QR_GLASS_R,
+        "qr glass fill", GLASS_FILL, "blur", GLASS_BLUR_MM,
+        "radius", QR_GLASS_R,
     )
     print("canvas", int(round(px(96))), int(round(px(61))), "dpi", DPI)
-    front, front_base = build_front(silk)
+    front, _ = build_front(silk)
     back, back_base = build_back(silk)
     if os.environ.get("CARD_PREVIEW"):
-        for name, rgb in (
-            ("front", front),
-            ("back", back),
-            ("front-base", front_base),
-            ("back-base", back_base),
-        ):
+        for name, rgb in (("front", front), ("back", back)):
             im = Image.fromarray(np.clip(rgb, 0, 255).astype(np.uint8), "RGB")
             im.thumbnail((1100, 800), Image.Resampling.LANCZOS)
             im.save(f"/tmp/ko-{name}.jpg", quality=90)
-    fx, fy, fw, fh = FRONT_PILL
-    contrast_in(front, (fx + 6, fy + 9, 42.0, 16.5), "front text")
+    contrast_in(front, FRONT_TEXT, "front type")
     save_rgb(ASSETS / "front-bg.png", front)
-    contrast_in(back, (11.2, 7.6, 44.0, 8.8), "back name")
-    for py in PILL_YS:
-        contrast_in(
-            back,
-            (PILL_X + 3.2, py + 1.15, PILL_W - 6.4, PILL_H - 2.3),
-            f"pill {py}",
-        )
+    contrast_in(back, BACK_TEXT, "back type")
+    # The code itself sits on burgundy, then a solid white square. Silk stays outside it.
+    contrast_in(back_base, QR_WHITE, "under the QR")
+    qx, qy, qw, qh = QR_GLASS
+    rim = back_base[int(px(qy)):int(px(qy + 3.2)), int(px(qx)):int(px(qx + qw))]
+    rim_l = 0.2126 * rim[..., 0] + 0.7152 * rim[..., 1] + 0.0722 * rim[..., 2]
+    print(f"qr glass top band silk fraction {(rim_l > 100).mean():.2f}")
     save_rgb(ASSETS / "back-bg.png", back)
 
     trace_wordmark()

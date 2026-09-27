@@ -7,8 +7,8 @@
     Thai business card, 90 × 55 mm trim.
     Print sheet 108 × 73 mm: 3 mm bleed, crop marks outside the bleed.
     Preview (?preview) shows the trim only.
-    Silk and glass are opaque rasters at 600 dpi. Logo, type, and QR are vectors.
-    No opacity, masks, or blend modes.
+    Silk and the single QR glass tile are opaque rasters at 600 dpi.
+    Logo, type, and QR are vectors. No opacity, masks, or blend modes.
   -->
   <style>
     @font-face {
@@ -85,47 +85,46 @@
 
     .front {
       position: absolute;
-      left: 12mm;
-      top: 13.2mm;
-      width: 48mm;
-      height: 34.6mm;
+      left: 11mm;
+      top: 31.5mm;
+      width: 70mm;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      justify-content: center;
       text-align: left;
     }
 
     .wordmark { width: 44mm; height: auto; display: block; }
 
     .tagline {
-      margin-top: 2.6mm;
+      margin-top: 2.2mm;
       font-family: "Source Serif 4", serif;
       font-style: italic;
       font-weight: 500;
       font-size: 12pt;
       line-height: 1.05;
-      letter-spacing: -0.045em;
+      letter-spacing: -0.05em;
       color: #ffffff;
     }
 
     .name {
       position: absolute;
-      left: 11.2mm;
-      top: 8.0mm;
+      left: 9mm;
+      top: 9mm;
       font-family: "Source Serif 4", serif;
       font-style: italic;
       font-weight: 500;
-      font-size: 13.5pt;
+      font-size: 15pt;
       line-height: 1.05;
       letter-spacing: -0.03em;
       color: #ffffff;
+      white-space: nowrap;
     }
 
     .role {
       position: absolute;
-      left: 11.4mm;
-      top: 14.15mm;
+      left: 9.2mm;
+      top: 16.4mm;
       font-family: Manrope, sans-serif;
       font-weight: 500;
       font-size: 8pt;
@@ -134,37 +133,32 @@
       color: #ffffff;
     }
 
-    .line {
+    .contacts {
       position: absolute;
-      left: 10.6mm;
-      width: 45.2mm;
-      height: 5.15mm;
-      display: flex;
-      align-items: center;
-      padding-left: 3.3mm;
+      left: 9.2mm;
+      top: 23.5mm;
+      width: 50mm;
+    }
+    .contacts p {
       font-family: Manrope, sans-serif;
-      font-weight: 500;
-      font-size: 7.5pt;
-      line-height: 1;
-      letter-spacing: -0.015em;
+      font-weight: 400;
+      font-size: 8pt;
+      line-height: 1.55;
+      letter-spacing: -0.012em;
       color: #ffffff;
       white-space: nowrap;
     }
-    .l1 { top: 19.4mm; }
-    .l2 { top: 25.55mm; }
-    .l3 { top: 31.7mm; }
-    .l4 { top: 37.85mm; }
 
     .qr {
       position: absolute;
-      left: 61mm;
-      top: 18.6mm;
-      width: 24.2mm;
-      height: 24.2mm;
+      left: 63.9mm;
+      top: 18.3mm;
+      width: 23.8mm;
+      height: 23.8mm;
     }
     .qr img {
-      width: 24.2mm;
-      height: 24.2mm;
+      width: 23.8mm;
+      height: 23.8mm;
       display: block;
     }
 
@@ -193,10 +187,12 @@
       <img class="bg" src="assets/back-bg.png" alt="">
       <p class="name">Lisa Maretti</p>
       <p class="role">Co-founder</p>
-      <p class="line l1">+66 65 073 9612</p>
-      <p class="line l2">lisa@komarketingagency.com</p>
-      <p class="line l3">komarketingagency.com</p>
-      <p class="line l4">Sukhumvit 24, Bangkok</p>
+      <div class="contacts">
+        <p>+66 65 073 9612</p>
+        <p>lisa@komarketingagency.com</p>
+        <p>komarketingagency.com</p>
+        <p>Sukhumvit 24, Bangkok</p>
+      </div>
       <div class="qr"><img src="assets/qr.svg" alt=""></div>
     </div>
     <div class="mark h h-tl"></div><div class="mark v v-tl"></div>
@@ -210,10 +206,12 @@
       <img class="bg" src="assets/back-bg.png" alt="">
       <p class="name">Kristina Ostapenko</p>
       <p class="role">Co-founder</p>
-      <p class="line l1">+66 99 119 7242</p>
-      <p class="line l2">kristina@komarketingagency.com</p>
-      <p class="line l3">komarketingagency.com</p>
-      <p class="line l4">Sukhumvit 24, Bangkok</p>
+      <div class="contacts">
+        <p>+66 99 119 7242</p>
+        <p>kristina@komarketingagency.com</p>
+        <p>komarketingagency.com</p>
+        <p>Sukhumvit 24, Bangkok</p>
+      </div>
       <div class="qr"><img src="assets/qr.svg" alt=""></div>
     </div>
     <div class="mark h h-tl"></div><div class="mark v v-tl"></div>
