@@ -26,14 +26,15 @@ HIGHLIGHT = np.array([255.0, 248.0, 242.0], dtype=np.float32)
 QR_GLASS = (57.6, 15.0, 30.4, 31.0)
 QR_GLASS_R = 2.8
 QR_SYMBOL = (60.7, 21.0, 24.2, 24.2)
-# Front type sits on the cream, clear of the silk. Bleed coordinates.
-# The silk file is wider than the bleed so both straight ends fall off the card.
-# Wordmark sits in the upper-right opening; the tagline sits in the lower-left opening.
-FRONT_LOGO = (64.0, 8.0, 24.0, 5.7)
+# Front. Bleed coordinates. The silk file runs past both sides of the bleed.
+# The wordmark is centered on the card, on the ribbon. The tagline stays lower left.
+FRONT_LOGO = (14.0, 22.53, 68.0, 15.94)
 FRONT_TAG = (13.0, 47.05, 17.6, 6.0)
 FRONT_SILK = (-13.0, 3.35, 114.0)  # bleed x, y, width. Height follows the file.
-CREAM = np.array([243.0, 238.0, 231.0], dtype=np.float32)
-SILK_SHADOW = np.array([124.0, 108.0, 96.0], dtype=np.float32)
+# Warm greige: blanc cassé, greyed. #E6E2DC
+CREAM = np.array([230.0, 226.0, 220.0], dtype=np.float32)
+# A deeper greige, so the cast shadow belongs to this ground.
+SILK_SHADOW = np.array([156.0, 146.0, 134.0], dtype=np.float32)
 BACK_TEXT = (7.5, 14.5, 50.0, 32.0)
 INK = np.array([76.0, 5.0, 12.0], dtype=np.float32)
 SHADOW = np.array([16.0, 1.0, 4.0], dtype=np.float32)
@@ -401,7 +402,7 @@ def place_whole_silk(base, silk, origin_mm, width_mm):
     pad = int(np.ceil(sigma * 3.0 + abs(dx) + abs(dy))) + 4
     buf = np.zeros((target_h + 2 * pad, target_w + 2 * pad), np.float32)
     buf[pad:pad + target_h, pad:pad + target_w] = shadow_a
-    blur = gaussian_filter(buf, sigma=sigma, mode="constant", cval=0.0) * 0.18
+    blur = gaussian_filter(buf, sigma=sigma, mode="constant", cval=0.0) * 0.24
     sx0, sy0 = x0 - pad + dx, y0 - pad + dy
     sx1, sy1 = max(0, -sx0), max(0, -sy0)
     sx2 = min(blur.shape[1], W - sx0)
@@ -466,7 +467,8 @@ def main():
             im = Image.fromarray(np.clip(rgb, 0, 255).astype(np.uint8), "RGB")
             im.thumbnail((1100, 800), Image.Resampling.LANCZOS)
             im.save(f"/tmp/ko-{name}.jpg", quality=90)
-    contrast_ink(front, FRONT_LOGO, "front logo", 4.5)
+    contrast_ink(front, FRONT_LOGO, "front logo lightest", 4.5)
+    contrast_on_silk(front, FRONT_LOGO, "front logo darkest", 4.5)
     contrast_ink(front, FRONT_TAG, "front tagline", 4.5)
     save_rgb(ASSETS / "front-bg.png", front)
     contrast_in(back, BACK_TEXT, "back type")
