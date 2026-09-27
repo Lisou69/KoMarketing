@@ -22,16 +22,33 @@ HIGHLIGHT = np.array([255.0, 248.0, 242.0], dtype=np.float32)
 
 # Millimetres from the bleed origin. cards.html uses the same numbers.
 FRONT_PILL = (8.0, 13.2, 80.0, 34.6)
-FRONT_PILL_R = 17.3
 BACK_CARD = (6.4, 4.8, 83.2, 51.4)
-BACK_CARD_R = 6.4
 PILL_X, PILL_W, PILL_H = 10.6, 45.2, 5.15
 PILL_YS = (19.4, 25.55, 31.7, 37.85)
-QR_GLASS = (58.6, 16.2, 28.6, 28.6)
-QR_GLASS_R = 7.0
-QR_WHITE = (61.0, 18.6, 23.8, 23.8)
-QR_WHITE_R = 2.2
+QR_GLASS = (58.0, 15.6, 30.2, 30.2)
+QR_WHITE = (61.0, 18.6, 24.2, 24.2)
+QR_WHITE_R = 1.6
 SHADOW = np.array([16.0, 1.0, 4.0], dtype=np.float32)
+WHITE = np.array([255.0, 255.0, 255.0], dtype=np.float32)
+
+# One frosted-glass recipe for every shape. Pills share a radius ratio;
+# the card and the QR tile share the 24–32px-equivalent radius.
+GLASS_FILL = 0.15
+GLASS_BLUR_MM = 1.75
+GLASS_BORDER_PT = 0.28
+GLASS_BORDER = 0.30
+GLASS_INNER_DY_MM = 0.6
+GLASS_INNER_BLUR_MM = 1.8
+GLASS_INNER = 0.10
+GLASS_SHADOW_MM = 2.0
+GLASS_SHADOW_OPACITY = 0.16
+GLASS_SHADOW_DY = 0.6
+PILL_RADIUS_RATIO = 0.45
+CARD_RADIUS_MM = 2.8
+FRONT_PILL_R = round(FRONT_PILL[3] * PILL_RADIUS_RATIO, 2)
+BACK_CARD_R = CARD_RADIUS_MM
+QR_GLASS_R = CARD_RADIUS_MM
+PILL_R = round(PILL_H * PILL_RADIUS_RATIO, 2)
 
 
 def px(mm):
@@ -156,11 +173,26 @@ def blit_shadow(canvas, x, y, mask, *, sigma_mm=2.2, opacity=0.22, dy_mm=0.55, d
     canvas[dy1:dy1 + (sy2 - sy1), dx1:dx1 + (sx2 - sx1)] = view * (1.0 - sh) + SHADOW * sh
 
 
-def apply_glass(canvas, source, box, radius_mm, *, blur_mm=1.2, tint=0.2,
-                bulge=0.07, bend_mm=1.6, zone_mm=6.0, lens_mm=1.8, rim_mm=1.8,
-                shadow=True, shadow_mm=2.2, shadow_opacity=0.22, shadow_dy=0.55,
-                darken=None):
-    """Thick liquid glass: blurred refraction, lens bend, lit rim. Opaque."""
+def inner_glow(inside):
+    """Soft white glow along the top interior. Stays inside the rounded mask."""
+    sigma = max(float(px(GLASS_INNER_BLUR_MM)), 0.8)
+    oy = int(round(px(GLASS_INNER_DY_MM)))
+    pad = int(np.ceil(sigma * 3.0 + oy)) + 2
+    h, w = inside.shape
+    buf = np.zeros((h + 2 * pad, w + 2 * pad), np.float32)
+    buf[pad:pad + h, pad:pad + w] = inside
+    outside = 1.0 - buf
+    shifted = np.zeros_like(outside)
+    if oy > 0:
+        shifted[oy:, :] = outside[:-oy, :]
+    else:
+        shifted = outside
+    blurred = gaussian_filter(shifted, sigma=sigma, mode="constant", cval=0.0)
+    return blurred[pad:pad + h, pad:pad + w] * inside
+
+
+def apply_glass(canvas, source, box, radius_mm):
+    """Shared frosted glass: blurred silk, 15% white, hairline, inner glow, rim."""
     H, W = canvas.shape[:2]
     x = int(round(px(box[0])))
     y = int(round(px(box[1])))
@@ -176,58 +208,29 @@ def apply_glass(canvas, source, box, radius_mm, *, blur_mm=1.2, tint=0.2,
     dist, nx, ny, xx, yy = sdf_round_box(h, w, rad)
     inside = np.clip(-dist / 1.35, 0, 1).astype(np.float32)
 
-    if shadow:
-        blit_shadow(
-            canvas, x, y, inside,
-            sigma_mm=shadow_mm, opacity=shadow_opacity, dy_mm=shadow_dy,
-        )
+    blit_shadow(
+        canvas, x, y, inside,
+        sigma_mm=GLASS_SHADOW_MM,
+        opacity=GLASS_SHADOW_OPACITY,
+        dy_mm=GLASS_SHADOW_DY,
+        dx_mm=0.0,
+    )
 
-    blur_px = max(float(px(blur_mm)), 0.6)
-    bend = float(px(bend_mm))
-    fringe_px = float(px(0.28))
-    extra = bend + float(px(lens_mm)) + fringe_px
-    blurred, spad = blurred_source(source, blur_px, extra)
+    blur_px = max(float(px(GLASS_BLUR_MM)), 0.6)
+    blurred, spad = blurred_source(source, blur_px, 0.0)
+    rgb = sample(blurred, yy + y + spad, xx + x + spad)
+    glass = rgb * (1.0 - GLASS_FILL) + WHITE * GLASS_FILL
 
-    lcx, lcy = (w - 1) / 2.0, (h - 1) / 2.0
-    lx = xx - lcx
-    ly = yy - lcy
-    rnorm = np.sqrt((lx / (w / 2.0)) ** 2 + (ly / (h / 2.0)) ** 2)
-    rad_len = np.sqrt(lx * lx + ly * ly) + 1e-6
-    # Magnify the middle, bow the picture across the lens, and bend hard at the rim.
-    zoom = 1.0 - bulge * np.clip(1.05 - rnorm, 0, 1) ** 0.8
-    radial = (np.clip(rnorm, 0, 1) ** 1.45) * float(px(lens_mm))
-    edge = np.clip(1.0 + dist / max(px(zone_mm), 1.0), 0, 1) ** 0.9
-    gx = x + lcx + lx * zoom + (lx / rad_len) * radial + nx * edge * bend + spad
-    gy = y + lcy + ly * zoom + (ly / rad_len) * radial + ny * edge * bend + spad
-    rgb = sample(blurred, gy, gx)
-    fringe = edge * fringe_px
-    rgb_r = sample(blurred, gy + ny * fringe, gx + nx * fringe)
-    rgb_b = sample(blurred, gy - ny * fringe, gx - nx * fringe)
-    rgb = rgb.copy()
-    mix = edge * 0.55
-    rgb[..., 0] = rgb[..., 0] * (1.0 - mix) + rgb_r[..., 0] * mix
-    rgb[..., 2] = rgb[..., 2] * (1.0 - mix) + rgb_b[..., 2] * mix
+    glow = inner_glow(inside)
+    glass = glass * (1.0 - glow[..., None] * GLASS_INNER) + WHITE * (glow[..., None] * GLASS_INNER)
 
-    glass = rgb * (1.0 - tint) + BURGUNDY * tint
-
-    if darken:
-        kind = darken[0]
-        if kind == "h":
-            # Wide smoothstep. No vertical edge.
-            _, x_full, x_clear, amount = darken
-            span = max(px(x_clear - x_full), 1.0)
-            t = np.clip((xx - px(x_full)) / span, 0.0, 1.0)
-            m = (1.0 - t * t * (3.0 - 2.0 * t)) * amount
-        elif kind == "sdf":
-            # Follows the rounded shape and feathers toward the rim.
-            _, reach_mm, amount = darken
-            m = np.clip((-dist) / max(px(reach_mm), 1.0), 0.0, 1.0) * amount
-        else:
-            raise ValueError(kind)
-        glass = glass * (1.0 - m[..., None]) + BURGUNDY * m[..., None]
+    # Crisp inside hairline, about 0.28 pt, white at 30%.
+    stroke_px = max(float(px(GLASS_BORDER_PT * 25.4 / 72.0)), 1.0)
+    stroke = np.clip(1.0 + dist / stroke_px, 0.0, 1.0) * np.clip(-dist / 1.25, 0.0, 1.0)
+    glass = glass * (1.0 - stroke[..., None] * GLASS_BORDER) + WHITE * (stroke[..., None] * GLASS_BORDER)
 
     # Convex rim: bright where the surface faces up-left, dark along the bottom.
-    rim_px = min(float(px(rim_mm)), min(h, w) * 0.2)
+    rim_px = min(float(px(2.2)), min(h, w) * 0.2)
     depth = np.maximum(-dist, 0.0)
     edge_zone = np.clip(1.0 - depth / max(rim_px, 1.0), 0, 1)
     edge_zone = edge_zone ** 0.72
@@ -348,16 +351,10 @@ def build_front(silk):
     base = field(w, h)
     # Broad diagonal sweep. The pill sits on top of it.
     # The silk's edge crosses the right of the pill. The logo sits on the burgundy side.
-    base = composite_ribbon(base, silk, (74.0, 0.0), 198.0, -14.0, tone=0.97)
+    base = composite_ribbon(base, silk, (130.0, 32.0), 120.0, 14.0, tone=0.97)
     scene = base.copy()
     clear_blurs()
-    apply_glass(
-        scene, base, FRONT_PILL, FRONT_PILL_R,
-        blur_mm=0.9, tint=0.08, bulge=0.13, bend_mm=5.5, zone_mm=11.0,
-        lens_mm=6.5, rim_mm=3.2,
-        shadow_mm=2.5, shadow_opacity=0.2, shadow_dy=0.7,
-        darken=("h", 52.0, 80.0, 0.86),
-    )
+    apply_glass(scene, base, FRONT_PILL, FRONT_PILL_R)
     return scene, base
 
 
@@ -365,30 +362,13 @@ def build_back(silk):
     h, w = int(round(px(61))), int(round(px(96)))
     base = field(w, h)
     # The ribbon crosses the card so the glass can refract it.
-    base = composite_ribbon(base, silk, (78.0, 6.0), 162.0, -12.0, tone=0.97)
+    base = composite_ribbon(base, silk, (130.0, 32.0), 120.0, 14.0, tone=0.97)
     scene = base.copy()
     clear_blurs()
-    apply_glass(
-        scene, base, BACK_CARD, BACK_CARD_R,
-        blur_mm=1.05, tint=0.1, bulge=0.08, bend_mm=3.6, zone_mm=8.0,
-        lens_mm=4.2, rim_mm=2.6,
-        shadow_mm=2.6, shadow_opacity=0.18, shadow_dy=0.75,
-        darken=("h", 50.0, 78.0, 0.76),
-    )
+    apply_glass(scene, base, BACK_CARD, BACK_CARD_R)
     for py in PILL_YS:
-        apply_glass(
-            scene, base, (PILL_X, py, PILL_W, PILL_H), PILL_H / 2.0,
-            blur_mm=0.65, tint=0.08, bulge=0.06, bend_mm=0.7, zone_mm=1.8,
-            lens_mm=0.45, rim_mm=0.85,
-            shadow_mm=1.35, shadow_opacity=0.16, shadow_dy=0.4,
-            darken=("sdf", 1.05, 0.8),
-        )
-    apply_glass(
-        scene, base, QR_GLASS, QR_GLASS_R,
-        blur_mm=0.8, tint=0.06, bulge=0.1, bend_mm=2.4, zone_mm=5.5,
-        lens_mm=2.4, rim_mm=1.7,
-        shadow_mm=1.7, shadow_opacity=0.15, shadow_dy=0.5,
-    )
+        apply_glass(scene, base, (PILL_X, py, PILL_W, PILL_H), PILL_R)
+    apply_glass(scene, base, QR_GLASS, QR_GLASS_R)
     paint_round(scene, QR_WHITE, QR_WHITE_R, (255, 255, 255))
     return scene, base
 
@@ -396,6 +376,14 @@ def build_back(silk):
 def main():
     ASSETS.mkdir(parents=True, exist_ok=True)
     silk = load_silk()
+    print(
+        "recipe fill", GLASS_FILL,
+        "blur_mm", GLASS_BLUR_MM,
+        "border_pt", GLASS_BORDER_PT,
+        "inner", GLASS_INNER_DY_MM, GLASS_INNER_BLUR_MM, GLASS_INNER,
+        "shadow", GLASS_SHADOW_MM, GLASS_SHADOW_OPACITY, GLASS_SHADOW_DY,
+        "radii", FRONT_PILL_R, PILL_R, BACK_CARD_R, QR_GLASS_R,
+    )
     print("canvas", int(round(px(96))), int(round(px(61))), "dpi", DPI)
     front, front_base = build_front(silk)
     back, back_base = build_back(silk)
