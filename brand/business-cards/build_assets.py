@@ -128,13 +128,13 @@ def apply_phone_button(canvas, box):
     """Bake a narrow refractive glass pill. The canvas stays opaque RGB.
 
     Drawn at twice the card resolution, then resampled to 600 dpi. The rim is
-    a narrow bevel, about 0.65 mm: burgundy shows through it, displaced along
+    a fine bevel, about 0.3 mm: burgundy shows through it, displaced along
     the surface normal, with a faint chromatic split. Specular lines follow a
     top-left light.
     """
     x_mm, y_mm, w_mm, h_mm = box
     ss = 2
-    rim = float(px(0.65))
+    rim = float(px(0.30))
     H, W = canvas.shape[:2]
     left, top = px(x_mm), px(y_mm)
     width, height = px(w_mm), px(h_mm)
@@ -193,9 +193,9 @@ def apply_phone_button(canvas, box):
     glow = np.array([196.0, 168.0, 176.0], np.float32)
     ground = ground * (1.0 - band[..., None] * 0.62) + glow * (band[..., None] * 0.62)
 
-    # Refraction lives in the bezel. A convex rim pulls samples outward, and the
-    # smooth burgundy gradient is gained so the bend stays visible at card size.
-    shift = bevel * px(1.5)
+    # Refraction stays inside the fine bevel. The bend is shorter so it does
+    # not read as a wide rim.
+    shift = bevel * px(0.70)
     refr = _sample_rgb(ground, (yy + ny * shift - y0) * ss - 0.5, (xx + nx * shift - x0) * ss - 0.5)
     delta = refr - ground
     refr = np.clip(ground + delta * 2.4, 0.0, 255.0)
@@ -217,26 +217,26 @@ def apply_phone_button(canvas, box):
     rim_col = refr * (1.0 - slab[..., None]) + 255.0 * slab[..., None]
     glass = body * (1.0 - bevel[..., None]) + rim_col * bevel[..., None]
 
-    # Dark groove where the bevel meets the flat face, so the rim has thickness.
-    groove_w = max(px(0.09), 0.7)
+    # Dark groove where the bevel meets the flat face, kept inside the thin rim.
+    groove_w = max(px(0.04), 0.45)
     groove = np.exp(-((depth - rim) ** 2) / (2.0 * groove_w ** 2)) * cover
     glass = glass * (1.0 - groove[..., None] * 0.28) + DEEP * (groove[..., None] * 0.28)
 
-    # Specular. Bottom inner edge is the crisp line; the top edge is softer.
-    bottom_w = max(px(0.07), 0.6)
-    bottom = np.exp(-((depth - rim * 0.90) ** 2) / (2.0 * bottom_w ** 2))
+    # Specular. Bottom inner edge is a bright hairline; the top edge is thinner.
+    bottom_w = max(px(0.032), 0.4)
+    bottom = np.exp(-((depth - rim * 0.72) ** 2) / (2.0 * bottom_w ** 2))
     bottom *= down ** 0.45 * cover
-    top_w = max(px(0.055), 0.55)
-    top_line = np.exp(-((depth - rim * 0.22) ** 2) / (2.0 * top_w ** 2))
+    top_w = max(px(0.025), 0.35)
+    top_line = np.exp(-((depth - rim * 0.28) ** 2) / (2.0 * top_w ** 2))
     top_line *= up * (0.45 + 0.55 * facing) * cover
-    hot = (facing ** 1.6) * bevel * (0.35 + 0.65 * (up + 0.35 * np.clip(-nx, 0, 1)))
+    hot = (facing ** 2.4) * bevel * (0.35 + 0.65 * (up + 0.35 * np.clip(-nx, 0, 1)))
     glass = glass + (255.0 - glass) * (
-        bottom[..., None] * 0.82 + top_line[..., None] * 0.32 + hot[..., None] * 0.22
+        bottom[..., None] * 0.88 + top_line[..., None] * 0.18 + hot[..., None] * 0.10
     )
     # Outer lip, a hairline on the glass edge.
-    lip_w = max(px(0.045), 0.45)
+    lip_w = max(px(0.022), 0.3)
     lip = np.exp(-(depth ** 2) / (2.0 * lip_w ** 2)) * cover * (0.35 + 0.65 * facing)
-    glass = glass + (255.0 - glass) * lip[..., None] * 0.28
+    glass = glass + (255.0 - glass) * lip[..., None] * 0.20
 
     out = ground * (1.0 - cover[..., None]) + np.clip(glass, 0.0, 255.0) * cover[..., None]
     small = np.asarray(
@@ -267,16 +267,16 @@ def apply_phone_button(canvas, box):
 def apply_glass_disc(canvas, box):
     """Bake a circular badge with the phone pill's glass, scaled to read small.
 
-    The rim stays 0.65 mm. Refraction, the bottom inner line, the softer top
-    line, and the top-left hot spot use the same recipe. The caustic and the
-    shadow are a little tighter so two badges can sit one line apart. Only the
-    glass, caustic, and shadow are written back, so a neighbour is left alone.
+    The rim is 0.3 mm, with the same hairline highlights as the phone pill.
+    The caustic and the shadow stay tighter so two badges can sit one line
+    apart. Only the glass, caustic, and shadow are written back, so a
+    neighbour is left alone.
     """
     x_mm, y_mm, w_mm, h_mm = box
     if abs(w_mm - h_mm) > 0.01:
         raise SystemExit(f"glass disc is not round: {w_mm} x {h_mm}")
     ss = 2
-    rim = float(px(0.65))
+    rim = float(px(0.30))
     H, W = canvas.shape[:2]
     left, top = px(x_mm), px(y_mm)
     width, height = px(w_mm), px(h_mm)
@@ -333,8 +333,8 @@ def apply_glass_disc(canvas, box):
     glow = np.array([196.0, 168.0, 176.0], np.float32)
     ground = ground * (1.0 - band[..., None] * 0.62) + glow * (band[..., None] * 0.62)
 
-    # Shorter than the pill. A 1.5 mm bend on a 5 mm circle pulls in the badge above.
-    shift = bevel * px(0.50)
+    # Stays inside this rim. A longer bend pulls in the badge above.
+    shift = bevel * px(0.25)
     refr = _sample_rgb(ground, (yy + ny * shift - y0) * ss - 0.5, (xx + nx * shift - x0) * ss - 0.5)
     delta = refr - ground
     refr = np.clip(ground + delta * 1.6, 0.0, 255.0)
@@ -354,24 +354,23 @@ def apply_glass_disc(canvas, box):
     rim_col = refr * (1.0 - slab[..., None]) + 255.0 * slab[..., None]
     glass = body * (1.0 - bevel[..., None]) + rim_col * bevel[..., None]
 
-    groove_w = max(px(0.08), 0.65)
+    groove_w = max(px(0.04), 0.45)
     groove = np.exp(-((depth - rim) ** 2) / (2.0 * groove_w ** 2)) * cover
     glass = glass * (1.0 - groove[..., None] * 0.28) + DEEP * (groove[..., None] * 0.28)
 
-    # Hairlines a touch wider than the pill so the arc still reads at 5 mm.
-    bottom_w = max(px(0.09), 0.7)
-    bottom = np.exp(-((depth - rim * 0.90) ** 2) / (2.0 * bottom_w ** 2))
+    bottom_w = max(px(0.032), 0.4)
+    bottom = np.exp(-((depth - rim * 0.72) ** 2) / (2.0 * bottom_w ** 2))
     bottom *= down ** 0.45 * cover
-    top_w = max(px(0.07), 0.6)
-    top_line = np.exp(-((depth - rim * 0.22) ** 2) / (2.0 * top_w ** 2))
+    top_w = max(px(0.025), 0.35)
+    top_line = np.exp(-((depth - rim * 0.28) ** 2) / (2.0 * top_w ** 2))
     top_line *= up * (0.45 + 0.55 * facing) * cover
-    hot = (facing ** 1.6) * bevel * (0.35 + 0.65 * (up + 0.35 * np.clip(-nx, 0, 1)))
+    hot = (facing ** 2.4) * bevel * (0.35 + 0.65 * (up + 0.35 * np.clip(-nx, 0, 1)))
     glass = glass + (255.0 - glass) * (
-        bottom[..., None] * 0.82 + top_line[..., None] * 0.32 + hot[..., None] * 0.22
+        bottom[..., None] * 0.88 + top_line[..., None] * 0.18 + hot[..., None] * 0.10
     )
-    lip_w = max(px(0.05), 0.5)
+    lip_w = max(px(0.022), 0.3)
     lip = np.exp(-(depth ** 2) / (2.0 * lip_w ** 2)) * cover * (0.35 + 0.65 * facing)
-    glass = glass + (255.0 - glass) * lip[..., None] * 0.28
+    glass = glass + (255.0 - glass) * lip[..., None] * 0.20
 
     out = ground * (1.0 - cover[..., None]) + np.clip(glass, 0.0, 255.0) * cover[..., None]
     shade_a = np.clip(dropped / 0.48, 0.0, 1.0)
