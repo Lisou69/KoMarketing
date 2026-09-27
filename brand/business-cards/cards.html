@@ -8,8 +8,9 @@
     Print sheet 108 × 73 mm: 3 mm bleed, crop marks outside the bleed.
     Preview (?preview) shows the trim only.
     The front is the silk photograph, cover-cropped to the bleed.
-    Backs are burgundy with a silk corner. The QR is white modules on that burgundy.
-    Logo, type, and QR are vectors. No opacity, masks, or blend modes.
+    Backs are burgundy with a silk corner. The phone number sits on a frosted pill
+    baked into the background. The QR is white modules on the burgundy.
+    Logo, type, icon, and QR are vectors. No opacity, masks, or blend modes.
   -->
   <style>
     @font-face {
@@ -133,10 +134,32 @@
       color: #ffffff;
     }
 
+    .phone-icon {
+      position: absolute;
+      left: 12.2mm;
+      top: 30.7mm;
+      width: 3mm;
+      height: 3mm;
+      display: block;
+    }
+
+    .phone {
+      position: absolute;
+      left: 16.7mm;
+      top: 30.7mm;
+      font-family: Manrope, sans-serif;
+      font-weight: 400;
+      font-size: 8.5pt;
+      line-height: 1;
+      letter-spacing: -0.01em;
+      color: #ffffff;
+      white-space: nowrap;
+    }
+
     .contacts {
       position: absolute;
       left: 8.2mm;
-      top: 28.8mm;
+      top: 37.9mm;
       width: 48mm;
     }
     .contacts p {
@@ -185,8 +208,9 @@
       <img class="bg" src="assets/back-bg.png" alt="">
       <p class="name">Lisa Maretti</p>
       <p class="role">Co-founder</p>
+      <img class="phone-icon" src="assets/phone.svg" alt="">
+      <p class="phone">+66 65 073 9612</p>
       <div class="contacts">
-        <p>+66 65 073 9612</p>
         <p>lisa@komarketingagency.com</p>
         <p>komarketingagency.com</p>
         <p>Sukhumvit 24, Bangkok</p>
@@ -204,8 +228,9 @@
       <img class="bg" src="assets/back-bg.png" alt="">
       <p class="name">Kristina Ostapenko</p>
       <p class="role">Co-founder</p>
+      <img class="phone-icon" src="assets/phone.svg" alt="">
+      <p class="phone">+66 99 119 7242</p>
       <div class="contacts">
-        <p>+66 99 119 7242</p>
         <p>kristina@komarketingagency.com</p>
         <p>komarketingagency.com</p>
         <p>Sukhumvit 24, Bangkok</p>

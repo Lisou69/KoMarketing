@@ -8,6 +8,7 @@ import os
 
 import numpy as np
 from PIL import Image
+from scipy.ndimage import gaussian_filter
 import segno
 
 ROOT = Path(__file__).resolve().parent
@@ -20,8 +21,12 @@ QR_SYMBOL = (60.7, 21.0, 24.2, 24.2)
 # Front. Bleed coordinates. The wordmark is 56 mm wide and centered. The tagline stays lower left.
 FRONT_LOGO = (20.0, 23.94, 56.0, 13.13)
 FRONT_TAG = (13.0, 47.05, 17.6, 6.0)
-BACK_TEXT = (7.5, 14.5, 50.0, 32.0)
 INK = np.array([76.0, 5.0, 12.0], dtype=np.float32)
+# Phone pill, bleed millimetres. Height is the 8.5 pt em plus 2.5 mm above and
+# below (~30 px at 96 dpi). Width fits the longer number, a 3 mm icon, and 4 mm
+# of side padding. cards.html places the icon and the number on this shape.
+PHONE_BTN = (8.2, 28.2, 35.1, 8.0)
+DEEP = np.array([16.0, 0.0, 3.0], dtype=np.float32)
 
 
 def px(mm):
@@ -86,6 +91,115 @@ def composite_ribbon(base, silk, center_mm, width_mm, angle, tone=0.95, thicknes
     dst = base[y1:y2, x1:x2]
     base[y1:y2, x1:x2] = dst * (1.0 - a) + patch[..., :3] * a
     return base
+
+
+def css_mm(px_at_96):
+    """A CSS pixel at 96 px per inch, in millimetres."""
+    return px_at_96 * 25.4 / 96.0
+
+
+def capsule_dist(xx, yy, left, top, width, height):
+    """Signed distance in pixels. Negative inside a fully rounded pill."""
+    rad = height * 0.5
+    cx = left + width * 0.5
+    cy = top + height * 0.5
+    qx = np.abs(xx - cx) - (width * 0.5 - rad)
+    qy = np.abs(yy - cy) - (height * 0.5 - rad)
+    outside = np.hypot(np.maximum(qx, 0.0), np.maximum(qy, 0.0))
+    inside = np.minimum(np.maximum(qx, qy), 0.0)
+    return outside + inside - rad
+
+
+def apply_phone_button(canvas, box):
+    """Bake the frosted phone pill. The canvas stays opaque RGB.
+
+    Screen recipe, at 96 px per inch: 15% white over a 20 px backdrop blur,
+    a 1 px 30% white border, and an inset shadow of 0 8 px 24 px at 10% white.
+    A thin lip runs along the top inner edge. A tight dark shadow sits under
+    the pill only, so it does not halo.
+    """
+    x_mm, y_mm, w_mm, h_mm = box
+    blur_sigma = float(px(css_mm(20)))
+    border_w = float(px(css_mm(1)))
+    inset_dy = float(px(css_mm(8)))
+    # Chrome turns a box-shadow blur radius into this Gaussian sigma.
+    inset_sigma = float(px((0.288675 * 24.0 + 0.5) * 25.4 / 96.0))
+    shadow_dy = float(px(0.45))
+    shadow_sigma = float(px(0.62))
+
+    H, W = canvas.shape[:2]
+    left, top = px(x_mm), px(y_mm)
+    width, height = px(w_mm), px(h_mm)
+    pad = int(np.ceil(blur_sigma * 3.2 + inset_sigma * 3.2 + inset_dy + shadow_sigma * 4 + shadow_dy)) + 6
+    x0 = int(np.floor(left)) - pad
+    y0 = int(np.floor(top)) - pad
+    x1 = int(np.ceil(left + width)) + pad
+    y1 = int(np.ceil(top + height)) + pad
+    sx0, sy0 = max(0, x0), max(0, y0)
+    sx1, sy1 = min(W, x1), min(H, y1)
+    src = canvas[sy0:sy1, sx0:sx1]
+    window = np.pad(src, ((sy0 - y0, y1 - sy1), (sx0 - x0, x1 - sx1), (0, 0)), mode="edge")
+
+    yy, xx = np.mgrid[0:window.shape[0], 0:window.shape[1]].astype(np.float32)
+    xx = x0 + xx + 0.5
+    yy = y0 + yy + 0.5
+    dist = capsule_dist(xx, yy, left, top, width, height)
+    # A little wider than one pixel, so the curve does not stair-step at 600 dpi.
+    cover = np.clip(0.5 - dist / 1.55, 0.0, 1.0).astype(np.float32)
+
+    blurred = gaussian_filter(window, sigma=(blur_sigma, blur_sigma, 0), mode="nearest")
+    glass = blurred * 0.85 + 255.0 * 0.15
+
+    outside = np.clip(dist + 0.5, 0.0, 1.0).astype(np.float32)
+    spread = gaussian_filter(outside, sigma=inset_sigma, mode="nearest")
+    oy = int(round(inset_dy))
+    shifted = np.zeros_like(spread)
+    if oy > 0:
+        shifted[oy:, :] = spread[:-oy, :]
+    else:
+        shifted = spread
+    inset = shifted * cover * 0.10
+    glass = glass * (1.0 - inset[..., None]) + 255.0 * inset[..., None]
+
+    gy, gx = np.gradient(dist)
+    ny = gy / (np.sqrt(gx * gx + gy * gy) + 1e-6)
+    lip_w = max(float(px(0.20)), 1.2)
+    lip = np.clip(1.0 - np.clip(-dist, 0.0, None) / lip_w, 0.0, 1.0)
+    lip *= np.clip(-ny, 0.0, 1.0) * cover
+    glass = glass * (1.0 - lip[..., None] * 0.50) + 255.0 * (lip[..., None] * 0.50)
+
+    outer = cover
+    inner = np.clip(0.5 - (dist + border_w) / 1.55, 0.0, 1.0)
+    stroke = np.clip(outer - inner, 0.0, 1.0)
+    glass = glass * (1.0 - stroke[..., None] * 0.30) + 255.0 * (stroke[..., None] * 0.30)
+
+    shade = gaussian_filter(cover, sigma=shadow_sigma, mode="nearest")
+    dy = max(1, int(round(shadow_dy)))
+    dropped = np.zeros_like(shade)
+    dropped[dy:, :] = shade[:-dy, :]
+    fade = np.clip((yy - (top + height - px(0.20))) / px(0.85), 0.0, 1.0)
+    dropped *= fade * 0.34
+    base = window * (1.0 - dropped[..., None]) + DEEP * dropped[..., None]
+    base = base * (1.0 - cover[..., None]) + glass * cover[..., None]
+
+    canvas[sy0:sy1, sx0:sx1] = base[(sy0 - y0):(sy0 - y0) + (sy1 - sy0), (sx0 - x0):(sx0 - x0) + (sx1 - sx0)]
+    qx, qy, qs, _ = QR_SYMBOL
+    gap_x = qx - (x_mm + w_mm)
+    if gap_x < 2.0:
+        raise SystemExit(f"phone pill is {gap_x:.2f}mm from the QR")
+    trim_left = x_mm - 3.0
+    trim_top = y_mm - 3.0
+    trim_right = 93.0 - (x_mm + w_mm)
+    trim_bottom = 58.0 - (y_mm + h_mm)
+    margins = (trim_left, trim_top, trim_right, trim_bottom)
+    print(
+        f"phone pill {w_mm:.2f}x{h_mm:.2f}mm "
+        f"({h_mm / 25.4 * 96:.1f}px) margins {trim_left:.2f} {trim_top:.2f} "
+        f"{trim_right:.2f} {trim_bottom:.2f}"
+    )
+    if min(margins) < 5.0:
+        raise SystemExit(f"phone pill is under 5 mm from the trim {margins}")
+    return canvas
 
 
 def save_rgb(path, rgb):
@@ -239,6 +353,7 @@ def build_back(silk):
         raise SystemExit(f"silk enters the QR quiet zone (delta {delta:.2f})")
     if gap < 1.5:
         raise SystemExit(f"silk is {gap:.2f}mm from the QR")
+    apply_phone_button(base, PHONE_BTN)
     return base
 
 
@@ -262,7 +377,9 @@ def main():
         print("front-bg.png unchanged")
     else:
         save_rgb(front_path, front)
-    contrast_in(back, BACK_TEXT, "back type")
+    contrast_in(back, (7.5, 14.5, 50.0, 13.0), "back name")
+    contrast_in(back, (12.2, 30.4, 27.0, 3.6), "phone label")
+    contrast_in(back, (8.0, 37.6, 50.0, 14.0), "back contacts")
     trace_wordmark()
     n = build_qr_svg()
     module = QR_SYMBOL[2] / n
