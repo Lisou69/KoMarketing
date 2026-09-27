@@ -5,10 +5,10 @@
   <title>KO Marketing Agency — business cards</title>
   <!--
     Thai business card, 90 × 55 mm trim.
-    Print sheets: 3 mm bleed, crop marks outside the bleed.
-    Preview (?preview): trim only.
-    Colours are opaque and CMYK-friendly. No opacity, masks, or blend modes.
-    Logo is the site wordmark, flattened onto white.
+    Print sheet 108 × 73 mm: 3 mm bleed, crop marks outside the bleed.
+    Preview (?preview) shows the trim only.
+    Silk and glass are opaque rasters at 600 dpi. Logo, type, and QR are vectors.
+    No opacity, masks, or blend modes.
   -->
   <style>
     @font-face {
@@ -37,10 +37,7 @@
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    html, body {
-      background: #ffffff;
-      color: #1a1310;
-    }
+    html, body { background: #4c050c; color: #ffffff; }
 
     .sheet {
       position: relative;
@@ -56,29 +53,27 @@
       break-after: auto;
     }
 
-    /* Bleed box sits 6 mm in from the sheet so crop marks stay outside it.
-       Trim is 3 mm inside the bleed: 90 × 55 mm. */
     .bleed {
       position: absolute;
       left: 6mm;
       top: 6mm;
       width: 96mm;
       height: 61mm;
-      background: #ffffff;
-      padding: 8mm;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: #4c050c;
+      overflow: hidden;
     }
 
-    .mark {
+    .bg {
       position: absolute;
-      background: #000000;
+      left: 0;
+      top: 0;
+      width: 96mm;
+      height: 61mm;
     }
+
+    .mark { position: absolute; background: #000000; }
     .mark.h { height: 0.1mm; width: 4.5mm; }
     .mark.v { width: 0.1mm; height: 4.5mm; }
-
-    /* Marks align with the trim (9 mm / 64 mm / 99 mm) and stop at the bleed edge. */
     .h-tl { left: 1.5mm; top: 8.95mm; }
     .v-tl { left: 8.95mm; top: 1.5mm; }
     .h-tr { left: 102mm; top: 8.95mm; }
@@ -88,12 +83,12 @@
     .h-br { left: 102mm; top: 63.95mm; }
     .v-br { left: 98.95mm; top: 67mm; }
 
-    .front, .back {
-      width: 100%;
-      height: 100%;
-    }
-
     .front {
+      position: absolute;
+      left: 8mm;
+      top: 8mm;
+      width: 80mm;
+      height: 45mm;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -101,143 +96,130 @@
       text-align: center;
     }
 
-    .wordmark {
-      width: 58mm;
-      height: auto;
-      display: block;
-    }
+    .wordmark { width: 58mm; height: auto; display: block; }
 
     .tagline {
-      margin-top: 3.6mm;
+      margin-top: 3.4mm;
       font-family: "Source Serif 4", serif;
       font-style: italic;
       font-weight: 500;
       font-size: 12pt;
       line-height: 1.05;
       letter-spacing: -0.045em;
-      color: #1a1310;
-    }
-
-    .back {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      text-align: left;
+      color: #ffffff;
     }
 
     .name {
+      position: absolute;
+      left: 8mm;
+      top: 7.2mm;
       font-family: "Source Serif 4", serif;
       font-style: italic;
       font-weight: 500;
-      font-size: 15pt;
+      font-size: 14.5pt;
       line-height: 1.05;
       letter-spacing: -0.03em;
-      color: #1a1310;
+      color: #ffffff;
     }
 
     .role {
-      margin-top: 1.4mm;
+      position: absolute;
+      left: 8mm;
+      top: 13.6mm;
       font-family: Manrope, sans-serif;
       font-weight: 500;
-      font-style: normal;
       font-size: 8pt;
       line-height: 1.2;
       letter-spacing: -0.01em;
-      color: #534e4c;
+      color: #ffffff;
     }
 
+    .contacts {
+      position: absolute;
+      left: 10mm;
+      top: 24.2mm;
+      width: 48mm;
+    }
     .contacts p {
       font-family: Manrope, sans-serif;
       font-weight: 400;
-      font-style: normal;
-      font-size: 8.5pt;
+      font-size: 8pt;
       line-height: 1.45;
       letter-spacing: -0.01em;
-      color: #1a1310;
+      color: #ffffff;
       white-space: nowrap;
     }
+    .contacts .place { margin-top: 1.5mm; }
 
-    .place {
-      margin-top: 2.6mm;
+    .qr {
+      position: absolute;
+      left: 61.7mm;
+      top: 23.95mm;
+      width: 23.6mm;
+      height: 23.6mm;
+    }
+    .qr img {
+      width: 23.6mm;
+      height: 23.6mm;
+      display: block;
     }
 
     html.preview .mark { display: none; }
-    html.preview .sheet {
-      width: 90mm;
-      height: 55mm;
-    }
-    html.preview .bleed {
-      left: -3mm;
-      top: -3mm;
-    }
+    html.preview .sheet { width: 90mm; height: 55mm; }
+    html.preview .bleed { left: -3mm; top: -3mm; }
   </style>
 </head>
 <body>
   <section class="sheet" data-face="front">
     <div class="bleed">
+      <img class="bg" src="assets/front-bg.png" alt="">
       <div class="front">
-        <img class="wordmark" src="assets/ko-wordmark.png" alt="KO Marketing Agency">
+        <img class="wordmark" src="assets/ko-wordmark.svg" alt="KO Marketing Agency">
         <p class="tagline">Marketing that<br>converts.</p>
       </div>
     </div>
-    <div class="mark h h-tl"></div>
-    <div class="mark v v-tl"></div>
-    <div class="mark h h-tr"></div>
-    <div class="mark v v-tr"></div>
-    <div class="mark h h-bl"></div>
-    <div class="mark v v-bl"></div>
-    <div class="mark h h-br"></div>
-    <div class="mark v v-br"></div>
+    <div class="mark h h-tl"></div><div class="mark v v-tl"></div>
+    <div class="mark h h-tr"></div><div class="mark v v-tr"></div>
+    <div class="mark h h-bl"></div><div class="mark v v-bl"></div>
+    <div class="mark h h-br"></div><div class="mark v v-br"></div>
   </section>
 
   <section class="sheet" data-face="back-lisa-maretti">
     <div class="bleed">
-      <div class="back">
-        <div>
-          <p class="name">Lisa Maretti</p>
-          <p class="role">Co-founder</p>
-        </div>
-        <div class="contacts">
-          <p>+66 65 073 9612</p>
-          <p>lisa@komarketingagency.com</p>
-          <p class="place">komarketingagency.com</p>
-          <p>Sukhumvit 24, Bangkok</p>
-        </div>
+      <img class="bg" src="assets/back-bg.png" alt="">
+      <p class="name">Lisa Maretti</p>
+      <p class="role">Co-founder</p>
+      <div class="contacts">
+        <p>+66 65 073 9612</p>
+        <p>lisa@komarketingagency.com</p>
+        <p class="place">komarketingagency.com</p>
+        <p>Sukhumvit 24, Bangkok</p>
       </div>
+      <div class="qr"><img src="assets/qr.svg" alt=""></div>
     </div>
-    <div class="mark h h-tl"></div>
-    <div class="mark v v-tl"></div>
-    <div class="mark h h-tr"></div>
-    <div class="mark v v-tr"></div>
-    <div class="mark h h-bl"></div>
-    <div class="mark v v-bl"></div>
-    <div class="mark h h-br"></div>
-    <div class="mark v v-br"></div>
+    <div class="mark h h-tl"></div><div class="mark v v-tl"></div>
+    <div class="mark h h-tr"></div><div class="mark v v-tr"></div>
+    <div class="mark h h-bl"></div><div class="mark v v-bl"></div>
+    <div class="mark h h-br"></div><div class="mark v v-br"></div>
   </section>
 
   <section class="sheet" data-face="back-kristina-ostapenko">
     <div class="bleed">
-      <div class="back">
-        <div>
-          <p class="name">Kristina Ostapenko</p>
-          <p class="role">Co-founder</p>
-        </div>
-        <div class="contacts">
-          <p>+66 99 119 7242</p>
-          <p>kristina@komarketingagency.com</p>
-          <p class="place">komarketingagency.com</p>
-          <p>Sukhumvit 24, Bangkok</p>
-        </div>
+      <img class="bg" src="assets/back-bg.png" alt="">
+      <p class="name">Kristina Ostapenko</p>
+      <p class="role">Co-founder</p>
+      <div class="contacts">
+        <p>+66 99 119 7242</p>
+        <p>kristina@komarketingagency.com</p>
+        <p class="place">komarketingagency.com</p>
+        <p>Sukhumvit 24, Bangkok</p>
       </div>
+      <div class="qr"><img src="assets/qr.svg" alt=""></div>
     </div>
-    <div class="mark h h-tl"></div>
-    <div class="mark v v-tl"></div>
-    <div class="mark h h-tr"></div>
-    <div class="mark v v-tr"></div>
-    <div class="mark h h-bl"></div>
-    <div class="mark v v-bl"></div>
-    <div class="mark h h-br"></div>
-    <div class="mark v v-br"></div>
+    <div class="mark h h-tl"></div><div class="mark v v-tl"></div>
+    <div class="mark h h-tr"></div><div class="mark v v-tr"></div>
+    <div class="mark h h-bl"></div><div class="mark v v-bl"></div>
+    <div class="mark h h-br"></div><div class="mark v v-br"></div>
   </section>
   <script>
     if (location.search.indexOf("preview") !== -1) {
