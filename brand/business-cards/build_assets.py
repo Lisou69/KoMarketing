@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Opaque card art: crisp site silk on burgundy, one frosted QR tile."""
+"""Opaque card art: whole site silk on cream, one frosted QR tile on the back."""
 
 from pathlib import Path
 import subprocess
@@ -26,9 +26,13 @@ HIGHLIGHT = np.array([255.0, 248.0, 242.0], dtype=np.float32)
 QR_GLASS = (57.6, 15.0, 30.4, 31.0)
 QR_GLASS_R = 2.8
 QR_SYMBOL = (60.7, 21.0, 24.2, 24.2)
-# Front type sits on the silk. Back type stays on open burgundy.
-FRONT_LOGO = (28.0, 21.5, 40.0, 10.2)
-FRONT_TAG = (35.0, 32.8, 26.0, 9.2)
+# Front type sits on the cream, clear of the silk. Bleed coordinates.
+# The silk file is placed whole: 68 mm wide, source aspect, 5 mm inside the trim.
+FRONT_LOGO = (58.0, 8.0, 30.0, 7.1)
+FRONT_TAG = (61.0, 16.6, 24.1, 8.3)
+FRONT_SILK = (8.0, 20.3, 68.0)  # bleed x, y, width. Height follows the file.
+CREAM = np.array([243.0, 238.0, 231.0], dtype=np.float32)
+SILK_SHADOW = np.array([124.0, 108.0, 96.0], dtype=np.float32)
 BACK_TEXT = (7.5, 14.5, 50.0, 32.0)
 INK = np.array([76.0, 5.0, 12.0], dtype=np.float32)
 SHADOW = np.array([16.0, 1.0, 4.0], dtype=np.float32)
@@ -292,6 +296,19 @@ def contrast_in(rgb, box, label, minimum=7.0):
     return ratio
 
 
+def contrast_ink(rgb, box, label, minimum):
+    """Burgundy ink. The worst pixel is the lightest ground behind the letters."""
+    x, y, w, h = (int(round(px(v))) for v in box)
+    crop = rgb[y:y + h, x:x + w].reshape(-1, 3)
+    lum = 0.2126 * crop[:, 0] + 0.7152 * crop[:, 1] + 0.0722 * crop[:, 2]
+    light = crop[int(np.argmax(lum))]
+    ratio = contrast_ratio(INK, light)
+    print(f"{label}: lightest ground {light.round(1)} burgundy-contrast {ratio:.2f}")
+    if ratio < minimum:
+        raise SystemExit(f"{label} contrast {ratio:.2f} is under {minimum:.1f}")
+    return ratio
+
+
 def contrast_on_silk(rgb, box, label, minimum):
     """Dark burgundy ink. The worst pixel is the darkest silk behind the letters."""
     x, y, w, h = (int(round(px(v))) for v in box)
@@ -354,13 +371,56 @@ def build_qr_svg():
     return n
 
 
+def place_whole_silk(base, silk, origin_mm, width_mm):
+    """Scale the silk file uniformly and bake it, with a soft cast shadow.
+
+    The whole image is placed. Nothing is cropped, stretched, tinted, or blurred.
+    """
+    H, W = base.shape[:2]
+    target_w = int(round(px(width_mm)))
+    target_h = int(round(target_w * silk.height / silk.width))
+    resized = silk.resize((target_w, target_h), Image.Resampling.LANCZOS)
+    arr = np.asarray(resized).astype(np.float32)
+    alpha = arr[..., 3] / 255.0
+    sigma = float(px(1.25))
+    dx = int(round(px(0.30)))
+    dy = int(round(px(0.65)))
+    pad = int(np.ceil(sigma * 3.0 + abs(dx) + abs(dy))) + 4
+    buf = np.zeros((target_h + 2 * pad, target_w + 2 * pad), np.float32)
+    buf[pad:pad + target_h, pad:pad + target_w] = alpha
+    blur = gaussian_filter(buf, sigma=sigma, mode="constant", cval=0.0)
+    x0 = int(round(px(origin_mm[0]))) - pad + dx
+    y0 = int(round(px(origin_mm[1]))) - pad + dy
+    bh, bw = blur.shape
+    x1, y1 = max(0, x0), max(0, y0)
+    x2, y2 = min(W, x0 + bw), min(H, y0 + bh)
+    if x2 > x1 and y2 > y1:
+        shad = (blur[y1 - y0:y1 - y0 + (y2 - y1), x1 - x0:x1 - x0 + (x2 - x1)] * 0.20)[..., None]
+        view = base[y1:y2, x1:x2]
+        base[y1:y2, x1:x2] = view * (1.0 - shad) + SILK_SHADOW * shad
+    x0 = int(round(px(origin_mm[0])))
+    y0 = int(round(px(origin_mm[1])))
+    if x0 < 0 or y0 < 0 or x0 + target_w > W or y0 + target_h > H:
+        raise SystemExit("silk image does not fit on the bleed")
+    # The opaque silhouette must sit inside the trim, 5 mm clear of the cut.
+    opaque = alpha > 0.04
+    ys, xs = np.where(opaque)
+    trim_x0, trim_y0 = px(3.0 + 5.0), px(3.0 + 5.0)
+    trim_x1, trim_y1 = px(96.0 - 3.0 - 5.0), px(61.0 - 3.0 - 5.0)
+    if xs.min() + x0 < trim_x0 or ys.min() + y0 < trim_y0 or xs.max() + x0 > trim_x1 or ys.max() + y0 > trim_y1:
+        raise SystemExit("silk silhouette is closer than 5 mm to the trim")
+    cover = alpha[..., None]
+    base[y0:y0 + target_h, x0:x0 + target_w] = (
+        base[y0:y0 + target_h, x0:x0 + target_w] * (1.0 - cover) + arr[..., :3] * cover
+    )
+    return base
+
+
 def build_front(silk):
     h, w = int(round(px(61))), int(round(px(96)))
-    base = field(w, h)
-    # Full-width horizontal band, centered. Hard ends of the artwork fall outside the bleed.
-    base = composite_ribbon(
-        base, silk, (48.0, 32.5), 140.0, 0.0, tone=1.0, thickness_mm=40.0
-    )
+    base = np.empty((h, w, 3), dtype=np.float32)
+    base[:] = CREAM
+    base = place_whole_silk(base, silk, FRONT_SILK[:2], FRONT_SILK[2])
     return base, base
 
 
@@ -392,8 +452,8 @@ def main():
             im = Image.fromarray(np.clip(rgb, 0, 255).astype(np.uint8), "RGB")
             im.thumbnail((1100, 800), Image.Resampling.LANCZOS)
             im.save(f"/tmp/ko-{name}.jpg", quality=90)
-    contrast_on_silk(front, FRONT_LOGO, "front logo", 3.0)
-    contrast_on_silk(front, FRONT_TAG, "front tagline", 4.5)
+    contrast_ink(front, FRONT_LOGO, "front logo", 4.5)
+    contrast_ink(front, FRONT_TAG, "front tagline", 4.5)
     save_rgb(ASSETS / "front-bg.png", front)
     contrast_in(back, BACK_TEXT, "back type")
     trace_wordmark()
