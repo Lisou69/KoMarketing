@@ -26,9 +26,11 @@ QR_GLASS = (57.6, 15.0, 30.4, 31.0)
 QR_GLASS_R = 2.8
 QR_WHITE = (60.7, 18.4, 24.2, 24.2)
 QR_WHITE_R = 1.6
-# Type sits in these boxes. The silk must stay outside them.
-FRONT_TEXT = (10.0, 8.0, 46.0, 23.0)
+# Front type sits on the silk. Back type stays on open burgundy.
+FRONT_LOGO = (28.0, 21.5, 40.0, 10.2)
+FRONT_TAG = (35.0, 32.8, 26.0, 9.2)
 BACK_TEXT = (7.5, 14.5, 50.0, 32.0)
+INK = np.array([76.0, 5.0, 12.0], dtype=np.float32)
 SHADOW = np.array([16.0, 1.0, 4.0], dtype=np.float32)
 WHITE = np.array([255.0, 255.0, 255.0], dtype=np.float32)
 
@@ -285,6 +287,11 @@ def save_rgb(path, rgb):
         raise SystemExit(f"{path.name} saved as {check.mode}")
 
 
+def contrast_ratio(ink, bg):
+    dark, light = sorted((rel_lum(ink), rel_lum(bg)))
+    return (light + 0.05) / (dark + 0.05)
+
+
 def contrast_in(rgb, box, label, minimum=7.0):
     x, y, w, h = (int(round(px(v))) for v in box)
     crop = rgb[y:y + h, x:x + w].reshape(-1, 3)
@@ -292,6 +299,19 @@ def contrast_in(rgb, box, label, minimum=7.0):
     light = crop[int(np.argmax(lum))]
     ratio = contrast_white(light)
     print(f"{label}: lightest {light.round(1)} white-contrast {ratio:.2f}")
+    if ratio < minimum:
+        raise SystemExit(f"{label} contrast {ratio:.2f} is under {minimum:.1f}")
+    return ratio
+
+
+def contrast_on_silk(rgb, box, label, minimum):
+    """Dark burgundy ink. The worst pixel is the darkest silk behind the letters."""
+    x, y, w, h = (int(round(px(v))) for v in box)
+    crop = rgb[y:y + h, x:x + w].reshape(-1, 3)
+    lum = 0.2126 * crop[:, 0] + 0.7152 * crop[:, 1] + 0.0722 * crop[:, 2]
+    dark = crop[int(np.argmin(lum))]
+    ratio = contrast_ratio(INK, dark)
+    print(f"{label}: darkest silk {dark.round(1)} burgundy-contrast {ratio:.2f}")
     if ratio < minimum:
         raise SystemExit(f"{label} contrast {ratio:.2f} is under {minimum:.1f}")
     return ratio
@@ -309,7 +329,7 @@ def trace_wordmark():
     subprocess.check_call(
         ["potrace", "-s", "-o", str(raw), "--flat", "-t", "12", "-a", "1.05", "-O", "0.18", str(pbm)]
     )
-    text = raw.read_text().replace('fill="#000000"', 'fill="#ffffff"')
+    text = raw.read_text().replace('fill="#000000"', 'fill="#4c050c"')
     svg = text[text.find("<svg"):]
     (ASSETS / "ko-wordmark.svg").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -349,9 +369,9 @@ def build_qr_svg():
 def build_front(silk):
     h, w = int(round(px(61))), int(round(px(96)))
     base = field(w, h)
-    # Thin diagonal from the lower-left bleed toward the upper-right, clear of the wordmark.
+    # Full-width horizontal band, centered. Hard ends of the artwork fall outside the bleed.
     base = composite_ribbon(
-        base, silk, (28.0, 58.0), 170.0, 38.0, tone=0.97, thickness_mm=23.0
+        base, silk, (48.0, 32.5), 140.0, 0.0, tone=1.0, thickness_mm=40.0
     )
     return base, base
 
@@ -385,7 +405,8 @@ def main():
             im = Image.fromarray(np.clip(rgb, 0, 255).astype(np.uint8), "RGB")
             im.thumbnail((1100, 800), Image.Resampling.LANCZOS)
             im.save(f"/tmp/ko-{name}.jpg", quality=90)
-    contrast_in(front, FRONT_TEXT, "front type")
+    contrast_on_silk(front, FRONT_LOGO, "front logo", 3.0)
+    contrast_on_silk(front, FRONT_TAG, "front tagline", 4.5)
     save_rgb(ASSETS / "front-bg.png", front)
     contrast_in(back, BACK_TEXT, "back type")
     # The code itself sits on burgundy, then a solid white square. Silk stays outside it.
