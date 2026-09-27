@@ -118,15 +118,16 @@ def _sample_rgb(img, ys, xs):
 
 
 def apply_phone_button(canvas, box):
-    """Bake a thick refractive glass pill. The canvas stays opaque RGB.
+    """Bake a narrow refractive glass pill. The canvas stays opaque RGB.
 
     Drawn at twice the card resolution, then resampled to 600 dpi. The rim is
-    a beveled slab: background pixels are displaced along the surface normal
-    (with a faint chromatic split), and specular lines follow a top-left light.
+    a narrow bevel, about 0.65 mm: burgundy shows through it, displaced along
+    the surface normal, with a faint chromatic split. Specular lines follow a
+    top-left light.
     """
     x_mm, y_mm, w_mm, h_mm = box
     ss = 2
-    rim = float(px(1.45))
+    rim = float(px(0.65))
     H, W = canvas.shape[:2]
     left, top = px(x_mm), px(y_mm)
     width, height = px(w_mm), px(h_mm)
@@ -187,10 +188,10 @@ def apply_phone_button(canvas, box):
 
     # Refraction lives in the bezel. A convex rim pulls samples outward, and the
     # smooth burgundy gradient is gained so the bend stays visible at card size.
-    shift = bevel * px(3.4)
+    shift = bevel * px(1.5)
     refr = _sample_rgb(ground, (yy + ny * shift - y0) * ss - 0.5, (xx + nx * shift - x0) * ss - 0.5)
     delta = refr - ground
-    refr = np.clip(ground + delta * 5.5, 0.0, 255.0)
+    refr = np.clip(ground + delta * 2.4, 0.0, 255.0)
     # Faint dispersion: red bends a little further than blue.
     red = _sample_rgb(ground, (yy + ny * shift * 1.22 - y0) * ss - 0.5, (xx + nx * shift * 1.22 - x0) * ss - 0.5)
     blue = _sample_rgb(ground, (yy + ny * shift * 0.78 - y0) * ss - 0.5, (xx + nx * shift * 0.78 - x0) * ss - 0.5)
@@ -204,13 +205,13 @@ def apply_phone_button(canvas, box):
     body = blurred * (1.0 - lift[..., None]) + 255.0 * lift[..., None]
     body *= (1.0 - 0.05 * v)[..., None]
 
-    # Slab: lighter than the interior all the way around, brighter toward the light.
-    slab = np.clip(0.16 + 0.20 * facing + 0.14 * down, 0.0, 0.46)
+    # A light lift only, so the rim stays burgundy glass rather than a pink fill.
+    slab = np.clip(0.03 + 0.04 * facing + 0.03 * down, 0.0, 0.10)
     rim_col = refr * (1.0 - slab[..., None]) + 255.0 * slab[..., None]
     glass = body * (1.0 - bevel[..., None]) + rim_col * bevel[..., None]
 
     # Dark groove where the bevel meets the flat face, so the rim has thickness.
-    groove_w = max(px(0.16), 0.8)
+    groove_w = max(px(0.09), 0.7)
     groove = np.exp(-((depth - rim) ** 2) / (2.0 * groove_w ** 2)) * cover
     glass = glass * (1.0 - groove[..., None] * 0.28) + DEEP * (groove[..., None] * 0.28)
 
@@ -218,17 +219,17 @@ def apply_phone_button(canvas, box):
     bottom_w = max(px(0.07), 0.6)
     bottom = np.exp(-((depth - rim * 0.90) ** 2) / (2.0 * bottom_w ** 2))
     bottom *= down ** 0.45 * cover
-    top_w = max(px(0.16), 0.8)
-    top_line = np.exp(-((depth - rim * 0.18) ** 2) / (2.0 * top_w ** 2))
+    top_w = max(px(0.055), 0.55)
+    top_line = np.exp(-((depth - rim * 0.22) ** 2) / (2.0 * top_w ** 2))
     top_line *= up * (0.45 + 0.55 * facing) * cover
     hot = (facing ** 1.6) * bevel * (0.35 + 0.65 * (up + 0.35 * np.clip(-nx, 0, 1)))
     glass = glass + (255.0 - glass) * (
-        bottom[..., None] * 0.82 + top_line[..., None] * 0.40 + hot[..., None] * 0.28
+        bottom[..., None] * 0.82 + top_line[..., None] * 0.32 + hot[..., None] * 0.22
     )
     # Outer lip, a hairline on the glass edge.
-    lip_w = max(px(0.06), 0.5)
+    lip_w = max(px(0.045), 0.45)
     lip = np.exp(-(depth ** 2) / (2.0 * lip_w ** 2)) * cover * (0.35 + 0.65 * facing)
-    glass = glass + (255.0 - glass) * lip[..., None] * 0.55
+    glass = glass + (255.0 - glass) * lip[..., None] * 0.28
 
     out = ground * (1.0 - cover[..., None]) + np.clip(glass, 0.0, 255.0) * cover[..., None]
     small = np.asarray(
