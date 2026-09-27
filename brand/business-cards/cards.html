@@ -9,8 +9,8 @@
     Preview (?preview) shows the trim only.
     The front is the silk photograph, cover-cropped to the bleed.
     Backs are burgundy with a silk corner. The phone number sits on a narrow glass
-    pill baked into the background. Mail and globe icons match the phone outline.
-    The QR is white modules on the burgundy.
+    pill baked into the background. Mail and globe icons sit in matching circular
+    glass badges, also baked. The QR is white modules on the burgundy.
     Logo, type, icon, and QR are vectors. No opacity, masks, or blend modes.
   -->
   <style>
@@ -157,35 +157,30 @@
       white-space: nowrap;
     }
 
-    .contacts {
+    .badge-icon {
       position: absolute;
       left: 8.2mm;
-      top: 38.2mm;
-      width: 48mm;
+      width: 2.4mm;
+      height: 2.4mm;
+      display: block;
     }
-    .contacts p {
-      display: flex;
-      align-items: center;
-      gap: 1.5mm;
+    .badge-icon.mail { top: 39.45mm; }
+    .badge-icon.globe { top: 45.70mm; }
+
+    .contact-line {
+      position: absolute;
+      left: 13.15mm;
       font-family: Manrope, sans-serif;
       font-weight: 400;
       font-size: 8.5pt;
-      line-height: 1.45;
+      line-height: 1;
       letter-spacing: -0.01em;
       color: #ffffff;
       white-space: nowrap;
     }
-    .contacts img {
-      width: 2.4mm;
-      height: 2.4mm;
-      flex: 0 0 2.4mm;
-      display: block;
-      position: relative;
-      top: -0.18mm;
-    }
-    .contacts .place {
-      padding-left: 3.9mm;
-    }
+    .contact-line.email { top: 39.08mm; }
+    .contact-line.web { top: 45.33mm; }
+    .contact-line.place { top: 51.58mm; }
 
     .qr {
       position: absolute;
@@ -225,11 +220,11 @@
       <p class="role">Co-founder</p>
       <img class="phone-icon" src="assets/phone.svg" alt="">
       <p class="phone">+66 65 073 9612</p>
-      <div class="contacts">
-        <p><img src="assets/mail.svg" alt=""><span>lisa@komarketingagency.com</span></p>
-        <p><img src="assets/globe.svg" alt=""><span>komarketingagency.com</span></p>
-        <p class="place">Bangkok, Thailand</p>
-      </div>
+      <img class="badge-icon mail" src="assets/mail.svg" alt="">
+      <p class="contact-line email">lisa@komarketingagency.com</p>
+      <img class="badge-icon globe" src="assets/globe.svg" alt="">
+      <p class="contact-line web">komarketingagency.com</p>
+      <p class="contact-line place">Bangkok, Thailand</p>
       <div class="qr"><img src="assets/qr.svg" alt=""></div>
     </div>
     <div class="mark h h-tl"></div><div class="mark v v-tl"></div>
@@ -245,11 +240,11 @@
       <p class="role">Co-founder</p>
       <img class="phone-icon" src="assets/phone.svg" alt="">
       <p class="phone">+66 99 119 7242</p>
-      <div class="contacts">
-        <p><img src="assets/mail.svg" alt=""><span>kristina@komarketingagency.com</span></p>
-        <p><img src="assets/globe.svg" alt=""><span>komarketingagency.com</span></p>
-        <p class="place">Bangkok, Thailand</p>
-      </div>
+      <img class="badge-icon mail" src="assets/mail.svg" alt="">
+      <p class="contact-line email">kristina@komarketingagency.com</p>
+      <img class="badge-icon globe" src="assets/globe.svg" alt="">
+      <p class="contact-line web">komarketingagency.com</p>
+      <p class="contact-line place">Bangkok, Thailand</p>
       <div class="qr"><img src="assets/qr.svg" alt=""></div>
     </div>
     <div class="mark h h-tl"></div><div class="mark v v-tl"></div>

@@ -26,6 +26,13 @@ INK = np.array([76.0, 5.0, 12.0], dtype=np.float32)
 # below (~30 px at 96 dpi). Width fits the longer number, a 3 mm icon, and 4 mm
 # of side padding. cards.html places the icon and the number on this shape.
 PHONE_BTN = (8.2, 27.5, 35.1, 9.0)
+# Circular glass badges behind the mail and globe icons. Bleed millimetres.
+# cards.html centers a 2.4 mm icon on each circle and starts the contact text
+# on one shared left edge. The address has no badge.
+BADGE_D = 5.2
+BADGE_LEFT = 6.80
+BADGE_MAIL = (BADGE_LEFT, 38.05, BADGE_D, BADGE_D)
+BADGE_WEB = (BADGE_LEFT, 44.30, BADGE_D, BADGE_D)
 DEEP = np.array([16.0, 0.0, 3.0], dtype=np.float32)
 
 
@@ -257,6 +264,136 @@ def apply_phone_button(canvas, box):
     return canvas
 
 
+def apply_glass_disc(canvas, box):
+    """Bake a circular badge with the phone pill's glass, scaled to read small.
+
+    The rim stays 0.65 mm. Refraction, the bottom inner line, the softer top
+    line, and the top-left hot spot use the same recipe. The caustic and the
+    shadow are a little tighter so two badges can sit one line apart. Only the
+    glass, caustic, and shadow are written back, so a neighbour is left alone.
+    """
+    x_mm, y_mm, w_mm, h_mm = box
+    if abs(w_mm - h_mm) > 0.01:
+        raise SystemExit(f"glass disc is not round: {w_mm} x {h_mm}")
+    ss = 2
+    rim = float(px(0.65))
+    H, W = canvas.shape[:2]
+    left, top = px(x_mm), px(y_mm)
+    width, height = px(w_mm), px(h_mm)
+    pad = int(px(3.2)) + 6
+    x0 = int(np.floor(left)) - pad
+    y0 = int(np.floor(top)) - pad
+    x1 = int(np.ceil(left + width)) + pad
+    y1 = int(np.ceil(top + height)) + pad
+    sx0, sy0 = max(0, x0), max(0, y0)
+    sx1, sy1 = min(W, x1), min(H, y1)
+    src = canvas[sy0:sy1, sx0:sx1]
+    window = np.pad(src, ((sy0 - y0, y1 - sy1), (sx0 - x0, x1 - sx1), (0, 0)), mode="edge")
+    big = np.asarray(
+        Image.fromarray(np.clip(window, 0, 255).astype(np.uint8), "RGB").resize(
+            (window.shape[1] * ss, window.shape[0] * ss), Image.Resampling.LANCZOS
+        )
+    ).astype(np.float32)
+
+    bh, bw = big.shape[:2]
+    row, col = np.mgrid[0:bh, 0:bw].astype(np.float32)
+    xx = x0 + (col + 0.5) / ss
+    yy = y0 + (row + 0.5) / ss
+    cx = left + width * 0.5
+    cy = top + height * 0.5
+    dist = np.hypot(xx - cx, yy - cy) - width * 0.5
+    gy, gx = np.gradient(dist)
+    nlen = np.sqrt(gx * gx + gy * gy) + 1e-6
+    nx, ny = gx / nlen, gy / nlen
+    depth = np.clip(-dist, 0.0, None)
+    cover = np.clip(0.5 - dist * ss / 1.35, 0.0, 1.0).astype(np.float32)
+
+    u = np.clip(depth / rim, 0.0, 1.0)
+    in_rim = depth < rim
+    bevel = np.where(in_rim, np.clip(np.sin(np.clip(u, 0.0, 1.0) * np.pi), 0.0, 1.0) ** 0.55, 0.0).astype(np.float32)
+
+    light = np.array([-0.42, -0.78], np.float32)
+    light /= np.linalg.norm(light)
+    facing = np.clip(nx * light[0] + ny * light[1], 0.0, 1.0)
+    down = np.clip(ny, 0.0, 1.0)
+    up = np.clip(-ny, 0.0, 1.0)
+
+    shadow_sigma = max(px(0.38) * ss, 1.0)
+    shade = gaussian_filter(cover, sigma=shadow_sigma, mode="nearest")
+    dy = max(1, int(round(px(0.28) * ss)))
+    dropped = np.zeros_like(shade)
+    dropped[dy:, :] = shade[:-dy, :]
+    below = np.clip((yy - (top + height + px(0.20))) / px(0.50), 0.0, 1.0)
+    dropped *= below * 0.48
+    ground = big * (1.0 - dropped[..., None]) + DEEP * dropped[..., None]
+    gap = yy - (top + height)
+    band = np.exp(-((gap - px(0.11)) ** 2) / (2.0 * px(0.09) ** 2))
+    band *= np.clip(1.0 - np.abs(xx - cx) / (width * 0.42), 0.0, 1.0)
+    band *= np.clip(1.0 - cover, 0.0, 1.0)
+    glow = np.array([196.0, 168.0, 176.0], np.float32)
+    ground = ground * (1.0 - band[..., None] * 0.62) + glow * (band[..., None] * 0.62)
+
+    # Shorter than the pill. A 1.5 mm bend on a 5 mm circle pulls in the badge above.
+    shift = bevel * px(0.50)
+    refr = _sample_rgb(ground, (yy + ny * shift - y0) * ss - 0.5, (xx + nx * shift - x0) * ss - 0.5)
+    delta = refr - ground
+    refr = np.clip(ground + delta * 1.6, 0.0, 255.0)
+    red = _sample_rgb(ground, (yy + ny * shift * 1.12 - y0) * ss - 0.5, (xx + nx * shift * 1.12 - x0) * ss - 0.5)
+    blue = _sample_rgb(ground, (yy + ny * shift * 0.88 - y0) * ss - 0.5, (xx + nx * shift * 0.88 - x0) * ss - 0.5)
+    refr[..., 0] = np.clip(refr[..., 0] * 0.55 + red[..., 0] * 0.45, 0.0, 255.0)
+    refr[..., 2] = np.clip(refr[..., 2] * 0.55 + blue[..., 2] * 0.45, 0.0, 255.0)
+
+    frost = max(px(0.32) * ss, 1.0)
+    blurred = gaussian_filter(ground, sigma=(frost, frost, 0), mode="nearest")
+    v = np.clip((yy - top) / height, 0.0, 1.0)
+    lift = 0.045 + 0.05 * (1.0 - v)
+    body = blurred * (1.0 - lift[..., None]) + 255.0 * lift[..., None]
+    body *= (1.0 - 0.05 * v)[..., None]
+
+    slab = np.clip(0.03 + 0.04 * facing + 0.03 * down, 0.0, 0.10)
+    rim_col = refr * (1.0 - slab[..., None]) + 255.0 * slab[..., None]
+    glass = body * (1.0 - bevel[..., None]) + rim_col * bevel[..., None]
+
+    groove_w = max(px(0.08), 0.65)
+    groove = np.exp(-((depth - rim) ** 2) / (2.0 * groove_w ** 2)) * cover
+    glass = glass * (1.0 - groove[..., None] * 0.28) + DEEP * (groove[..., None] * 0.28)
+
+    # Hairlines a touch wider than the pill so the arc still reads at 5 mm.
+    bottom_w = max(px(0.09), 0.7)
+    bottom = np.exp(-((depth - rim * 0.90) ** 2) / (2.0 * bottom_w ** 2))
+    bottom *= down ** 0.45 * cover
+    top_w = max(px(0.07), 0.6)
+    top_line = np.exp(-((depth - rim * 0.22) ** 2) / (2.0 * top_w ** 2))
+    top_line *= up * (0.45 + 0.55 * facing) * cover
+    hot = (facing ** 1.6) * bevel * (0.35 + 0.65 * (up + 0.35 * np.clip(-nx, 0, 1)))
+    glass = glass + (255.0 - glass) * (
+        bottom[..., None] * 0.82 + top_line[..., None] * 0.32 + hot[..., None] * 0.22
+    )
+    lip_w = max(px(0.05), 0.5)
+    lip = np.exp(-(depth ** 2) / (2.0 * lip_w ** 2)) * cover * (0.35 + 0.65 * facing)
+    glass = glass + (255.0 - glass) * lip[..., None] * 0.28
+
+    out = ground * (1.0 - cover[..., None]) + np.clip(glass, 0.0, 255.0) * cover[..., None]
+    shade_a = np.clip(dropped / 0.48, 0.0, 1.0)
+    mask = np.maximum(cover, np.maximum(shade_a, np.clip(band, 0.0, 1.0)))
+    small = np.asarray(
+        Image.fromarray(np.clip(out, 0, 255).astype(np.uint8), "RGB").resize(
+            (window.shape[1], window.shape[0]), Image.Resampling.LANCZOS
+        )
+    ).astype(np.float32)
+    mask_small = np.asarray(
+        Image.fromarray(np.clip(mask * 255.0, 0, 255).astype(np.uint8), "L").resize(
+            (window.shape[1], window.shape[0]), Image.Resampling.BILINEAR
+        )
+    ).astype(np.float32) / 255.0
+    ys, ye = (sy0 - y0), (sy0 - y0) + (sy1 - sy0)
+    xs, xe = (sx0 - x0), (sx0 - x0) + (sx1 - sx0)
+    fx = mask_small[ys:ye, xs:xe][..., None]
+    canvas[sy0:sy1, sx0:sx1] = canvas[sy0:sy1, sx0:sx1] * (1.0 - fx) + small[ys:ye, xs:xe] * fx
+    print(f"glass disc {w_mm:.2f}mm at {x_mm:.2f},{y_mm:.2f}")
+    return canvas
+
+
 def save_rgb(path, rgb):
     im = Image.fromarray(np.clip(rgb, 0, 255).astype(np.uint8), "RGB")
     im.save(path, "PNG", optimize=True)
@@ -409,6 +546,8 @@ def build_back(silk):
     if gap < 1.5:
         raise SystemExit(f"silk is {gap:.2f}mm from the QR")
     apply_phone_button(base, PHONE_BTN)
+    apply_glass_disc(base, BADGE_MAIL)
+    apply_glass_disc(base, BADGE_WEB)
     return base
 
 
@@ -434,7 +573,7 @@ def main():
         save_rgb(front_path, front)
     contrast_in(back, (7.5, 14.5, 50.0, 12.6), "back name")
     contrast_in(back, (16.5, 30.6, 22.4, 3.1), "phone label")
-    contrast_in(back, (8.0, 38.3, 50.0, 13.5), "back contacts")
+    contrast_in(back, (13.1, 38.9, 46.2, 16.6), "back contacts")
     trace_wordmark()
     n = build_qr_svg()
     module = QR_SYMBOL[2] / n
