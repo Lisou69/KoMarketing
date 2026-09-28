@@ -27,11 +27,12 @@ _spec.loader.exec_module(v1)
 DPI = v1.DPI
 px = v1.px
 INK = np.array([76.0, 5.0, 12.0], dtype=np.float32)  # #4C050C
-# Spot-UV ink. Same hue as the paper, a step darker and richer.
-GLOSS = np.array([34.0, 1.0, 5.0], dtype=np.float32)
-GLOSS_SHEEN = np.array([148.0, 64.0, 70.0], dtype=np.float32)
-GLOSS_EDGE = np.array([244.0, 226.0, 220.0], dtype=np.float32)
-GLOSS_SHADE = np.array([18.0, 0.0, 3.0], dtype=np.float32)
+# Spot UV. The body stays in the dark range; the sheen and the rim sit on top of it.
+FILL = np.array([42.0, 2.0, 6.0], dtype=np.float32)       # #2A0206
+SHEEN = np.array([112.0, 28.0, 38.0], dtype=np.float32)   # broad varnish band
+RIM = np.array([176.0, 64.0, 76.0], dtype=np.float32)     # #B0404C
+RIM_SHADE = np.array([14.0, 0.0, 2.0], dtype=np.float32)
+GLINT = np.array([236.0, 206.0, 202.0], dtype=np.float32)
 
 WORD_X, WORD_Y, WORD_W = 20.0, 23.94, 56.0
 TAG_X, TAG_Y = 13.0, 47.05
@@ -85,26 +86,60 @@ def apply_deboss(canvas, mask, shadow_gain, catch_gain, floor_gain, radius_mm):
     return canvas
 
 
+def _norm(field):
+    positive = field[field > 0.02]
+    peak = float(np.percentile(positive, 88)) if positive.size else 1.0
+    return np.clip(field / max(peak, 1e-4), 0.0, 1.0)
+
+
 def apply_gloss(canvas, mask):
-    """Tone-on-tone spot UV. Darker ink, a soft sheen, a bright top-left edge."""
+    """Spot UV on the matte sheet.
+
+    The letter body is #2A0206. A broad band of lighter varnish sits inside the
+    top-left of each stroke. A 0.12 mm rim at #B0404C catches the light, the
+    bottom-right edge goes dark, and a few curves pick up a small glint.
+    A short contact shadow sits down-right of the ink.
+    """
     coverage = np.clip(mask.astype(np.float32), 0.0, 1.0)
     if float(coverage.max()) < 0.01:
         return canvas
-    h, w = coverage.shape
-    yy, xx = np.mgrid[0:h, 0:w].astype(np.float32)
-    # Sheen follows the light, across the whole mark, and dies toward the lower right.
-    sheen = np.clip(1.05 - xx / max(w - 1, 1) * 0.85 - yy / max(h - 1, 1) * 0.55, 0.0, 1.0)
-    sheen *= gaussian_filter(coverage, sigma=max(px(0.22), 0.6))
-    sheen /= max(float(sheen.max()), 1e-4)
-    body = GLOSS * (1.0 - 0.55 * sheen[..., None]) + GLOSS_SHEEN * (0.55 * sheen[..., None])
-    s = max(px(0.10), 1.2)
-    soft = gaussian_filter(coverage, sigma=max(px(0.04), 0.35))
-    edge = np.clip(soft - slide(soft, s, s), 0.0, 1.0)
-    shade = np.clip(soft - slide(soft, -s, -s), 0.0, 1.0)
-    edge = gaussian_filter(edge, sigma=max(px(0.03), 0.25))
-    shade = gaussian_filter(shade, sigma=max(px(0.03), 0.25))
-    color = body * (1.0 - edge[..., None]) + GLOSS_EDGE * edge[..., None]
-    color = color * (1.0 - 0.72 * shade[..., None]) + GLOSS_SHADE * (0.72 * shade[..., None])
+    # Contact shadow on the paper, hidden where the ink covers it.
+    off = max(px(0.20), 1.5)
+    dropped = gaussian_filter(slide(coverage, off, off), sigma=max(px(0.14), 0.8))
+    under = dropped * (1.0 - coverage)
+    canvas -= under[..., None] * np.array([26.0, 6.0, 8.0], np.float32)
+
+    # Broad sheen: a soft band inside the top-left of every stroke, not a flat tint.
+    band_shift = max(px(0.42), 2.0)
+    band = np.clip(coverage - slide(coverage, band_shift, band_shift), 0.0, 1.0)
+    band = gaussian_filter(band, sigma=max(px(0.16), 0.8))
+    band = _norm(band) * np.clip(coverage, 0.0, 1.0)
+    body = FILL * (1.0 - band[..., None]) + SHEEN * band[..., None]
+
+    # Crisp rims, about 0.12 mm. Barely smoothed, so they stay sharp at 600 dpi.
+    rim = max(px(0.12), 1.6)
+    edge = np.clip(coverage - slide(coverage, rim, rim), 0.0, 1.0)
+    shade = np.clip(coverage - slide(coverage, -rim, -rim), 0.0, 1.0)
+    edge = gaussian_filter(edge, sigma=0.45)
+    shade = gaussian_filter(shade, sigma=0.45)
+    edge = _norm(edge)
+    shade = _norm(shade)
+
+    # Glints where a curve faces the light. Kept small.
+    blurred = gaussian_filter(coverage, sigma=max(px(0.08), 0.6))
+    gy, gx = np.gradient(blurred)
+    mag = np.hypot(gx, gy) + 1e-6
+    lx, ly = -0.52, -0.85
+    ln = np.hypot(lx, ly)
+    facing = np.clip(((-gx / mag) * lx + (-gy / mag) * ly) / ln, 0.0, 1.0)
+    glint = (facing ** 5) * edge
+    glint = np.where(glint > 0.42, glint, 0.0)
+    glint = gaussian_filter(glint, sigma=0.35)
+    glint = _norm(glint) * 0.92
+
+    color = body * (1.0 - edge[..., None]) + RIM * edge[..., None]
+    color = color * (1.0 - 0.88 * shade[..., None]) + RIM_SHADE * (0.88 * shade[..., None])
+    color = color * (1.0 - glint[..., None]) + GLINT * glint[..., None]
     canvas[:] = canvas * (1.0 - coverage[..., None]) + color * coverage[..., None]
     np.clip(canvas, 0.0, 255.0, out=canvas)
     return canvas
@@ -250,7 +285,7 @@ def build_front(masks, shape):
     img = paper(*shape)
     # Oversized KO script, cropped by the card. Same artwork as the small mark.
     giant = paste_centered(shape, masks["mark"], 640.0, (48.0, 30.5))
-    apply_deboss(img, giant, shadow_gain=28.0, catch_gain=20.0, floor_gain=8.0, radius_mm=0.28)
+    apply_deboss(img, giant, shadow_gain=14.0, catch_gain=9.0, floor_gain=3.5, radius_mm=0.24)
     word = paste_at(shape, masks["mark"], WORD_X, WORD_Y, WORD_W)
     # 32 pt shot scaled to the 8 pt tagline. 8/32 = 0.25 of the rendered CSS width.
     tag_w = masks["tag"].shape[1] / 2.0 * 25.4 / 96.0 * (8.0 / 32.0)
@@ -284,7 +319,7 @@ def build_back_b(masks, shape):
     # so the ends and the tops of the letters crop off.
     # Cap height fills the sheet. The line is wider than the card, so the ends crop off.
     phrase = paste_centered(shape, masks["phrase"], 520.0, (48.0, 30.5))
-    apply_deboss(img, phrase, shadow_gain=24.0, catch_gain=17.0, floor_gain=7.0, radius_mm=0.32)
+    apply_deboss(img, phrase, shadow_gain=40.0, catch_gain=26.0, floor_gain=12.0, radius_mm=0.38)
     v1.apply_phone_button(img, v1.PHONE_BTN)
     v1.apply_glass_disc(img, v1.BADGE_MAIL)
     v1.apply_glass_disc(img, v1.BADGE_WEB)
@@ -327,6 +362,39 @@ def check_contrast(name, rgb):
     return worst
 
 
+def check_gloss(front, mark):
+    """Fill alone, against the paper. Relative luminance of the dark body."""
+    shape = front.shape[:2]
+    mask = paste_at(shape, mark, WORD_X, WORD_Y, WORD_W)
+    solid = mask > 0.90
+    if int(solid.sum()) < 50:
+        raise SystemExit("gloss fill sample is empty")
+    # The darkest solid pixels are the fill, before the rim and the sheen band.
+    pixels = front[solid]
+    fill = pixels[np.argsort(v1._linear_y(pixels))[int(len(pixels) * 0.15)]]
+    ys, xs = np.where(solid)
+    pad = int(px(2.0))
+    y0, y1 = max(0, int(ys.min()) - pad), min(front.shape[0], int(ys.max()) + pad)
+    x0, x1 = max(0, int(xs.min()) - pad), min(front.shape[1], int(xs.max()) + pad)
+    window = front[y0:y1, x0:x1]
+    outside = mask[y0:y1, x0:x1] < 0.02
+    paper = window[outside]
+    paper_y = v1._linear_y(paper)
+    paper_px = paper[int(np.argmin(np.abs(paper_y - np.median(paper_y))))]
+    fill_y = v1.rel_lum(fill)
+    paper_y = v1.rel_lum(paper_px)
+    ratio = paper_y / max(fill_y, 1e-6)
+    wcag = (max(paper_y, fill_y) + 0.05) / (min(paper_y, fill_y) + 0.05)
+    print(
+        f"gloss fill {np.round(fill, 1)} {v1._hex(fill)} "
+        f"paper {np.round(paper_px, 1)} {v1._hex(paper_px)} "
+        f"Y ratio {ratio:.2f} wcag {wcag:.2f}"
+    )
+    if ratio < 1.8:
+        raise SystemExit(f"gloss fill luminance ratio {ratio:.2f} is under 1.8")
+    return ratio
+
+
 def main():
     ASSETS.mkdir(parents=True, exist_ok=True)
     shape = canvas_size()
@@ -340,6 +408,7 @@ def main():
     save_rgb(ASSETS / "back-b-bg.png", back_b)
     check_contrast("v2A", back_a)
     check_contrast("v2B", back_b)
+    check_gloss(front, masks["mark"])
     # A small contact sheet for inspection. Not part of the print files.
     for name, rgb in (("front", front), ("back-a", back_a), ("back-b", back_b)):
         im = Image.fromarray(np.clip(rgb, 0, 255).astype(np.uint8), "RGB")

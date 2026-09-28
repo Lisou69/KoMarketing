@@ -52,11 +52,21 @@ def set_boxes(path):
         writer.write(handle)
 
 
+def split_pages(src, names):
+    reader = PdfReader(str(src))
+    if len(reader.pages) != len(names):
+        raise SystemExit(f"{src.name} has {len(reader.pages)} pages, expected {len(names)}")
+    for page, name in zip(reader.pages, names):
+        writer = PdfWriter()
+        writer.add_page(page)
+        with name.open("wb") as handle:
+            writer.write(handle)
+        print("wrote", name.name)
+
+
 def render_all():
     jobs = (
-        ("?back=a", ROOT / "v2A-print.pdf"),
         ("?back=b", ROOT / "v2B-print.pdf"),
-        ("?preview&back=a", Path("/tmp/v2-preview-a.pdf")),
         ("?preview&back=b", Path("/tmp/v2-preview-b.pdf")),
     )
     with sync_playwright() as p:
@@ -68,8 +78,15 @@ def render_all():
             render_one(browser, query, path)
             print("rendered", path.name)
         browser.close()
-    set_boxes(ROOT / "v2A-print.pdf")
     set_boxes(ROOT / "v2B-print.pdf")
+    split_pages(
+        ROOT / "v2B-print.pdf",
+        [
+            ROOT / "v2B-front.pdf",
+            ROOT / "v2B-back-lisa-maretti.pdf",
+            ROOT / "v2B-back-kristina-ostapenko.pdf",
+        ],
+    )
 
 
 if __name__ == "__main__":
