@@ -24,18 +24,19 @@ QR_QUIET_MODULES = 4
 FRONT_LOGO = (20.0, 23.94, 56.0, 13.13)
 FRONT_TAG = (13.0, 47.05, 17.6, 6.0)
 INK = np.array([76.0, 5.0, 12.0], dtype=np.float32)
-# Phone pill, bleed millimetres. Height is the 8.5 pt em plus 2.5 mm above and
-# below (~30 px at 96 dpi). Width fits the longer number, a 3 mm icon, and 4 mm
-# of side padding. cards.html places the icon and the number on this shape.
-PHONE_BTN = (8.2, 22.170, 35.1, 9.0)
+# Phone pill, bleed millimetres. 35.1 × 7.5 mm, full capsule (radius = height/2).
+# The 8.5 pt number and the 2.4 mm icon stay centered on the pill. The gap to
+# the role and the gap to the email badge match the 9 mm pill. cards.html
+# places the icon and the number on this shape.
+PHONE_BTN = (8.2, 22.910, 35.1, 7.5)
 # Circular glass badges behind the mail, globe, and map-pin icons.
 # Bleed millimetres. cards.html centers a 2.4 mm icon on each circle and
 # starts the contact text on one shared left edge. Rows are 6.25 mm apart.
 BADGE_D = 5.2
 BADGE_LEFT = 8.2
-BADGE_MAIL = (BADGE_LEFT, 32.720, BADGE_D, BADGE_D)
-BADGE_WEB = (BADGE_LEFT, 38.970, BADGE_D, BADGE_D)
-BADGE_PLACE = (BADGE_LEFT, 45.220, BADGE_D, BADGE_D)
+BADGE_MAIL = (BADGE_LEFT, 31.960, BADGE_D, BADGE_D)
+BADGE_WEB = (BADGE_LEFT, 38.210, BADGE_D, BADGE_D)
+BADGE_PLACE = (BADGE_LEFT, 44.460, BADGE_D, BADGE_D)
 DEEP = np.array([16.0, 0.0, 3.0], dtype=np.float32)
 
 
@@ -736,12 +737,12 @@ def main():
     else:
         save_rgb(front_path, front)
     # Each line, both backs. The name box fits the longer name.
-    contrast_in(back, (8.2, 9.570, 46.0, 6.4), "name")
-    contrast_in(back, (8.2, 17.170, 16.5, 3.6), "role")
-    contrast_in(back, (16.6, 25.070, 22.5, 3.3), "phone")
-    contrast_in(back, (14.5, 33.570, 44.0, 3.6), "email")
-    contrast_in(back, (14.5, 39.870, 32.0, 3.6), "website")
-    contrast_in(back, (14.5, 46.070, 24.0, 3.6), "address")
+    contrast_in(back, (8.2, 10.310, 46.0, 6.4), "name")
+    contrast_in(back, (8.2, 17.910, 16.5, 3.6), "role")
+    contrast_in(back, (16.6, 25.061, 22.5, 3.3), "phone")
+    contrast_in(back, (14.5, 32.810, 44.0, 3.6), "email")
+    contrast_in(back, (14.5, 39.110, 32.0, 3.6), "website")
+    contrast_in(back, (14.5, 45.310, 24.0, 3.6), "address")
     trace_wordmark()
     n = build_qr_svg()
     module = QR_SYMBOL[2] / n
