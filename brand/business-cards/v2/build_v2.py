@@ -40,13 +40,14 @@ WORD_X, WORD_Y, WORD_W = 20.0, 23.94, 56.0
 TAG_INK_X, TAG_INK_BOTTOM = 13.0, 52.49
 TAG_SCALE = 1.18
 TAG_FILL = np.array([46.0, 2.0, 7.0], dtype=np.float32)  # #2E0207
-# "Knock" and "Out" frame the wordmark. Shared size, open tracking, centered.
-# Knock's ink width sets the scale. Tops and bottoms sit on the trim edge.
-KNOCK_INK_W = 86.0
+# "Knock" and "Out" frame the wordmark. Twenty percent taller than the
+# 18.92 mm lockup, with a fifth of each word past the trim. Tracking is
+# opened less than 0.16em so Knock only nicks the side trim and stays on the sheet.
+KNOCK_H = 18.92 * 1.20
+KNOCK_CROP = 0.20
 KNOCK_CX = 48.0
-KNOCK_TOP = 2.15
-OUT_BOTTOM = 58.85
-KNOCK_TRACK = "0.16em"
+KNOCK_TRACK = "0.09em"
+TRIM_TOP, TRIM_BOT = 3.0, 58.0
 
 
 def canvas_size():
@@ -407,10 +408,10 @@ def _ink_box(mask, thr=0.15):
     return int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1
 
 
-def _place_scaled(shape, mask, ref_mask, ref_width_mm, cx, top=None, bottom=None):
-    """Scale `mask` with `ref_mask`'s ink width, then center it on cx."""
-    rx0, _, rx1, _ = _ink_box(ref_mask)
-    mm_per = ref_width_mm / (rx1 - rx0)
+def _place_by_height(shape, mask, ref_mask, ref_height_mm, cx, top=None, bottom=None):
+    """Scale `mask` with `ref_mask`'s ink height, then center it on cx."""
+    _, ry0, _, ry1 = _ink_box(ref_mask)
+    mm_per = ref_height_mm / (ry1 - ry0)
     x0, y0, x1, y1 = _ink_box(mask)
     sprite_w = (x1 - x0) * mm_per * mask.shape[1] / (x1 - x0)
     sprite_h = sprite_w * mask.shape[0] / mask.shape[1]
@@ -446,7 +447,7 @@ def render_knock_masks():
         color: #000000;
         background: #ffffff;
         display: inline-block;
-        padding: 0.1em 0.16em 0.14em;
+        padding: 0.12em 0.2em 0.16em;
       }}
     </style></head><body>
       <p id="knock">Knock</p>
@@ -459,7 +460,7 @@ def render_knock_masks():
             executable_path="/usr/bin/google-chrome",
             args=["--no-sandbox", "--disable-dev-shm-usage"],
         )
-        page = browser.new_page(viewport={"width": 2400, "height": 900}, device_scale_factor=2)
+        page = browser.new_page(viewport={"width": 2800, "height": 1000}, device_scale_factor=2)
         page.goto(html_path.as_uri(), wait_until="networkidle")
         page.evaluate("() => document.fonts.ready")
         masks = {}
@@ -488,11 +489,16 @@ def build_front(masks, shape):
     tag_x, tag_y, tag_w = _tag_placement(masks["tag"], TAG_SCALE)
     tag = paste_at(shape, masks["tag"], tag_x, tag_y, tag_w)
     apply_tagline(img, tag)
-    # Press "Knock" along the top edge and "Out" along the bottom edge.
+    # Press "Knock" off the top trim and "Out" off the bottom trim.
     # Gloss pixels stay as they are, so the wordmark and the tagline sit on top.
     before = img.copy()
-    knock = _place_scaled(shape, masks["knock"], masks["knock"], KNOCK_INK_W, KNOCK_CX, top=KNOCK_TOP)
-    out = _place_scaled(shape, masks["out"], masks["knock"], KNOCK_INK_W, KNOCK_CX, bottom=OUT_BOTTOM)
+    _, ky0, _, ky1 = _ink_box(masks["knock"])
+    _, oy0, _, oy1 = _ink_box(masks["out"])
+    out_h = KNOCK_H * (oy1 - oy0) / (ky1 - ky0)
+    knock_top = TRIM_TOP - KNOCK_CROP * KNOCK_H
+    out_bottom = TRIM_BOT + KNOCK_CROP * out_h
+    knock = _place_by_height(shape, masks["knock"], masks["knock"], KNOCK_H, KNOCK_CX, top=knock_top)
+    out = _place_by_height(shape, masks["out"], masks["knock"], KNOCK_H, KNOCK_CX, bottom=out_bottom)
     knock = np.maximum(knock, out)
     pressed = sheet.copy()
     apply_deboss(pressed, knock, shadow_gain=40.0, catch_gain=26.0, floor_gain=12.0, radius_mm=0.38)
@@ -649,13 +655,12 @@ def _span(mask):
 
 
 def check_knock(front, before, knock):
-    """Two centered words hug the trim, clear the wordmark, and stay debossed."""
+    """Larger words run off the trim, stay clear of the wordmark, and stay debossed."""
     changed = np.abs(front - before)
     if float(changed.max()) < 1.0:
         raise SystemExit("Knock Out deboss did not land")
     mid = int(round(px(32.0)))
     upper, lower = _span(knock[:mid]), _span(knock[mid:])
-    # lower y is relative to the crop
     lower = (lower[0], lower[1], lower[2] + 32.0, lower[3] + 32.0)
     ink = knock > 0.8
     open_ink = ink & (changed.max(axis=2) > 0.6)
@@ -663,24 +668,26 @@ def check_knock(front, before, knock):
         raise SystemExit("Knock Out is hidden behind the wordmark")
     sample = front[open_ink]
     fill = np.median(sample, axis=0)
+    knock_cut = (TRIM_TOP - (upper[3] - KNOCK_H)) / KNOCK_H
     print(
         f"knock {upper[0]:.2f}–{upper[1]:.2f} x {upper[2]:.2f}–{upper[3]:.2f} mm "
+        f"cut {knock_cut:.0%} "
         f"out {lower[0]:.2f}–{lower[1]:.2f} x {lower[2]:.2f}–{lower[3]:.2f} mm "
         f"fill {np.round(fill, 1)} {v1._hex(fill)}"
     )
     for name, box in (("knock", upper), ("out", lower)):
-        left, right, top, bottom = box
+        left, right, _, _ = box
         center = (left + right) / 2.0
-        if abs(center - KNOCK_CX) > 0.6:
+        if abs(center - KNOCK_CX) > 0.8:
             raise SystemExit(f"{name} is not centered ({center:.2f})")
-        if left < 0.4 or right > 95.6 or top < 0.3 or bottom > 60.8:
-            raise SystemExit(f"{name} leaves the bleed")
-    if upper[2] > 3.4 or upper[3] > 22.6:
-        raise SystemExit("Knock is not tight to the top, or it meets the wordmark")
-    if lower[2] < 39.4 or lower[3] < 57.6:
-        raise SystemExit("Out is not clear of the wordmark, or it misses the bottom edge")
-    if upper[0] < 3.2 or upper[1] > 92.8:
-        raise SystemExit("Knock is cut off at the side of the trim")
+    if not (0.15 <= knock_cut <= 0.25):
+        raise SystemExit(f"Knock crop {knock_cut:.0%} is outside 15–25%")
+    if upper[2] > 0.4 or upper[3] > 22.2 or upper[3] < 20.2:
+        raise SystemExit("Knock does not bleed off the top, or it meets the wordmark")
+    if upper[0] < 0.15 or upper[0] > 2.2 or upper[1] < 93.8 or upper[1] > 95.9:
+        raise SystemExit("Knock side bleed is missing or too deep")
+    if lower[2] < 39.6 or lower[3] < 60.4:
+        raise SystemExit("Out meets the wordmark, or it does not bleed off the bottom")
     if float(fill[0]) > 100 or float(fill[1]) > 40:
         raise SystemExit(f"Knock Out fill {v1._hex(fill)} is not a deboss")
     bright = int(((sample[:, 0] > 150) & (sample[:, 1] > 70)).sum())
@@ -700,9 +707,8 @@ def main():
     else:
         masks = render_masks()
         np.savez(cache, **masks)
-    if "out" not in masks or os.environ.get("V2_REMASK") == "1":
-        masks.update(render_knock_masks())
-        np.savez(cache, **masks)
+    masks.update(render_knock_masks())
+    np.savez(cache, **masks)
     front, before, knock = build_front(masks, shape)
     save_rgb(ASSETS / "front-bg.png", front)
     check_gloss(front, masks["mark"])
