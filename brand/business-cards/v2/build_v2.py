@@ -26,7 +26,7 @@ _spec.loader.exec_module(v1)
 
 DPI = v1.DPI
 px = v1.px
-INK = np.array([76.0, 5.0, 12.0], dtype=np.float32)  # #4C050C
+INK = np.array([94.0, 20.0, 25.0], dtype=np.float32)  # #5E1419
 # Raised varnish. Darker than the paper, with a slight shift across the bead.
 BODY_DARK = np.array([42.0, 2.0, 6.0], dtype=np.float32)  # #2A0206
 BODY_LIGHT = np.array([50.0, 3.0, 8.0], dtype=np.float32)  # #320308
@@ -42,7 +42,7 @@ def canvas_size():
 
 
 def paper(h, w, tooth=0.016, nap=0.0):
-    """Flat uncoated sheet. The mean stays on #4C050C; the grain is the tooth.
+    """Flat uncoated sheet. The mean stays on #5E1419; the grain is the tooth.
 
     `nap` adds a fine luminance speckle so the grain stays visible on a dark red.
     A purely multiplicative tooth barely moves the green channel, and luminance
@@ -173,30 +173,29 @@ def apply_gloss(canvas, mask):
     rng = np.random.default_rng(23)
     noise = rng.random((height, wid)).astype(np.float32)
     gaps = rng.random((height, wid)).astype(np.float32)
-    short_h = gaussian_filter(noise, (0.40, 1.6))
-    short_v = gaussian_filter(noise, (1.6, 0.40))
-    long_h = gaussian_filter(noise, (0.45, 6.5))
-    long_v = gaussian_filter(noise, (6.5, 0.45))
-    gap_h = gaussian_filter(gaps, (0.35, 1.1))
-    gap_v = gaussian_filter(gaps, (1.1, 0.35))
+    # Long beads, then a slower gap field. No fine speckle inside a segment.
+    long_h = gaussian_filter(noise, (0.7, 12.0))
+    long_v = gaussian_filter(noise, (12.0, 0.7))
+    gap_h = gaussian_filter(gaps, (0.6, 4.0))
+    gap_v = gaussian_filter(gaps, (4.0, 0.6))
     tx, ty = np.abs(-ny), np.abs(nx)
-    short = short_h * tx + short_v * ty
     long = long_h * tx + long_v * ty
     gap = gap_h * tx + gap_v * ty
     edge = solid & (dist < 4.5) & (dist > 0.3)
-    short_n = _norm_in(short, edge)
     long_n = _norm_in(long, edge)
     gap_n = _norm_in(gap, edge)
-    # Beads of mixed length on thick strokes. Small type is mostly dots, and fewer of them.
-    segments = thick * np.clip((long_n - 0.50) / 0.12, 0.0, 1.0)
-    segments += (1.0 - 0.35 * thick) * np.clip((short_n - 0.55) / 0.12, 0.0, 1.0)
-    segments *= np.clip((gap_n - 0.38) / 0.22, 0.0, 1.0)
-    bar = 0.58 - 0.16 * thick
-    keep = np.clip((segments - bar) / 0.12, 0.0, 1.0)
+    segments = np.clip((long_n - 0.54) / 0.12, 0.0, 1.0)
+    segments *= np.clip((gap_n - 0.46) / 0.16, 0.0, 1.0)
+    # Small type keeps fewer of the same clean beads.
+    bar = 0.64 - 0.18 * thick
+    keep = np.clip((segments - bar) / 0.10, 0.0, 1.0)
+    # Close the little holes so a segment reads as one line, not grains.
+    keep = gaussian_filter(keep, (0.55, 2.6)) * tx + gaussian_filter(keep, (2.6, 0.55)) * ty
+    keep = np.clip((keep - 0.22) / 0.20, 0.0, 1.0)
     spec = band * (0.35 + 0.65 * face) * keep
-    spec = gaussian_filter(spec, 0.16)
+    spec = gaussian_filter(spec, (0.35, 1.5)) * tx + gaussian_filter(spec, (1.5, 0.35)) * ty
     spec *= solid
-    crest = np.clip((spec - 0.22) / 0.16, 0.0, 1.0)
+    crest = np.clip((spec - 0.20) / 0.18, 0.0, 1.0)
     # Soft pink halo, then a crisp near-white core only on the crest.
     halo = gaussian_filter((crest > 0.35).astype(np.float32), 1.25) * (0.62 + 0.2 * thick)
     halo = np.clip(halo, 0.0, 0.8) * solid
@@ -464,10 +463,10 @@ def main():
     front = build_front(masks, shape)
     save_rgb(ASSETS / "front-bg.png", front)
     check_gloss(front, masks["mark"])
-    im = Image.fromarray(np.clip(front, 0, 255).astype(np.uint8), "RGB")
-    im.thumbnail((1100, 800), Image.Resampling.LANCZOS)
-    im.save("/tmp/v2-front.jpg", quality=90)
-    print("wrote front; backs left as they are")
+    back = build_back_b(masks, shape)
+    save_rgb(ASSETS / "back-b-bg.png", back)
+    check_contrast("back-b", back)
+    print("wrote front and back B")
 
 
 if __name__ == "__main__":
