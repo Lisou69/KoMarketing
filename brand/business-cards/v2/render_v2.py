@@ -65,28 +65,37 @@ def split_pages(src, names):
 
 
 def render_all():
-    jobs = (
-        ("?back=b", ROOT / "v2B-print.pdf"),
-        ("?preview&back=b", Path("/tmp/v2-preview-b.pdf")),
-    )
+    """Refresh the front only. The two single-page B backs stay as they are."""
+    raw_path = Path("/tmp/v2B-print-raw.pdf")
     with sync_playwright() as p:
         browser = p.chromium.launch(
             executable_path="/usr/bin/google-chrome",
             args=["--no-sandbox", "--disable-dev-shm-usage"],
         )
-        for query, path in jobs:
-            render_one(browser, query, path)
-            print("rendered", path.name)
+        render_one(browser, "?back=b", raw_path)
+        print("rendered", raw_path.name)
         browser.close()
-    set_boxes(ROOT / "v2B-print.pdf")
-    split_pages(
-        ROOT / "v2B-print.pdf",
-        [
-            ROOT / "v2B-front.pdf",
-            ROOT / "v2B-back-lisa-maretti.pdf",
-            ROOT / "v2B-back-kristina-ostapenko.pdf",
-        ],
-    )
+    set_boxes(raw_path)
+    raw = PdfReader(str(raw_path))
+    if len(raw.pages) != 3:
+        raise SystemExit(f"{raw_path.name} has {len(raw.pages)} pages, expected 3")
+
+    front_path = ROOT / "v2B-front.pdf"
+    front_writer = PdfWriter()
+    front_writer.add_page(raw.pages[0])
+    with front_path.open("wb") as handle:
+        front_writer.write(handle)
+    print("wrote", front_path.name)
+
+    # Print file is the new front plus the existing B back pages, untouched.
+    print_path = ROOT / "v2B-print.pdf"
+    print_writer = PdfWriter()
+    print_writer.add_page(raw.pages[0])
+    for name in ("v2B-back-lisa-maretti.pdf", "v2B-back-kristina-ostapenko.pdf"):
+        print_writer.add_page(PdfReader(str(ROOT / name)).pages[0])
+    with print_path.open("wb") as handle:
+        print_writer.write(handle)
+    print("wrote", print_path.name)
 
 
 if __name__ == "__main__":

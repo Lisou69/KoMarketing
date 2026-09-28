@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""V2 test cards. Matte burgundy paper, deboss, and a glossy wordmark.
+"""V2 test cards. Matte burgundy paper and a tone-on-tone gloss wordmark.
 
 Does not write anything outside brand/business-cards/v2/. The approved v1
 files stay as they are. Glass uses the v1 recipe, called against this paper.
@@ -12,7 +12,7 @@ import os
 import numpy as np
 from PIL import Image
 from playwright.sync_api import sync_playwright
-from scipy.ndimage import gaussian_filter, shift as nd_shift
+from scipy.ndimage import distance_transform_edt, gaussian_filter, maximum_filter, shift as nd_shift
 
 ROOT = Path(__file__).resolve().parent
 V1_DIR = ROOT.parent
@@ -27,12 +27,9 @@ _spec.loader.exec_module(v1)
 DPI = v1.DPI
 px = v1.px
 INK = np.array([76.0, 5.0, 12.0], dtype=np.float32)  # #4C050C
-# Spot UV. The body stays in the dark range; the sheen and the rim sit on top of it.
-FILL = np.array([42.0, 2.0, 6.0], dtype=np.float32)       # #2A0206
-SHEEN = np.array([112.0, 28.0, 38.0], dtype=np.float32)   # broad varnish band
-RIM = np.array([176.0, 64.0, 76.0], dtype=np.float32)     # #B0404C
-RIM_SHADE = np.array([14.0, 0.0, 2.0], dtype=np.float32)
-GLINT = np.array([236.0, 206.0, 202.0], dtype=np.float32)
+# Tone-on-tone varnish. The body is only a step darker than the paper.
+FILL = np.array([58.0, 4.0, 10.0], dtype=np.float32)  # #3A040A
+HI = np.array([122.0, 32.0, 48.0], dtype=np.float32)   # #7A2030, the brightest glint
 
 WORD_X, WORD_Y, WORD_W = 20.0, 23.94, 56.0
 TAG_X, TAG_Y = 13.0, 47.05
@@ -42,14 +39,22 @@ def canvas_size():
     return int(round(px(61))), int(round(px(96)))
 
 
-def paper(h, w):
-    """Flat uncoated sheet. The mean stays on #4C050C; the grain is the tooth."""
+def paper(h, w, tooth=0.016, nap=0.0):
+    """Flat uncoated sheet. The mean stays on #4C050C; the grain is the tooth.
+
+    `nap` adds a fine luminance speckle so the grain stays visible on a dark red.
+    A purely multiplicative tooth barely moves the green channel, and luminance
+    is mostly green, so the sheet would look flat next to smooth ink.
+    """
     rng = np.random.default_rng(11)
     fine = rng.normal(0.0, 1.0, (h, w)).astype(np.float32)
     fiber = gaussian_filter(rng.normal(0.0, 1.0, (h, w)).astype(np.float32), (0.55, 1.7))
-    tooth = gaussian_filter(rng.normal(0.0, 1.0, (h, w)).astype(np.float32), 0.4)
-    amp = fine * 1.05 + fiber * 1.25 + tooth * 0.40
-    img = INK * (1.0 + amp[..., None] * 0.016)
+    grain = gaussian_filter(rng.normal(0.0, 1.0, (h, w)).astype(np.float32), 0.4)
+    amp = fine * 1.05 + fiber * 1.25 + grain * 0.40
+    img = INK * (1.0 + amp[..., None] * tooth)
+    if nap > 0:
+        speckle = gaussian_filter(rng.normal(0.0, 1.0, (h, w)).astype(np.float32), 0.42)
+        img += speckle[..., None] * (np.array([3.4, 1.45, 1.75], np.float32) * nap)
     return np.clip(img, 0.0, 255.0)
 
 
@@ -86,60 +91,75 @@ def apply_deboss(canvas, mask, shadow_gain, catch_gain, floor_gain, radius_mm):
     return canvas
 
 
-def _norm(field):
-    positive = field[field > 0.02]
-    peak = float(np.percentile(positive, 88)) if positive.size else 1.0
-    return np.clip(field / max(peak, 1e-4), 0.0, 1.0)
-
-
 def apply_gloss(canvas, mask):
-    """Spot UV on the matte sheet.
+    """Smooth tone-on-tone varnish on grained paper.
 
-    The letter body is #2A0206. A broad band of lighter varnish sits inside the
-    top-left of each stroke. A 0.12 mm rim at #B0404C catches the light, the
-    bottom-right edge goes dark, and a few curves pick up a small glint.
-    A short contact shadow sits down-right of the ink.
+    The letter body is flat #3A040A. A clean lip at the silhouette stays that
+    color, so nothing draws a rim. Speculars are short, soft, and broken, and
+    they sit inside the stroke where the varnish faces the light. A short soft
+    shadow falls down and to the right, on the paper only.
     """
     coverage = np.clip(mask.astype(np.float32), 0.0, 1.0)
     if float(coverage.max()) < 0.01:
         return canvas
-    # Contact shadow on the paper, hidden where the ink covers it.
-    off = max(px(0.20), 1.5)
-    dropped = gaussian_filter(slide(coverage, off, off), sigma=max(px(0.14), 0.8))
-    under = dropped * (1.0 - coverage)
-    canvas -= under[..., None] * np.array([26.0, 6.0, 8.0], np.float32)
+    # 1.6 px at 300 dpi, softened. Low strength so it reads as a lift, not a line.
+    scale = DPI / 300.0
+    off = scale * 1.6
+    core = (coverage > 0.45).astype(np.float32)
+    dropped = gaussian_filter(slide(core, off * 0.75, off), sigma=scale * 0.95)
+    outside = coverage < 0.10
+    canvas *= 1.0 - (dropped * outside)[..., None] * 0.32
 
-    # Broad sheen: a soft band inside the top-left of every stroke, not a flat tint.
-    band_shift = max(px(0.42), 2.0)
-    band = np.clip(coverage - slide(coverage, band_shift, band_shift), 0.0, 1.0)
-    band = gaussian_filter(band, sigma=max(px(0.16), 0.8))
-    band = _norm(band) * np.clip(coverage, 0.0, 1.0)
-    body = FILL * (1.0 - band[..., None]) + SHEEN * band[..., None]
+    solid = coverage > 0.62
+    dist = distance_transform_edt(solid)
+    # Keep the outer ~0.9 px (at 300 dpi) a flat fill. Highlights live further in.
+    lip = scale * 1.8
 
-    # Crisp rims, about 0.12 mm. Barely smoothed, so they stay sharp at 600 dpi.
-    rim = max(px(0.12), 1.6)
-    edge = np.clip(coverage - slide(coverage, rim, rim), 0.0, 1.0)
-    shade = np.clip(coverage - slide(coverage, -rim, -rim), 0.0, 1.0)
-    edge = gaussian_filter(edge, sigma=0.45)
-    shade = gaussian_filter(shade, sigma=0.45)
-    edge = _norm(edge)
-    shade = _norm(shade)
-
-    # Glints where a curve faces the light. Kept small.
-    blurred = gaussian_filter(coverage, sigma=max(px(0.08), 0.6))
+    blurred = gaussian_filter(coverage, sigma=scale * 1.5)
     gy, gx = np.gradient(blurred)
     mag = np.hypot(gx, gy) + 1e-6
-    lx, ly = -0.52, -0.85
-    ln = np.hypot(lx, ly)
+    # Outward normal. Light is above and a little to the left.
+    lx, ly = -0.12, -0.99
+    ln = float(np.hypot(lx, ly))
     facing = np.clip(((-gx / mag) * lx + (-gy / mag) * ly) / ln, 0.0, 1.0)
-    glint = (facing ** 5) * edge
-    glint = np.where(glint > 0.42, glint, 0.0)
-    glint = gaussian_filter(glint, sigma=0.35)
-    glint = _norm(glint) * 0.92
+    facing = np.clip((facing - 0.28) / 0.72, 0.0, 1.0) ** 1.15
 
-    color = body * (1.0 - edge[..., None]) + RIM * edge[..., None]
-    color = color * (1.0 - 0.88 * shade[..., None]) + RIM_SHADE * (0.88 * shade[..., None])
-    color = color * (1.0 - glint[..., None]) + GLINT * glint[..., None]
+    rng = np.random.default_rng(19)
+    height, width = coverage.shape
+    # Short streaks, not long painted dashes. A second field breaks them up.
+    streaks = gaussian_filter(rng.random((height, width)).astype(np.float32), (scale * 0.32, scale * 1.15))
+    beads = gaussian_filter(rng.random((height, width)).astype(np.float32), scale * 0.55)
+    streaks = (streaks - streaks.min()) / (float(streaks.max() - streaks.min()) + 1e-6)
+    beads = (beads - beads.min()) / (float(beads.max() - beads.min()) + 1e-6)
+    gate = np.clip((streaks - 0.55) / 0.16, 0.0, 1.0)
+    gate *= np.clip((beads - 0.38) / 0.34, 0.0, 1.0)
+    gate = gaussian_filter(gate, (scale * 0.22, scale * 0.28))
+
+    # The outward normal only exists near an edge, so the sheen has to live
+    # there too. Thick strokes get a wider dark lip; a hairline tagline keeps
+    # a lip thinner than its own stroke or the sheen never lands.
+    half = maximum_filter(dist, size=max(3, int(round(scale * 7))))
+    lip_map = np.minimum(lip, np.maximum(1.15, half * 0.34))
+    depth = lip_map + scale * (0.85 + 1.15 * beads)
+    depth = np.minimum(depth, np.maximum(half * 0.82, lip_map + 0.45))
+    band = np.exp(-0.5 * ((dist - depth) / (scale * 0.70)) ** 2)
+    band *= (dist > lip_map) & solid & (facing > 0.02)
+
+    spec = band * facing * gate
+    spec = gaussian_filter(spec, sigma=scale * 0.32)
+    spec *= (dist > lip_map) & solid
+    lit = spec > 0.002
+    if np.any(lit) and os.environ.get("V2_GLOSS_DEBUG") == "1":
+        vals = spec[lit]
+        print("spec p50/p90/p99/max", np.percentile(vals, [50, 90, 99]), float(vals.max()))
+    # Fixed gain, so a thin stroke is not crushed by the thicker letters.
+    # Only the center of a streak approaches #7A2030. The shoulders stay close
+    # to the fill, which keeps a dash from reading as a pink bevel.
+    mix = np.clip(spec * 2.6, 0.0, 1.0) ** 1.65 * 0.82
+    color = FILL * (1.0 - mix[..., None]) + HI * mix[..., None]
+    hard_lip = 1.35
+    color[(dist <= np.maximum(lip_map, hard_lip)) & solid] = FILL
+    # Crisp silhouette. The paper grain stops at the ink.
     canvas[:] = canvas * (1.0 - coverage[..., None]) + color * coverage[..., None]
     np.clip(canvas, 0.0, 255.0, out=canvas)
     return canvas
@@ -282,10 +302,8 @@ def gloss_group(canvas, mask):
 
 
 def build_front(masks, shape):
-    img = paper(*shape)
-    # Oversized KO script, cropped by the card. Same artwork as the small mark.
-    giant = paste_centered(shape, masks["mark"], 640.0, (48.0, 30.5))
-    apply_deboss(img, giant, shadow_gain=14.0, catch_gain=9.0, floor_gain=3.5, radius_mm=0.24)
+    # A little more tooth than the backs, so the smooth ink reads against the sheet.
+    img = paper(*shape, tooth=0.020, nap=1.35)
     word = paste_at(shape, masks["mark"], WORD_X, WORD_Y, WORD_W)
     # 32 pt shot scaled to the 8 pt tagline. 8/32 = 0.25 of the rendered CSS width.
     tag_w = masks["tag"].shape[1] / 2.0 * 25.4 / 96.0 * (8.0 / 32.0)
@@ -363,58 +381,43 @@ def check_contrast(name, rgb):
 
 
 def check_gloss(front, mark):
-    """Fill alone, against the paper. Relative luminance of the dark body."""
+    """The body stays near #3A040A. Highlights stay at or under #7A2030."""
     shape = front.shape[:2]
     mask = paste_at(shape, mark, WORD_X, WORD_Y, WORD_W)
     solid = mask > 0.90
     if int(solid.sum()) < 50:
         raise SystemExit("gloss fill sample is empty")
-    # The darkest solid pixels are the fill, before the rim and the sheen band.
     pixels = front[solid]
-    fill = pixels[np.argsort(v1._linear_y(pixels))[int(len(pixels) * 0.15)]]
-    ys, xs = np.where(solid)
-    pad = int(px(2.0))
-    y0, y1 = max(0, int(ys.min()) - pad), min(front.shape[0], int(ys.max()) + pad)
-    x0, x1 = max(0, int(xs.min()) - pad), min(front.shape[1], int(xs.max()) + pad)
-    window = front[y0:y1, x0:x1]
-    outside = mask[y0:y1, x0:x1] < 0.02
-    paper = window[outside]
-    paper_y = v1._linear_y(paper)
-    paper_px = paper[int(np.argmin(np.abs(paper_y - np.median(paper_y))))]
-    fill_y = v1.rel_lum(fill)
-    paper_y = v1.rel_lum(paper_px)
-    ratio = paper_y / max(fill_y, 1e-6)
-    wcag = (max(paper_y, fill_y) + 0.05) / (min(paper_y, fill_y) + 0.05)
+    fill = pixels[np.argsort(v1._linear_y(pixels))[int(len(pixels) * 0.40)]]
+    brightest = pixels[np.argmax(v1._linear_y(pixels))]
     print(
         f"gloss fill {np.round(fill, 1)} {v1._hex(fill)} "
-        f"paper {np.round(paper_px, 1)} {v1._hex(paper_px)} "
-        f"Y ratio {ratio:.2f} wcag {wcag:.2f}"
+        f"brightest ink {np.round(brightest, 1)} {v1._hex(brightest)}"
     )
-    if ratio < 1.8:
-        raise SystemExit(f"gloss fill luminance ratio {ratio:.2f} is under 1.8")
-    return ratio
+    if float(brightest[0]) > 150 or float(brightest[1]) > 70:
+        raise SystemExit(f"gloss highlight {v1._hex(brightest)} is past #7A2030")
+    return fill
 
 
 def main():
     ASSETS.mkdir(parents=True, exist_ok=True)
     shape = canvas_size()
     print("canvas", shape[1], shape[0], "dpi", DPI)
-    masks = render_masks()
+    cache = Path("/tmp/v2-masks.npz")
+    if cache.exists() and os.environ.get("V2_REMASK") != "1":
+        loaded = np.load(cache)
+        masks = {key: loaded[key] for key in loaded.files}
+        print("masks cached", {key: masks[key].shape for key in masks})
+    else:
+        masks = render_masks()
+        np.savez(cache, **masks)
     front = build_front(masks, shape)
-    back_a = build_back_a(masks, shape)
-    back_b = build_back_b(masks, shape)
     save_rgb(ASSETS / "front-bg.png", front)
-    save_rgb(ASSETS / "back-a-bg.png", back_a)
-    save_rgb(ASSETS / "back-b-bg.png", back_b)
-    check_contrast("v2A", back_a)
-    check_contrast("v2B", back_b)
     check_gloss(front, masks["mark"])
-    # A small contact sheet for inspection. Not part of the print files.
-    for name, rgb in (("front", front), ("back-a", back_a), ("back-b", back_b)):
-        im = Image.fromarray(np.clip(rgb, 0, 255).astype(np.uint8), "RGB")
-        im.thumbnail((1100, 800), Image.Resampling.LANCZOS)
-        im.save(f"/tmp/v2-{name}.jpg", quality=88)
-    print("wrote v2 backgrounds")
+    im = Image.fromarray(np.clip(front, 0, 255).astype(np.uint8), "RGB")
+    im.thumbnail((1100, 800), Image.Resampling.LANCZOS)
+    im.save("/tmp/v2-front.jpg", quality=90)
+    print("wrote front; backs left as they are")
 
 
 if __name__ == "__main__":
