@@ -30,8 +30,8 @@ INK = np.array([94.0, 20.0, 25.0], dtype=np.float32)  # #5E1419
 # Raised varnish. Darker than the paper, with a slight shift across the bead.
 BODY_DARK = np.array([42.0, 2.0, 6.0], dtype=np.float32)  # #2A0206
 BODY_LIGHT = np.array([50.0, 3.0, 8.0], dtype=np.float32)  # #320308
-GLOW = np.array([240.0, 208.0, 214.0], dtype=np.float32)  # #F0D0D6
-WHITE = np.array([255.0, 255.0, 255.0], dtype=np.float32)
+CORE = np.array([216.0, 160.0, 168.0], dtype=np.float32)  # #D8A0A8
+PEAK = np.array([232.0, 188.0, 194.0], dtype=np.float32)  # #E8BCC2
 
 WORD_X, WORD_Y, WORD_W = 20.0, 23.94, 56.0
 TAG_X, TAG_Y = 13.0, 47.05
@@ -104,9 +104,9 @@ def _norm_in(field, where):
 def apply_gloss(canvas, mask):
     """Raised glossy varnish. Dark smooth bead, crisp white catchlights.
 
-    The body sits around #2A0206–#320308. A thin near-white line, broken into
-    segments and dots, runs along the edges that face the light, with a soft
-    pink halo. The opposite lip is a dark rounded bevel. A soft shadow falls
+    The body sits around #2A0206–#320308. A soft pink catchlight, broken into
+    segments, runs along the edges that face the light and feathers into the
+    varnish. The opposite lip is a dark rounded bevel. A soft shadow falls
     on the paper below and to the right. Highlight width tracks the stroke.
     """
     coverage = np.clip(mask.astype(np.float32), 0.0, 1.0)
@@ -195,13 +195,20 @@ def apply_gloss(canvas, mask):
     spec = band * (0.35 + 0.65 * face) * keep
     spec = gaussian_filter(spec, (0.35, 1.5)) * tx + gaussian_filter(spec, (1.5, 0.35)) * ty
     spec *= solid
-    crest = np.clip((spec - 0.20) / 0.18, 0.0, 1.0)
-    # Soft pink halo, then a crisp near-white core only on the crest.
-    halo = gaussian_filter((crest > 0.35).astype(np.float32), 1.25) * (0.62 + 0.2 * thick)
-    halo = np.clip(halo, 0.0, 0.8) * solid
-    color = color * (1.0 - halo[..., None]) + GLOW * halo[..., None]
-    white = np.clip((crest - 0.62) / 0.22, 0.0, 1.0)
-    color = color * (1.0 - white[..., None]) + WHITE * white[..., None]
+    crest = np.clip((spec - 0.12) / 0.22, 0.0, 1.0)
+    # Wider than the old hairline, and feathered so the edge is a glow, not a pixel step.
+    feather = gaussian_filter(crest, 2.15)
+    lit = feather > 0.02
+    if np.any(lit):
+        scale = float(np.percentile(feather[lit], 99.2))
+        feather = np.clip(feather / max(scale, 1e-4), 0.0, 1.0)
+    feather *= solid
+    amount = feather ** 0.90
+    hot = np.clip((feather - 0.58) / 0.42, 0.0, 1.0) ** 1.35
+    hot = gaussian_filter(hot, 1.05) * solid
+    light = CORE * (1.0 - hot[..., None]) + PEAK * hot[..., None]
+    # The crest is the pink itself. The long tail is a partial mix, so it sinks into the varnish.
+    color = color * (1.0 - amount[..., None]) + light * amount[..., None]
 
     # Crisp silhouette. Grain stops at the ink; the catchlight stays inside it.
     canvas[:] = canvas * (1.0 - coverage[..., None]) + color * coverage[..., None]
@@ -425,7 +432,7 @@ def check_contrast(name, rgb):
 
 
 def check_gloss(front, mark):
-    """Body stays in the dark varnish range. Catchlights reach near-white."""
+    """Body stays dark. Catchlights are a soft pink, not white."""
     shape = front.shape[:2]
     mask = paste_at(shape, mark, WORD_X, WORD_Y, WORD_W)
     solid = mask > 0.90
@@ -435,16 +442,18 @@ def check_gloss(front, mark):
     order = np.argsort(v1._linear_y(pixels))
     fill = pixels[order[int(len(pixels) * 0.35)]]
     brightest = pixels[order[-1]]
-    white_n = int(((pixels[:, 0] > 230) & (pixels[:, 1] > 180)).sum())
+    pink_n = int(((pixels[:, 0] > 170) & (pixels[:, 0] < 236) & (pixels[:, 1] > 110)).sum())
     print(
         f"gloss fill {np.round(fill, 1)} {v1._hex(fill)} "
         f"brightest {np.round(brightest, 1)} {v1._hex(brightest)} "
-        f"nearwhite {white_n}"
+        f"pink {pink_n}"
     )
     if float(fill[0]) > 62:
         raise SystemExit(f"gloss fill {v1._hex(fill)} is lighter than the varnish")
-    if white_n < 30:
-        raise SystemExit("gloss catchlights are missing")
+    if float(brightest[0]) > 236 or float(brightest[1]) > 200:
+        raise SystemExit(f"catchlight {v1._hex(brightest)} is harsher than #E8BCC2")
+    if pink_n < 40:
+        raise SystemExit("soft catchlights are missing")
     return fill
 
 
@@ -463,10 +472,7 @@ def main():
     front = build_front(masks, shape)
     save_rgb(ASSETS / "front-bg.png", front)
     check_gloss(front, masks["mark"])
-    back = build_back_b(masks, shape)
-    save_rgb(ASSETS / "back-b-bg.png", back)
-    check_contrast("back-b", back)
-    print("wrote front and back B")
+    print("wrote front; backs left as they are")
 
 
 if __name__ == "__main__":
