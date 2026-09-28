@@ -30,8 +30,10 @@ INK = np.array([94.0, 20.0, 25.0], dtype=np.float32)  # #5E1419
 # Raised varnish. Darker than the paper, with a slight shift across the bead.
 BODY_DARK = np.array([42.0, 2.0, 6.0], dtype=np.float32)  # #2A0206
 BODY_LIGHT = np.array([50.0, 3.0, 8.0], dtype=np.float32)  # #320308
-CORE = np.array([216.0, 160.0, 168.0], dtype=np.float32)  # #D8A0A8
-PEAK = np.array([232.0, 188.0, 194.0], dtype=np.float32)  # #E8BCC2
+# Sheen sources. At 50% over the varnish they bake to about #8A4852 and #9A5A64.
+CORE = np.array([228.0, 141.0, 157.0], dtype=np.float32)
+PEAK = np.array([255.0, 177.0, 193.0], dtype=np.float32)
+SHEEN = 0.50
 
 WORD_X, WORD_Y, WORD_W = 20.0, 23.94, 56.0
 TAG_X, TAG_Y = 13.0, 47.05
@@ -203,11 +205,11 @@ def apply_gloss(canvas, mask):
         scale = float(np.percentile(feather[lit], 99.2))
         feather = np.clip(feather / max(scale, 1e-4), 0.0, 1.0)
     feather *= solid
-    amount = feather ** 0.90
+    # 50% at the crest, same feather shape, baked into opaque pixels.
+    amount = (feather ** 0.90) * SHEEN
     hot = np.clip((feather - 0.58) / 0.42, 0.0, 1.0) ** 1.35
     hot = gaussian_filter(hot, 1.05) * solid
     light = CORE * (1.0 - hot[..., None]) + PEAK * hot[..., None]
-    # The crest is the pink itself. The long tail is a partial mix, so it sinks into the varnish.
     color = color * (1.0 - amount[..., None]) + light * amount[..., None]
 
     # Crisp silhouette. Grain stops at the ink; the catchlight stays inside it.
@@ -442,17 +444,17 @@ def check_gloss(front, mark):
     order = np.argsort(v1._linear_y(pixels))
     fill = pixels[order[int(len(pixels) * 0.35)]]
     brightest = pixels[order[-1]]
-    pink_n = int(((pixels[:, 0] > 170) & (pixels[:, 0] < 236) & (pixels[:, 1] > 110)).sum())
+    sheen_n = int(((pixels[:, 0] > 110) & (pixels[:, 0] < 175) & (pixels[:, 1] > 45) & (pixels[:, 1] < 120)).sum())
     print(
         f"gloss fill {np.round(fill, 1)} {v1._hex(fill)} "
         f"brightest {np.round(brightest, 1)} {v1._hex(brightest)} "
-        f"pink {pink_n}"
+        f"sheen {sheen_n}"
     )
     if float(fill[0]) > 62:
         raise SystemExit(f"gloss fill {v1._hex(fill)} is lighter than the varnish")
-    if float(brightest[0]) > 236 or float(brightest[1]) > 200:
-        raise SystemExit(f"catchlight {v1._hex(brightest)} is harsher than #E8BCC2")
-    if pink_n < 40:
+    if float(brightest[0]) > 180 or float(brightest[1]) > 130:
+        raise SystemExit(f"catchlight {v1._hex(brightest)} is harsher than #9A5A64")
+    if sheen_n < 40:
         raise SystemExit("soft catchlights are missing")
     return fill
 
