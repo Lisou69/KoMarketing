@@ -36,7 +36,10 @@ PEAK = np.array([255.0, 177.0, 193.0], dtype=np.float32)
 SHEEN = 0.50
 
 WORD_X, WORD_Y, WORD_W = 20.0, 23.94, 56.0
-TAG_X, TAG_Y = 13.0, 47.05
+# Ink bottom-left of the 8 pt tagline, kept when the type grows.
+TAG_INK_X, TAG_INK_BOTTOM = 13.0, 52.49
+TAG_SCALE = 1.18
+TAG_FILL = np.array([46.0, 2.0, 7.0], dtype=np.float32)  # #2E0207
 
 
 def canvas_size():
@@ -342,6 +345,26 @@ def paste_centered(shape, coverage, width_mm, center_mm, angle=0.0, fatten_mm=0.
     return mask
 
 
+def apply_tagline(canvas, mask):
+    """Smooth dark gloss for the small line. No bevel and no catchlights.
+
+    A short, very soft shadow is the only thing that lifts it off the sheet.
+    The fill is flat #2E0207 so the strokes stay crisp.
+    """
+    coverage = np.clip(mask.astype(np.float32), 0.0, 1.0)
+    if float(coverage.max()) < 0.01:
+        return canvas
+    mm = DPI / 25.4
+    solid = (coverage > 0.45).astype(np.float32)
+    off = mm * 0.10
+    dropped = gaussian_filter(slide(solid, off * 0.45, off), sigma=mm * 0.20)
+    outside = coverage < 0.08
+    canvas *= 1.0 - (dropped * outside)[..., None] * 0.22
+    canvas[:] = canvas * (1.0 - coverage[..., None]) + TAG_FILL * coverage[..., None]
+    np.clip(canvas, 0.0, 255.0, out=canvas)
+    return canvas
+
+
 def gloss_group(canvas, mask):
     """Gloss only where the mask sits, so the sheen is per letter, not the whole card."""
     ys, xs = np.where(mask > 0.04)
@@ -354,13 +377,36 @@ def gloss_group(canvas, mask):
     return canvas
 
 
+def _tag_placement(mask, scale):
+    """Grow the 8 pt tagline from its ink bottom-left."""
+    base_w = mask.shape[1] / 2.0 * 25.4 / 96.0 * (8.0 / 32.0)
+    width = base_w * scale
+    height = width * mask.shape[0] / mask.shape[1]
+    ink = mask > 0.15
+    ys, xs = np.where(ink)
+    if len(ys) == 0:
+        raise SystemExit("tagline mask is empty")
+    left_f = float(xs.min()) / mask.shape[1]
+    bot_f = float(ys.max() + 1) / mask.shape[0]
+    x = TAG_INK_X - left_f * width
+    y = TAG_INK_BOTTOM - bot_f * height
+    return x, y, width
+
+
 def build_front(masks, shape):
     img = paper(*shape)
     word = paste_at(shape, masks["mark"], WORD_X, WORD_Y, WORD_W)
-    # 32 pt shot scaled to the 8 pt tagline. 8/32 = 0.25 of the rendered CSS width.
-    tag_w = masks["tag"].shape[1] / 2.0 * 25.4 / 96.0 * (8.0 / 32.0)
-    tag = paste_at(shape, masks["tag"], TAG_X, TAG_Y, tag_w)
-    gloss_group(img, np.maximum(word, tag))
+    # The approved logo and this line were glossed as one mask. Repeating that
+    # keeps the wordmark's catchlight field identical, then the line is replaced.
+    old_w = masks["tag"].shape[1] / 2.0 * 25.4 / 96.0 * (8.0 / 32.0)
+    old_tag = paste_at(shape, masks["tag"], 13.0, 47.05, old_w)
+    gloss_group(img, np.maximum(word, old_tag))
+    sheet = paper(*shape)
+    cut = int(round(px(44.0)))
+    img[cut:] = sheet[cut:]
+    tag_x, tag_y, tag_w = _tag_placement(masks["tag"], TAG_SCALE)
+    tag = paste_at(shape, masks["tag"], tag_x, tag_y, tag_w)
+    apply_tagline(img, tag)
     return img
 
 
@@ -458,6 +504,44 @@ def check_gloss(front, mark):
     return fill
 
 
+def check_tagline(front, tag_mask):
+    """The small line is a flat #2E0207 gloss, larger, still inside the safe box."""
+    shape = front.shape[:2]
+    tag_x, tag_y, tag_w = _tag_placement(tag_mask, TAG_SCALE)
+    mask = paste_at(shape, tag_mask, tag_x, tag_y, tag_w)
+    ink = mask > 0.45
+    if int(ink.sum()) < 40:
+        raise SystemExit("tagline ink sample is empty")
+    ys, xs = np.where(ink)
+    mm = 25.4 / DPI
+    left, right = float(xs.min()) * mm, float(xs.max() + 1) * mm
+    top, bottom = float(ys.min()) * mm, float(ys.max() + 1) * mm
+    solid = front[ink]
+    fill = np.median(solid, axis=0)
+    ratio = v1.rel_lum(INK) / v1.rel_lum(fill)
+    paper_px = INK
+    print(
+        f"tagline ink {left:.2f}–{right:.2f} x {top:.2f}–{bottom:.2f} mm "
+        f"size {right - left:.2f}×{bottom - top:.2f} "
+        f"fill {np.round(fill, 1)} {v1._hex(fill)} "
+        f"Y-ratio {ratio:.2f} vs paper {np.round(paper_px, 1)}"
+    )
+    if left < 5.9 or right > 90.1 or top < 5.9 or bottom > 55.1:
+        raise SystemExit("tagline leaves the 3 mm safe zone")
+    if abs(left - TAG_INK_X) > 0.15 or abs(bottom - TAG_INK_BOTTOM) > 0.15:
+        raise SystemExit("tagline ink bottom-left moved")
+    if not (17.57 * 1.14 <= (right - left) <= 17.57 * 1.22):
+        raise SystemExit("tagline width is outside the 15–20% increase")
+    if float(fill[0]) > 52 or float(np.max(np.abs(fill - TAG_FILL))) > 8:
+        raise SystemExit(f"tagline fill {v1._hex(fill)} is not #2E0207")
+    if ratio < 3.0:
+        raise SystemExit(f"tagline luminance contrast {ratio:.2f} is under 3")
+    bright = int(((solid[:, 0] > 80) & (solid[:, 1] > 30)).sum())
+    if bright > 0:
+        raise SystemExit(f"tagline still has {bright} catchlight pixels")
+    return ratio
+
+
 def main():
     ASSETS.mkdir(parents=True, exist_ok=True)
     shape = canvas_size()
@@ -473,10 +557,8 @@ def main():
     front = build_front(masks, shape)
     save_rgb(ASSETS / "front-bg.png", front)
     check_gloss(front, masks["mark"])
-    back = build_back_b(masks, shape)
-    save_rgb(ASSETS / "back-b-bg.png", back)
-    check_contrast("back-b", back)
-    print("wrote front and back B")
+    check_tagline(front, masks["tag"])
+    print("wrote front")
 
 
 if __name__ == "__main__":

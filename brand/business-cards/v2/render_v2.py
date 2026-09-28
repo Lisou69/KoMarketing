@@ -64,9 +64,30 @@ def split_pages(src, names):
         print("wrote", name.name)
 
 
+def stitch_print(front_src, print_path):
+    """New front page plus the already-approved back pages."""
+    front = PdfReader(str(front_src))
+    writer = PdfWriter()
+    writer.add_page(front.pages[0])
+    single = PdfWriter()
+    single.add_page(front.pages[0])
+    front_path = ROOT / "v2B-front.pdf"
+    with front_path.open("wb") as handle:
+        single.write(handle)
+    print("wrote", front_path.name)
+    for name in ("v2B-back-lisa-maretti.pdf", "v2B-back-kristina-ostapenko.pdf"):
+        back = PdfReader(str(ROOT / name))
+        if len(back.pages) != 1:
+            raise SystemExit(f"{name} should stay a single page")
+        writer.add_page(back.pages[0])
+    with print_path.open("wb") as handle:
+        writer.write(handle)
+    print("wrote", print_path.name)
+
+
 def render_all():
-    """Front and both B backs, on the lighter grained sheet."""
-    raw_path = ROOT / "v2B-print.pdf"
+    """Rebuild the front page. The two back PDFs stay byte-for-byte."""
+    raw_path = Path("/tmp/v2B-print-raw.pdf")
     preview_path = Path("/tmp/v2-preview-b.pdf")
     with sync_playwright() as p:
         browser = p.chromium.launch(
@@ -78,14 +99,7 @@ def render_all():
         print("rendered", raw_path.name, preview_path.name)
         browser.close()
     set_boxes(raw_path)
-    split_pages(
-        raw_path,
-        [
-            ROOT / "v2B-front.pdf",
-            ROOT / "v2B-back-lisa-maretti.pdf",
-            ROOT / "v2B-back-kristina-ostapenko.pdf",
-        ],
-    )
+    stitch_print(raw_path, ROOT / "v2B-print.pdf")
 
 
 if __name__ == "__main__":
