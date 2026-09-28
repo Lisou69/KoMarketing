@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Print PDFs for the two v2 backs. Each file is front, Lisa, Kristina."""
+"""Print PDFs. The front page is the pre-Knock-Out card. Both backs are new."""
 
 from pathlib import Path
 
@@ -52,18 +52,26 @@ def set_boxes(path):
         writer.write(handle)
 
 
-def stitch_print(front_src, print_path):
-    """New front page plus the already-approved back pages."""
-    front = PdfReader(str(front_src))
+def split_pages(src, names):
+    reader = PdfReader(str(src))
+    if len(reader.pages) != len(names):
+        raise SystemExit(f"{src.name} has {len(reader.pages)} pages, expected {len(names)}")
+    for page, name in zip(reader.pages, names):
+        writer = PdfWriter()
+        writer.add_page(page)
+        with name.open("wb") as handle:
+            writer.write(handle)
+        print("wrote", name.name)
+
+
+def stitch_print(front_path, back_names, print_path):
+    """Pre-Knock-Out front page plus the newly rendered backs."""
+    front = PdfReader(str(front_path))
+    if len(front.pages) != 1:
+        raise SystemExit(f"{front_path.name} should stay a single page")
     writer = PdfWriter()
     writer.add_page(front.pages[0])
-    single = PdfWriter()
-    single.add_page(front.pages[0])
-    front_path = ROOT / "v2B-front.pdf"
-    with front_path.open("wb") as handle:
-        single.write(handle)
-    print("wrote", front_path.name)
-    for name in ("v2B-back-lisa-maretti.pdf", "v2B-back-kristina-ostapenko.pdf"):
+    for name in back_names:
         back = PdfReader(str(ROOT / name))
         if len(back.pages) != 1:
             raise SystemExit(f"{name} should stay a single page")
@@ -74,7 +82,7 @@ def stitch_print(front_src, print_path):
 
 
 def render_all():
-    """Rebuild the front page. The two back PDFs stay byte-for-byte."""
+    """New backs. The front PDF stays the file from before Knock Out."""
     raw_path = Path("/tmp/v2B-print-raw.pdf")
     preview_path = Path("/tmp/v2-preview-b.pdf")
     with sync_playwright() as p:
@@ -87,7 +95,21 @@ def render_all():
         print("rendered", raw_path.name, preview_path.name)
         browser.close()
     set_boxes(raw_path)
-    stitch_print(raw_path, ROOT / "v2B-print.pdf")
+    raw = PdfReader(str(raw_path))
+    if len(raw.pages) != 3:
+        raise SystemExit(f"{raw_path.name} has {len(raw.pages)} pages, expected 3")
+    backs_only = Path("/tmp/v2B-backs-raw.pdf")
+    backs = PdfWriter()
+    backs.add_page(raw.pages[1])
+    backs.add_page(raw.pages[2])
+    with backs_only.open("wb") as handle:
+        backs.write(handle)
+    back_names = [
+        ROOT / "v2B-back-lisa-maretti.pdf",
+        ROOT / "v2B-back-kristina-ostapenko.pdf",
+    ]
+    split_pages(backs_only, back_names)
+    stitch_print(ROOT / "v2B-front.pdf", [path.name for path in back_names], ROOT / "v2B-print.pdf")
 
 
 if __name__ == "__main__":

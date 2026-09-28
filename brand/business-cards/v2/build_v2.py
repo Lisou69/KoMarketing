@@ -40,15 +40,17 @@ WORD_X, WORD_Y, WORD_W = 20.0, 23.94, 56.0
 TAG_INK_X, TAG_INK_BOTTOM = 13.0, 52.49
 TAG_SCALE = 1.18
 TAG_FILL = np.array([46.0, 2.0, 7.0], dtype=np.float32)  # #2E0207
-# About 10% smaller than the 27.93 mm lockup. Forty percent of Knock sits
-# above the top trim. Out keeps a third below the bottom trim. Tracking is
-# a hair tighter than -0.02em so both K's stay inside the side trim.
-KNOCK_H = 18.92 * 1.20 * 1.23 * 0.90
+# The last front lockup was 25.13 mm. The back is about 10% smaller.
+# Forty percent of Knock sits above the top trim. A third of Out sits below
+# the bottom trim. At 0.06em both K's land on the side trim.
+KNOCK_H = 18.92 * 1.20 * 1.23 * 0.90 * 0.90
 KNOCK_CROP = 0.40
 OUT_CROP = 1.0 / 3.0
 KNOCK_CX = 48.0
-KNOCK_TRACK = "-0.05em"
+KNOCK_TRACK = "0.06em"
 TRIM_TOP, TRIM_BOT = 3.0, 58.0
+# Deboss halo is about a millimetre. This clears the QR without eating the letters.
+QR_CLEAR_MM = 0.8
 
 
 def canvas_size():
@@ -490,9 +492,11 @@ def build_front(masks, shape):
     tag_x, tag_y, tag_w = _tag_placement(masks["tag"], TAG_SCALE)
     tag = paste_at(shape, masks["tag"], tag_x, tag_y, tag_w)
     apply_tagline(img, tag)
-    # Press "Knock" off the top trim and "Out" off the bottom trim.
-    # Gloss pixels stay as they are, so the wordmark and the tagline sit on top.
-    before = img.copy()
+    return img
+
+
+def place_knock(shape, masks):
+    """Knock off the top trim, Out off the bottom, both centered."""
     _, ky0, _, ky1 = _ink_box(masks["knock"])
     _, oy0, _, oy1 = _ink_box(masks["out"])
     out_h = KNOCK_H * (oy1 - oy0) / (ky1 - ky0)
@@ -500,16 +504,7 @@ def build_front(masks, shape):
     out_bottom = TRIM_BOT + OUT_CROP * out_h
     knock = _place_by_height(shape, masks["knock"], masks["knock"], KNOCK_H, KNOCK_CX, top=knock_top)
     out = _place_by_height(shape, masks["out"], masks["knock"], KNOCK_H, KNOCK_CX, bottom=out_bottom)
-    knock = np.maximum(knock, out)
-    pressed = sheet.copy()
-    apply_deboss(pressed, knock, shadow_gain=40.0, catch_gain=26.0, floor_gain=12.0, radius_mm=0.38)
-    delta = pressed - sheet
-    owned = np.abs(before - sheet).max(axis=2) > 1.5
-    effect = (np.abs(delta).max(axis=2) > 0.35) & ~owned
-    img[effect] = np.clip(img[effect] + delta[effect], 0.0, 255.0)
-    if float(np.abs(img[owned] - before[owned]).max()) > 0.05:
-        raise SystemExit("wordmark or tagline pixels moved")
-    return img, before, knock
+    return np.maximum(knock, out)
 
 
 def build_back_a(masks, shape):
@@ -531,18 +526,29 @@ def build_back_a(masks, shape):
     return img
 
 
+def _restore_rect(img, sheet, box, margin_mm):
+    x, y, w, h = box
+    H, W = img.shape[:2]
+    x0 = max(0, int(round(px(x - margin_mm))))
+    y0 = max(0, int(round(px(y - margin_mm))))
+    x1 = min(W, int(round(px(x + w + margin_mm))))
+    y1 = min(H, int(round(px(y + h + margin_mm))))
+    img[y0:y1, x0:x1] = sheet[y0:y1, x0:x1]
+    return x0, y0, x1, y1
+
+
 def build_back_b(masks, shape):
+    """Knock / Out deboss under the same glass as v1. The QR stays plain paper."""
     img = paper(*shape)
-    # One line, taller than the card is comfortable and wider than the bleed,
-    # so the ends and the tops of the letters crop off.
-    # Cap height fills the sheet. The line is wider than the card, so the ends crop off.
-    phrase = paste_centered(shape, masks["phrase"], 520.0, (48.0, 30.5))
-    apply_deboss(img, phrase, shadow_gain=40.0, catch_gain=26.0, floor_gain=12.0, radius_mm=0.38)
+    knock = place_knock(shape, masks)
+    apply_deboss(img, knock, shadow_gain=40.0, catch_gain=26.0, floor_gain=12.0, radius_mm=0.38)
+    sheet = paper(*shape)
+    _restore_rect(img, sheet, v1.QR_SYMBOL[:4], QR_CLEAR_MM)
     v1.apply_phone_button(img, v1.PHONE_BTN)
     v1.apply_glass_disc(img, v1.BADGE_MAIL)
     v1.apply_glass_disc(img, v1.BADGE_WEB)
     v1.apply_glass_disc(img, v1.BADGE_PLACE)
-    return img
+    return img, knock
 
 
 def save_rgb(path, rgb):
@@ -655,19 +661,25 @@ def _span(mask):
     )
 
 
-def check_knock(front, before, knock):
-    """Larger words run off the trim, stay clear of the wordmark, and stay debossed."""
-    changed = np.abs(front - before)
+def check_knock(back, knock):
+    """Knock is cropped at the top and the side trim. Out bleeds off the bottom."""
+    sheet = paper(*back.shape[:2])
+    changed = np.abs(back - sheet)
     if float(changed.max()) < 1.0:
         raise SystemExit("Knock Out deboss did not land")
     mid = int(round(px(32.0)))
     upper, lower = _span(knock[:mid]), _span(knock[mid:])
     lower = (lower[0], lower[1], lower[2] + 32.0, lower[3] + 32.0)
     ink = knock > 0.8
-    open_ink = ink & (changed.max(axis=2) > 0.6)
+    # Glass sits on top of the press. Sample the open sheet only.
+    keep = v1._glass_keep_mask(back.shape)
+    qx, qy, qs, _ = v1.QR_SYMBOL
+    x0, y0, x1, y1 = _restore_rect(np.zeros(back.shape[:2]), np.zeros(back.shape[:2]), (qx, qy, qs, qs), QR_CLEAR_MM)
+    keep[y0:y1, x0:x1] = False
+    open_ink = ink & keep & (changed.max(axis=2) > 0.6)
     if int(open_ink.sum()) < 80:
-        raise SystemExit("Knock Out is hidden behind the wordmark")
-    sample = front[open_ink]
+        raise SystemExit("Knock Out deboss is missing from the open sheet")
+    sample = back[open_ink]
     fill = np.median(sample, axis=0)
     knock_cut = (TRIM_TOP - (upper[3] - KNOCK_H)) / KNOCK_H
     print(
@@ -683,17 +695,28 @@ def check_knock(front, before, knock):
             raise SystemExit(f"{name} is not centered ({center:.2f})")
     if not (0.37 <= knock_cut <= 0.44):
         raise SystemExit(f"Knock crop {knock_cut:.0%} is outside about 40%")
-    if upper[2] > 0.35 or upper[3] > 19.2 or upper[3] < 17.4:
-        raise SystemExit("Knock is not high enough, or it meets the wordmark")
-    if upper[0] < 2.5 or upper[0] > 7.0 or upper[1] < 89.0 or upper[1] > 93.5:
-        raise SystemExit("Knock's K's are not inside the side trim")
-    if lower[2] < 41.0 or lower[2] > 44.0 or lower[3] < 60.5:
-        raise SystemExit("Out meets the wordmark, or it does not bleed off the bottom")
+    if upper[2] > 0.35 or not (16.1 <= upper[3] <= 17.1):
+        raise SystemExit("Knock is not cut at about 40% of its height")
+    # Trim is x = 3..93. The K's sit on that line.
+    if upper[0] < 1.6 or upper[0] > 4.2 or upper[1] < 91.8 or upper[1] > 94.4:
+        raise SystemExit("Knock's K's are not on the side trim")
+    if not (42.8 <= lower[2] <= 45.2) or lower[3] < 60.5:
+        raise SystemExit("Out is not cut by about a third at the bottom trim")
     if float(fill[0]) > 100 or float(fill[1]) > 40:
         raise SystemExit(f"Knock Out fill {v1._hex(fill)} is not a deboss")
     bright = int(((sample[:, 0] > 150) & (sample[:, 1] > 70)).sum())
     if bright > 0:
         raise SystemExit(f"Knock Out has {bright} gloss pixels")
+    qr = np.abs(back[int(round(px(qy))):int(round(px(qy + qs))), int(round(px(qx))):int(round(px(qx + qs)))] - sheet[int(round(px(qy))):int(round(px(qy + qs))), int(round(px(qx))):int(round(px(qx + qs)))])
+    qr_delta = float(qr.max())
+    print(f"qr paper delta {qr_delta:.3f}")
+    if qr_delta > 0.05:
+        raise SystemExit("QR area still carries the deboss")
+    letter = knock[y0:y1, x0:x1]
+    eaten = int((letter > 0.15).sum())
+    print(f"qr clear overlaps letter ink {eaten} px")
+    if eaten > 40:
+        raise SystemExit("QR clear ate the Knock Out letters")
 
 
 def main():
@@ -710,12 +733,21 @@ def main():
         np.savez(cache, **masks)
     masks.update(render_knock_masks())
     np.savez(cache, **masks)
-    front, before, knock = build_front(masks, shape)
-    save_rgb(ASSETS / "front-bg.png", front)
+    front = build_front(masks, shape)
+    approved_path = ASSETS / "front-bg.png"
+    approved = np.asarray(Image.open(approved_path).convert("RGB"))
+    rebuilt = np.clip(front, 0, 255).astype(np.uint8)
+    if approved.shape != rebuilt.shape or not np.array_equal(approved, rebuilt):
+        delta = float(np.abs(approved.astype(np.int16) - rebuilt.astype(np.int16)).max()) if approved.shape == rebuilt.shape else -1
+        raise SystemExit(f"rebuilt front does not match the pre-Knock-Out card (max diff {delta})")
+    print("front matches the pre-Knock-Out card")
     check_gloss(front, masks["mark"])
     check_tagline(front, masks["tag"])
-    check_knock(front, before, knock)
-    print("wrote front")
+    back, knock = build_back_b(masks, shape)
+    save_rgb(ASSETS / "back-b-bg.png", back)
+    check_contrast("back", back)
+    check_knock(back, knock)
+    print("wrote back")
 
 
 if __name__ == "__main__":
