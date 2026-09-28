@@ -9,9 +9,9 @@
     Preview (?preview) shows the trim only.
     The front is the silk photograph, cover-cropped to the bleed.
     Backs are the satin photograph, recolored to the logo burgundy. The phone
-    number sits on a narrow glass pill baked into that cloth. Mail and globe
-    icons sit in matching circular glass badges, also baked. The left column
-    is one group: its cap line and the address descender are equally inset
+    number sits on a narrow glass pill baked into that cloth. Mail, globe, and
+    map-pin icons sit in matching circular glass badges, also baked. The left
+    column is one group: its cap line and the address badge are equally inset
     from the 55 mm trim, and the QR is centered on that same axis. The QR is
     black modules on the satin, with no tile.
     Logo, type, icon, and QR are vectors. No opacity, masks, or blend modes.
@@ -115,7 +115,7 @@
     .name {
       position: absolute;
       left: 8.2mm;
-      top: 10.218mm;
+      top: 9.670mm;
       font-family: "Source Serif 4", serif;
       font-style: italic;
       font-weight: 500;
@@ -129,7 +129,7 @@
     .role {
       position: absolute;
       left: 8.2mm;
-      top: 17.818mm;
+      top: 17.270mm;
       font-family: Manrope, sans-serif;
       font-weight: 500;
       font-size: 8.5pt;
@@ -141,7 +141,7 @@
     .phone-icon {
       position: absolute;
       left: 12.8mm;
-      top: 26.018mm;
+      top: 25.470mm;
       width: 2.4mm;
       height: 2.4mm;
       display: block;
@@ -150,7 +150,7 @@
     .phone {
       position: absolute;
       left: 16.7mm;
-      top: 25.718mm;
+      top: 25.170mm;
       font-family: Manrope, sans-serif;
       font-weight: 400;
       font-size: 8.5pt;
@@ -167,8 +167,9 @@
       height: 2.4mm;
       display: block;
     }
-    .badge-icon.mail { top: 34.668mm; }
-    .badge-icon.globe { top: 40.918mm; }
+    .badge-icon.mail { top: 34.120mm; }
+    .badge-icon.globe { top: 40.370mm; }
+    .badge-icon.pin { top: 46.620mm; }
 
     .contact-line {
       position: absolute;
@@ -181,14 +182,14 @@
       color: #ffffff;
       white-space: nowrap;
     }
-    .contact-line.email { top: 34.388mm; }
-    .contact-line.web { top: 40.638mm; }
-    .contact-line.place { top: 46.888mm; }
+    .contact-line.email { top: 33.840mm; }
+    .contact-line.web { top: 40.090mm; }
+    .contact-line.place { top: 46.340mm; }
 
     .qr {
       position: absolute;
       left: 60.7mm;
-      top: 18.465mm;
+      top: 18.400mm;
       width: 24.2mm;
       height: 24.2mm;
     }
@@ -227,6 +228,7 @@
       <p class="contact-line email">lisa@komarketingagency.com</p>
       <img class="badge-icon globe" src="assets/globe.svg" alt="">
       <p class="contact-line web">komarketingagency.com</p>
+      <img class="badge-icon pin" src="assets/pin.svg" alt="">
       <p class="contact-line place">Bangkok, Thailand</p>
       <div class="qr"><img src="assets/qr.svg" alt=""></div>
     </div>
@@ -247,6 +249,7 @@
       <p class="contact-line email">kristina@komarketingagency.com</p>
       <img class="badge-icon globe" src="assets/globe.svg" alt="">
       <p class="contact-line web">komarketingagency.com</p>
+      <img class="badge-icon pin" src="assets/pin.svg" alt="">
       <p class="contact-line place">Bangkok, Thailand</p>
       <div class="qr"><img src="assets/qr.svg" alt=""></div>
     </div>

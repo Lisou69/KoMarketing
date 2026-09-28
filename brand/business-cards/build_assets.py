@@ -18,7 +18,7 @@ DPI = int(os.environ.get("CARD_DPI", "600"))
 # Millimetres from the bleed origin. cards.html uses the same numbers.
 # The symbol includes a 4-module quiet zone. Black modules sit on the satin;
 # the quiet zone and the gaps are the cloth itself. Bleed millimetres.
-QR_SYMBOL = (60.7, 18.465, 24.2, 24.2)
+QR_SYMBOL = (60.7, 18.400, 24.2, 24.2)
 QR_QUIET_MODULES = 4
 # Front. Bleed coordinates. The wordmark is 56 mm wide and centered. The tagline stays lower left.
 FRONT_LOGO = (20.0, 23.94, 56.0, 13.13)
@@ -27,14 +27,15 @@ INK = np.array([76.0, 5.0, 12.0], dtype=np.float32)
 # Phone pill, bleed millimetres. Height is the 8.5 pt em plus 2.5 mm above and
 # below (~30 px at 96 dpi). Width fits the longer number, a 3 mm icon, and 4 mm
 # of side padding. cards.html places the icon and the number on this shape.
-PHONE_BTN = (8.2, 22.718, 35.1, 9.0)
-# Circular glass badges behind the mail and globe icons. Bleed millimetres.
-# cards.html centers a 2.4 mm icon on each circle and starts the contact text
-# on one shared left edge. The address has no badge.
+PHONE_BTN = (8.2, 22.170, 35.1, 9.0)
+# Circular glass badges behind the mail, globe, and map-pin icons.
+# Bleed millimetres. cards.html centers a 2.4 mm icon on each circle and
+# starts the contact text on one shared left edge. Rows are 6.25 mm apart.
 BADGE_D = 5.2
 BADGE_LEFT = 8.2
-BADGE_MAIL = (BADGE_LEFT, 33.268, BADGE_D, BADGE_D)
-BADGE_WEB = (BADGE_LEFT, 39.518, BADGE_D, BADGE_D)
+BADGE_MAIL = (BADGE_LEFT, 32.720, BADGE_D, BADGE_D)
+BADGE_WEB = (BADGE_LEFT, 38.970, BADGE_D, BADGE_D)
+BADGE_PLACE = (BADGE_LEFT, 45.220, BADGE_D, BADGE_D)
 DEEP = np.array([16.0, 0.0, 3.0], dtype=np.float32)
 
 
@@ -505,6 +506,7 @@ def _glass_keep_mask(shape):
     blank(PHONE_BTN, 3.5, 0.8)
     blank(BADGE_MAIL, 2.6, 0.6)
     blank(BADGE_WEB, 2.6, 0.6)
+    blank(BADGE_PLACE, 2.6, 0.6)
     return keep
 
 
@@ -710,6 +712,7 @@ def build_back():
     apply_phone_button(base, PHONE_BTN)
     apply_glass_disc(base, BADGE_MAIL)
     apply_glass_disc(base, BADGE_WEB)
+    apply_glass_disc(base, BADGE_PLACE)
     return base
 
 
@@ -733,12 +736,12 @@ def main():
     else:
         save_rgb(front_path, front)
     # Each line, both backs. The name box fits the longer name.
-    contrast_in(back, (8.2, 10.118, 46.0, 6.4), "name")
-    contrast_in(back, (8.2, 17.718, 16.5, 3.6), "role")
-    contrast_in(back, (16.6, 25.618, 22.5, 3.3), "phone")
-    contrast_in(back, (14.5, 34.118, 44.0, 3.6), "email")
-    contrast_in(back, (14.5, 40.418, 32.0, 3.6), "website")
-    contrast_in(back, (14.5, 46.618, 24.0, 3.6), "address")
+    contrast_in(back, (8.2, 9.570, 46.0, 6.4), "name")
+    contrast_in(back, (8.2, 17.170, 16.5, 3.6), "role")
+    contrast_in(back, (16.6, 25.070, 22.5, 3.3), "phone")
+    contrast_in(back, (14.5, 33.570, 44.0, 3.6), "email")
+    contrast_in(back, (14.5, 39.870, 32.0, 3.6), "website")
+    contrast_in(back, (14.5, 46.070, 24.0, 3.6), "address")
     trace_wordmark()
     n = build_qr_svg()
     module = QR_SYMBOL[2] / n
