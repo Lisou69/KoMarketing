@@ -42,12 +42,12 @@ TAG_SCALE = 1.18
 TAG_FILL = np.array([46.0, 2.0, 7.0], dtype=np.float32)  # #2E0207
 # About 10% smaller than the 27.93 mm lockup. Forty percent of Knock sits
 # above the top trim. Out keeps a third below the bottom trim. Tracking is
-# tightened to -0.02em so both K's sit on the side trim.
+# a hair tighter than -0.02em so both K's stay inside the side trim.
 KNOCK_H = 18.92 * 1.20 * 1.23 * 0.90
 KNOCK_CROP = 0.40
 OUT_CROP = 1.0 / 3.0
 KNOCK_CX = 48.0
-KNOCK_TRACK = "-0.02em"
+KNOCK_TRACK = "-0.05em"
 TRIM_TOP, TRIM_BOT = 3.0, 58.0
 
 
@@ -685,8 +685,8 @@ def check_knock(front, before, knock):
         raise SystemExit(f"Knock crop {knock_cut:.0%} is outside about 40%")
     if upper[2] > 0.35 or upper[3] > 19.2 or upper[3] < 17.4:
         raise SystemExit("Knock is not high enough, or it meets the wordmark")
-    if upper[0] < 2.3 or upper[0] > 4.2 or upper[1] < 91.8 or upper[1] > 93.8:
-        raise SystemExit("Knock's K's are not on the side trim")
+    if upper[0] < 2.5 or upper[0] > 7.0 or upper[1] < 89.0 or upper[1] > 93.5:
+        raise SystemExit("Knock's K's are not inside the side trim")
     if lower[2] < 41.0 or lower[2] > 44.0 or lower[3] < 60.5:
         raise SystemExit("Out meets the wordmark, or it does not bleed off the bottom")
     if float(fill[0]) > 100 or float(fill[1]) > 40:
