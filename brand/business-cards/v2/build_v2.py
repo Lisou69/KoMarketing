@@ -27,9 +27,11 @@ _spec.loader.exec_module(v1)
 DPI = v1.DPI
 px = v1.px
 INK = np.array([76.0, 5.0, 12.0], dtype=np.float32)  # #4C050C
-# Tone-on-tone varnish. The body is only a step darker than the paper.
-FILL = np.array([58.0, 4.0, 10.0], dtype=np.float32)  # #3A040A
-HI = np.array([122.0, 32.0, 48.0], dtype=np.float32)   # #7A2030, the brightest glint
+# Raised varnish. Darker than the paper, with a slight shift across the bead.
+BODY_DARK = np.array([42.0, 2.0, 6.0], dtype=np.float32)  # #2A0206
+BODY_LIGHT = np.array([50.0, 3.0, 8.0], dtype=np.float32)  # #320308
+GLOW = np.array([240.0, 208.0, 214.0], dtype=np.float32)  # #F0D0D6
+WHITE = np.array([255.0, 255.0, 255.0], dtype=np.float32)
 
 WORD_X, WORD_Y, WORD_W = 20.0, 23.94, 56.0
 TAG_X, TAG_Y = 13.0, 47.05
@@ -91,75 +93,118 @@ def apply_deboss(canvas, mask, shadow_gain, catch_gain, floor_gain, radius_mm):
     return canvas
 
 
-def apply_gloss(canvas, mask):
-    """Smooth tone-on-tone varnish on grained paper.
+def _norm_in(field, where):
+    sample = field[where]
+    if sample.size < 20:
+        return np.zeros_like(field)
+    lo, hi = np.percentile(sample, [4, 96])
+    return np.clip((field - lo) / (float(hi - lo) + 1e-6), 0.0, 1.0)
 
-    The letter body is flat #3A040A. A clean lip at the silhouette stays that
-    color, so nothing draws a rim. Speculars are short, soft, and broken, and
-    they sit inside the stroke where the varnish faces the light. A short soft
-    shadow falls down and to the right, on the paper only.
+
+def apply_gloss(canvas, mask):
+    """Raised glossy varnish. Dark smooth bead, crisp white catchlights.
+
+    The body sits around #2A0206–#320308. A thin near-white line, broken into
+    segments and dots, runs along the edges that face the light, with a soft
+    pink halo. The opposite lip is a dark rounded bevel. A soft shadow falls
+    on the paper below and to the right. Highlight width tracks the stroke.
     """
     coverage = np.clip(mask.astype(np.float32), 0.0, 1.0)
     if float(coverage.max()) < 0.01:
         return canvas
-    # 1.6 px at 300 dpi, softened. Low strength so it reads as a lift, not a line.
-    scale = DPI / 300.0
-    off = scale * 1.6
-    core = (coverage > 0.45).astype(np.float32)
-    dropped = gaussian_filter(slide(core, off * 0.75, off), sigma=scale * 0.95)
-    outside = coverage < 0.10
-    canvas *= 1.0 - (dropped * outside)[..., None] * 0.32
-
-    solid = coverage > 0.62
+    mm = DPI / 25.4
+    solid = coverage > 0.52
     dist = distance_transform_edt(solid)
-    # Keep the outer ~0.9 px (at 300 dpi) a flat fill. Highlights live further in.
-    lip = scale * 1.8
+    # Local half-width, sampled near the edge. Distinguishes the tagline from KO.
+    half = maximum_filter(dist, size=max(3, int(round(mm * 0.55))))
+    thick = np.clip((half - 2.6) / 5.5, 0.0, 1.0)
 
-    blurred = gaussian_filter(coverage, sigma=scale * 1.5)
+    blurred = gaussian_filter(coverage, sigma=max(mm * 0.06, 0.8))
     gy, gx = np.gradient(blurred)
     mag = np.hypot(gx, gy) + 1e-6
-    # Outward normal. Light is above and a little to the left.
-    lx, ly = -0.12, -0.99
+    # Outward normal. y grows downward, so up is -y. Light is above-left.
+    nx, ny = -gx / mag, -gy / mag
+    lx, ly = -0.34, -0.94
     ln = float(np.hypot(lx, ly))
-    facing = np.clip(((-gx / mag) * lx + (-gy / mag) * ly) / ln, 0.0, 1.0)
-    facing = np.clip((facing - 0.28) / 0.72, 0.0, 1.0) ** 1.15
+    ndot = (nx * lx + ny * ly) / ln
+    face = np.clip((ndot - 0.02) / 0.62, 0.0, 1.0)
+    away = np.clip((-ndot - 0.02) / 0.55, 0.0, 1.0)
 
-    rng = np.random.default_rng(19)
-    height, width = coverage.shape
-    # Short streaks, not long painted dashes. A second field breaks them up.
-    streaks = gaussian_filter(rng.random((height, width)).astype(np.float32), (scale * 0.32, scale * 1.15))
-    beads = gaussian_filter(rng.random((height, width)).astype(np.float32), scale * 0.55)
-    streaks = (streaks - streaks.min()) / (float(streaks.max() - streaks.min()) + 1e-6)
-    beads = (beads - beads.min()) / (float(beads.max() - beads.min()) + 1e-6)
-    gate = np.clip((streaks - 0.55) / 0.16, 0.0, 1.0)
-    gate *= np.clip((beads - 0.38) / 0.34, 0.0, 1.0)
-    gate = gaussian_filter(gate, (scale * 0.22, scale * 0.28))
+    # Soft cast shadow on the paper, down and to the right.
+    off = mm * 0.20
+    core = solid.astype(np.float32)
+    broad = gaussian_filter(slide(core, off * 0.55, off), sigma=mm * 0.16)
+    tight = gaussian_filter(slide(core, off * 0.28, off * 0.42), sigma=mm * 0.055)
+    outside = coverage < 0.10
+    shade = np.clip(broad * 0.72 + tight * 0.55, 0.0, 1.0) * outside
+    canvas *= 1.0 - shade[..., None] * 0.50
 
-    # The outward normal only exists near an edge, so the sheen has to live
-    # there too. Thick strokes get a wider dark lip; a hairline tagline keeps
-    # a lip thinner than its own stroke or the sheen never lands.
-    half = maximum_filter(dist, size=max(3, int(round(scale * 7))))
-    lip_map = np.minimum(lip, np.maximum(1.15, half * 0.34))
-    depth = lip_map + scale * (0.85 + 1.15 * beads)
-    depth = np.minimum(depth, np.maximum(half * 0.82, lip_map + 0.45))
-    band = np.exp(-0.5 * ((dist - depth) / (scale * 0.70)) ** 2)
-    band *= (dist > lip_map) & solid & (facing > 0.02)
+    # Interior gradient, light side #320308, shadow side #2A0206.
+    signed = ndot * solid.astype(np.float32)
+    near = gaussian_filter(signed, 1.6)
+    mid = gaussian_filter(signed, 5.5)
+    far = gaussian_filter(signed, 14.0)
+    w_far = np.clip((half - 8.0) / 14.0, 0.0, 1.0)
+    w_mid = np.clip(half / 9.0, 0.0, 1.0) * (1.0 - w_far)
+    w_near = np.clip(1.0 - w_mid - w_far, 0.0, 1.0)
+    grad = near * w_near + mid * w_mid + far * w_far
+    if np.any(solid):
+        lo, hi = np.percentile(grad[solid], [8, 92])
+        t = np.clip((grad - lo) / (float(hi - lo) + 1e-6), 0.0, 1.0)
+    else:
+        t = np.zeros_like(grad)
+    color = BODY_DARK * (1.0 - t[..., None]) + BODY_LIGHT * t[..., None]
 
-    spec = band * facing * gate
-    spec = gaussian_filter(spec, sigma=scale * 0.32)
-    spec *= (dist > lip_map) & solid
-    lit = spec > 0.002
-    if np.any(lit) and os.environ.get("V2_GLOSS_DEBUG") == "1":
-        vals = spec[lit]
-        print("spec p50/p90/p99/max", np.percentile(vals, [50, 90, 99]), float(vals.max()))
-    # Fixed gain, so a thin stroke is not crushed by the thicker letters.
-    # Only the center of a streak approaches #7A2030. The shoulders stay close
-    # to the fill, which keeps a dash from reading as a pink bevel.
-    mix = np.clip(spec * 2.6, 0.0, 1.0) ** 1.65 * 0.82
-    color = FILL * (1.0 - mix[..., None]) + HI * mix[..., None]
-    hard_lip = 1.35
-    color[(dist <= np.maximum(lip_map, hard_lip)) & solid] = FILL
-    # Crisp silhouette. The paper grain stops at the ink.
+    # Dark rounded lip on the side facing away from the light.
+    bevel_w = np.clip(0.8 + thick * 1.6, 0.7, 2.4)
+    bevel = np.exp(-0.5 * ((dist - bevel_w * 0.85) / bevel_w) ** 2)
+    bevel *= away * solid * np.clip(dist / 0.6, 0.0, 1.0)
+    bevel = gaussian_filter(bevel, 0.7)
+    color *= 1.0 - np.clip(bevel, 0.0, 1.0)[..., None] * 0.72
+
+    # Catchlights. Width 0.05 mm on small type, up to 0.12 mm on the wordmark.
+    width = (0.05 + thick * 0.07) * mm
+    sigma = np.maximum(width * 0.30, 0.36)
+    peak = np.clip(width * 0.72, 0.7, 2.1)
+    band = np.exp(-0.5 * ((dist - peak) / sigma) ** 2)
+    band *= solid & (dist > 0.30) & (face > 0.04)
+
+    height, wid = coverage.shape
+    rng = np.random.default_rng(23)
+    noise = rng.random((height, wid)).astype(np.float32)
+    gaps = rng.random((height, wid)).astype(np.float32)
+    short_h = gaussian_filter(noise, (0.40, 1.6))
+    short_v = gaussian_filter(noise, (1.6, 0.40))
+    long_h = gaussian_filter(noise, (0.45, 6.5))
+    long_v = gaussian_filter(noise, (6.5, 0.45))
+    gap_h = gaussian_filter(gaps, (0.35, 1.1))
+    gap_v = gaussian_filter(gaps, (1.1, 0.35))
+    tx, ty = np.abs(-ny), np.abs(nx)
+    short = short_h * tx + short_v * ty
+    long = long_h * tx + long_v * ty
+    gap = gap_h * tx + gap_v * ty
+    edge = solid & (dist < 4.5) & (dist > 0.3)
+    short_n = _norm_in(short, edge)
+    long_n = _norm_in(long, edge)
+    gap_n = _norm_in(gap, edge)
+    # Beads of mixed length on thick strokes. Small type is mostly dots, and fewer of them.
+    segments = thick * np.clip((long_n - 0.50) / 0.12, 0.0, 1.0)
+    segments += (1.0 - 0.35 * thick) * np.clip((short_n - 0.55) / 0.12, 0.0, 1.0)
+    segments *= np.clip((gap_n - 0.38) / 0.22, 0.0, 1.0)
+    bar = 0.58 - 0.16 * thick
+    keep = np.clip((segments - bar) / 0.12, 0.0, 1.0)
+    spec = band * (0.35 + 0.65 * face) * keep
+    spec = gaussian_filter(spec, 0.16)
+    spec *= solid
+    crest = np.clip((spec - 0.22) / 0.16, 0.0, 1.0)
+    # Soft pink halo, then a crisp near-white core only on the crest.
+    halo = gaussian_filter((crest > 0.35).astype(np.float32), 1.25) * (0.62 + 0.2 * thick)
+    halo = np.clip(halo, 0.0, 0.8) * solid
+    color = color * (1.0 - halo[..., None]) + GLOW * halo[..., None]
+    white = np.clip((crest - 0.62) / 0.22, 0.0, 1.0)
+    color = color * (1.0 - white[..., None]) + WHITE * white[..., None]
+
+    # Crisp silhouette. Grain stops at the ink; the catchlight stays inside it.
     canvas[:] = canvas * (1.0 - coverage[..., None]) + color * coverage[..., None]
     np.clip(canvas, 0.0, 255.0, out=canvas)
     return canvas
@@ -381,21 +426,26 @@ def check_contrast(name, rgb):
 
 
 def check_gloss(front, mark):
-    """The body stays near #3A040A. Highlights stay at or under #7A2030."""
+    """Body stays in the dark varnish range. Catchlights reach near-white."""
     shape = front.shape[:2]
     mask = paste_at(shape, mark, WORD_X, WORD_Y, WORD_W)
     solid = mask > 0.90
     if int(solid.sum()) < 50:
         raise SystemExit("gloss fill sample is empty")
     pixels = front[solid]
-    fill = pixels[np.argsort(v1._linear_y(pixels))[int(len(pixels) * 0.40)]]
-    brightest = pixels[np.argmax(v1._linear_y(pixels))]
+    order = np.argsort(v1._linear_y(pixels))
+    fill = pixels[order[int(len(pixels) * 0.35)]]
+    brightest = pixels[order[-1]]
+    white_n = int(((pixels[:, 0] > 230) & (pixels[:, 1] > 180)).sum())
     print(
         f"gloss fill {np.round(fill, 1)} {v1._hex(fill)} "
-        f"brightest ink {np.round(brightest, 1)} {v1._hex(brightest)}"
+        f"brightest {np.round(brightest, 1)} {v1._hex(brightest)} "
+        f"nearwhite {white_n}"
     )
-    if float(brightest[0]) > 150 or float(brightest[1]) > 70:
-        raise SystemExit(f"gloss highlight {v1._hex(brightest)} is past #7A2030")
+    if float(fill[0]) > 62:
+        raise SystemExit(f"gloss fill {v1._hex(fill)} is lighter than the varnish")
+    if white_n < 30:
+        raise SystemExit("gloss catchlights are missing")
     return fill
 
 
