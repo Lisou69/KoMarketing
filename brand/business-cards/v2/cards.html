@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>KO Marketing Agency — business cards, v2 test</title>
+  <!--
+    V2 test. v1 files are not used as output.
+    Sheet 108 × 73 mm, 3 mm bleed, crop marks. Preview (?preview) is the trim.
+    ?back=b selects the large-phrase deboss. The default back is the swirl deboss.
+    The matte paper, deboss, gloss wordmark, and glass are baked into opaque RGB.
+    Names, icons, and the QR stay vector. No opacity, masks, or blend modes.
+  -->
+  <style>
+    @font-face {
+      font-family: "Source Serif 4";
+      font-style: italic;
+      font-weight: 500;
+      font-display: block;
+      src: url("../fonts/source-serif-4-latin-500-italic.woff2") format("woff2");
+    }
+    @font-face {
+      font-family: Manrope;
+      font-style: normal;
+      font-weight: 400;
+      font-display: block;
+      src: url("../fonts/manrope-latin-400-normal.woff2") format("woff2");
+    }
+    @font-face {
+      font-family: Manrope;
+      font-style: normal;
+      font-weight: 500;
+      font-display: block;
+      src: url("../fonts/manrope-latin-500-normal.woff2") format("woff2");
+    }
+
+    @page { size: 108mm 73mm; margin: 0; }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body { background: #4c050c; color: #ffffff; }
+
+    .sheet {
+      position: relative;
+      width: 108mm;
+      height: 73mm;
+      background: #ffffff;
+      overflow: hidden;
+      page-break-after: always;
+      break-after: page;
+    }
+    .sheet:last-child { page-break-after: auto; break-after: auto; }
+
+    .bleed {
+      position: absolute;
+      left: 6mm;
+      top: 6mm;
+      width: 96mm;
+      height: 61mm;
+      background: #4c050c;
+      overflow: hidden;
+    }
+    .bg { position: absolute; left: 0; top: 0; width: 96mm; height: 61mm; }
+
+    .mark { position: absolute; background: #000000; }
+    .mark.h { height: 0.1mm; width: 4.5mm; }
+    .mark.v { width: 0.1mm; height: 4.5mm; }
+    .h-tl { left: 1.5mm; top: 8.95mm; }
+    .v-tl { left: 8.95mm; top: 1.5mm; }
+    .h-tr { left: 102mm; top: 8.95mm; }
+    .v-tr { left: 98.95mm; top: 1.5mm; }
+    .h-bl { left: 1.5mm; top: 63.95mm; }
+    .v-bl { left: 8.95mm; top: 67mm; }
+    .h-br { left: 102mm; top: 63.95mm; }
+    .v-br { left: 98.95mm; top: 67mm; }
+
+    .name {
+      position: absolute;
+      left: 8.2mm;
+      top: 10.410mm;
+      font-family: "Source Serif 4", serif;
+      font-style: italic;
+      font-weight: 500;
+      font-size: 16pt;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      color: #ffffff;
+      white-space: nowrap;
+    }
+    .role {
+      position: absolute;
+      left: 8.2mm;
+      top: 18.010mm;
+      font-family: Manrope, sans-serif;
+      font-weight: 500;
+      font-size: 8.5pt;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      color: #ffffff;
+    }
+    .phone-icon {
+      position: absolute;
+      left: 12.8mm;
+      top: 25.460mm;
+      width: 2.4mm;
+      height: 2.4mm;
+      display: block;
+    }
+    .phone {
+      position: absolute;
+      left: 16.7mm;
+      top: 25.161mm;
+      font-family: Manrope, sans-serif;
+      font-weight: 400;
+      font-size: 8.5pt;
+      line-height: 1;
+      letter-spacing: -0.01em;
+      color: #ffffff;
+      white-space: nowrap;
+    }
+    .badge-icon {
+      position: absolute;
+      left: 9.6mm;
+      width: 2.4mm;
+      height: 2.4mm;
+      display: block;
+    }
+    .badge-icon.mail { top: 33.360mm; }
+    .badge-icon.globe { top: 39.610mm; }
+    .badge-icon.pin { top: 45.860mm; }
+    .contact-line {
+      position: absolute;
+      left: 14.55mm;
+      font-family: Manrope, sans-serif;
+      font-weight: 400;
+      font-size: 8pt;
+      line-height: 1;
+      letter-spacing: -0.01em;
+      color: #ffffff;
+      white-space: nowrap;
+    }
+    .contact-line.email { top: 33.080mm; }
+    .contact-line.web { top: 39.330mm; }
+    .contact-line.place { top: 45.580mm; }
+    .qr { position: absolute; left: 60.7mm; top: 18.400mm; width: 24.2mm; height: 24.2mm; }
+    .qr img { width: 24.2mm; height: 24.2mm; display: block; }
+
+    html.preview .mark { display: none; }
+    html.preview .sheet { width: 90mm; height: 55mm; }
+    html.preview .bleed { left: -3mm; top: -3mm; }
+  </style>
+</head>
+<body>
+  <section class="sheet" data-face="front">
+    <div class="bleed"><img class="bg" src="assets/front-bg.png" alt=""></div>
+    <div class="mark h h-tl"></div><div class="mark v v-tl"></div>
+    <div class="mark h h-tr"></div><div class="mark v v-tr"></div>
+    <div class="mark h h-bl"></div><div class="mark v v-bl"></div>
+    <div class="mark h h-br"></div><div class="mark v v-br"></div>
+  </section>
+
+  <section class="sheet" data-face="back-lisa-maretti">
+    <div class="bleed">
+      <img class="bg back" src="assets/back-a-bg.png" alt="">
+      <p class="name">Lisa Maretti</p>
+      <p class="role">Co-founder</p>
+      <img class="phone-icon" src="../assets/phone.svg" alt="">
+      <p class="phone">+66 65 073 9612</p>
+      <img class="badge-icon mail" src="../assets/mail.svg" alt="">
+      <p class="contact-line email">lisa@komarketingagency.com</p>
+      <img class="badge-icon globe" src="../assets/globe.svg" alt="">
+      <p class="contact-line web">komarketingagency.com</p>
+      <img class="badge-icon pin" src="../assets/pin.svg" alt="">
+      <p class="contact-line place">Bangkok, Thailand</p>
+      <div class="qr"><img src="../assets/qr.svg" alt=""></div>
+    </div>
+    <div class="mark h h-tl"></div><div class="mark v v-tl"></div>
+    <div class="mark h h-tr"></div><div class="mark v v-tr"></div>
+    <div class="mark h h-bl"></div><div class="mark v v-bl"></div>
+    <div class="mark h h-br"></div><div class="mark v v-br"></div>
+  </section>
+
+  <section class="sheet" data-face="back-kristina-ostapenko">
+    <div class="bleed">
+      <img class="bg back" src="assets/back-a-bg.png" alt="">
+      <p class="name">Kristina Ostapenko</p>
+      <p class="role">Co-founder</p>
+      <img class="phone-icon" src="../assets/phone.svg" alt="">
+      <p class="phone">+66 99 119 7242</p>
+      <img class="badge-icon mail" src="../assets/mail.svg" alt="">
+      <p class="contact-line email">kristina@komarketingagency.com</p>
+      <img class="badge-icon globe" src="../assets/globe.svg" alt="">
+      <p class="contact-line web">komarketingagency.com</p>
+      <img class="badge-icon pin" src="../assets/pin.svg" alt="">
+      <p class="contact-line place">Bangkok, Thailand</p>
+      <div class="qr"><img src="../assets/qr.svg" alt=""></div>
+    </div>
+    <div class="mark h h-tl"></div><div class="mark v v-tl"></div>
+    <div class="mark h h-tr"></div><div class="mark v v-tr"></div>
+    <div class="mark h h-bl"></div><div class="mark v v-bl"></div>
+    <div class="mark h h-br"></div><div class="mark v v-br"></div>
+  </section>
+  <script>
+    var search = location.search;
+    if (search.indexOf("back=b") !== -1) {
+      document.querySelectorAll("img.back").forEach(function (el) {
+        el.src = "assets/back-b-bg.png";
+      });
+    }
+    if (search.indexOf("preview") !== -1) {
+      document.documentElement.classList.add("preview");
+      var fix = document.createElement("style");
+      fix.textContent = "@page { size: 90mm 55mm; margin: 0; }";
+      document.head.appendChild(fix);
+    }
+  </script>
+</body>
+</html>
