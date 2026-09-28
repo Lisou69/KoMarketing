@@ -40,6 +40,10 @@ WORD_X, WORD_Y, WORD_W = 20.0, 23.94, 56.0
 TAG_INK_X, TAG_INK_BOTTOM = 13.0, 52.49
 TAG_SCALE = 1.18
 TAG_FILL = np.array([46.0, 2.0, 7.0], dtype=np.float32)  # #2E0207
+# "Knock Out" pressed behind the wordmark. Ink width, then its center and bottom.
+KNOCK_INK_W = 66.0
+KNOCK_CX = 48.0
+KNOCK_INK_BOTTOM = 44.0
 
 
 def canvas_size():
@@ -393,6 +397,70 @@ def _tag_placement(mask, scale):
     return x, y, width
 
 
+def _place_ink(shape, mask, width_mm, cx, bottom):
+    """Place a mask so its ink is `width_mm` wide, centered on cx, sitting on bottom."""
+    ink = mask > 0.15
+    ys, xs = np.where(ink)
+    if len(ys) == 0:
+        raise SystemExit("placement mask is empty")
+    x0, x1 = int(xs.min()), int(xs.max()) + 1
+    y1 = int(ys.max()) + 1
+    sprite_w = width_mm * mask.shape[1] / (x1 - x0)
+    icx = (x0 + x1) / 2.0 / mask.shape[1]
+    bot_f = y1 / mask.shape[0]
+    x = cx - icx * sprite_w
+    y = bottom - bot_f * sprite_w * mask.shape[0] / mask.shape[1]
+    return paste_at(shape, mask, x, y, sprite_w)
+
+
+def render_knock_mask():
+    """Two-line 'Knock Out' in the same italic as the back phrase."""
+    font_uri = FONT.as_uri()
+    html_path = ASSETS / "_knock.html"
+    html_path.write_text(
+        f"""<!DOCTYPE html><html><head><style>
+      @font-face {{
+        font-family: "Source Serif 4";
+        font-style: italic;
+        font-weight: 500;
+        src: url("{font_uri}") format("woff2");
+      }}
+      * {{ margin: 0; padding: 0; }}
+      body {{ background: #ffffff; }}
+      #knock {{
+        font-family: "Source Serif 4", serif;
+        font-style: italic;
+        font-weight: 500;
+        font-size: 140pt;
+        line-height: 0.78;
+        letter-spacing: -0.04em;
+        text-align: center;
+        color: #000000;
+        background: #ffffff;
+        display: inline-block;
+        padding: 0.12em 0.18em 0.16em;
+      }}
+    </style></head><body><p id="knock">Knock<br>Out</p></body></html>"""
+    )
+    from io import BytesIO
+    with sync_playwright() as p:
+        browser = p.chromium.launch(
+            executable_path="/usr/bin/google-chrome",
+            args=["--no-sandbox", "--disable-dev-shm-usage"],
+        )
+        page = browser.new_page(viewport={"width": 1800, "height": 1200}, device_scale_factor=2)
+        page.goto(html_path.as_uri(), wait_until="networkidle")
+        page.evaluate("() => document.fonts.ready")
+        shot = page.locator("#knock").screenshot()
+        browser.close()
+    html_path.unlink()
+    mask = _coverage_from_shot(Image.open(BytesIO(shot)))
+    print(f"mask knock {mask.shape} ink {float((mask > 0.2).mean()):.3f}")
+    if mask.shape[0] < 200:
+        raise SystemExit(f"knock mask collapsed to {mask.shape}")
+    return mask
+
+
 def build_front(masks, shape):
     img = paper(*shape)
     word = paste_at(shape, masks["mark"], WORD_X, WORD_Y, WORD_W)
@@ -407,7 +475,19 @@ def build_front(masks, shape):
     tag_x, tag_y, tag_w = _tag_placement(masks["tag"], TAG_SCALE)
     tag = paste_at(shape, masks["tag"], tag_x, tag_y, tag_w)
     apply_tagline(img, tag)
-    return img
+    # Press "Knock Out" into the open paper. Gloss pixels stay as they are,
+    # so the wordmark and the tagline do not pick up the deboss.
+    before = img.copy()
+    knock = _place_ink(shape, masks["knock"], KNOCK_INK_W, KNOCK_CX, KNOCK_INK_BOTTOM)
+    pressed = sheet.copy()
+    apply_deboss(pressed, knock, shadow_gain=40.0, catch_gain=26.0, floor_gain=12.0, radius_mm=0.38)
+    delta = pressed - sheet
+    owned = np.abs(before - sheet).max(axis=2) > 1.5
+    effect = (np.abs(delta).max(axis=2) > 0.35) & ~owned
+    img[effect] = np.clip(img[effect] + delta[effect], 0.0, 255.0)
+    if float(np.abs(img[owned] - before[owned]).max()) > 0.05:
+        raise SystemExit("wordmark or tagline pixels moved")
+    return img, before, knock
 
 
 def build_back_a(masks, shape):
@@ -542,6 +622,37 @@ def check_tagline(front, tag_mask):
     return ratio
 
 
+def check_knock(front, before, knock):
+    """Deboss stays inside the bleed, clear of the tagline, and off the gloss."""
+    changed = np.abs(front - before)
+    if float(changed.max()) < 1.0:
+        raise SystemExit("Knock Out deboss did not land")
+    ys, xs = np.where(knock > 0.15)
+    mm = 25.4 / DPI
+    left, right = float(xs.min()) * mm, float(xs.max() + 1) * mm
+    top, bottom = float(ys.min()) * mm, float(ys.max() + 1) * mm
+    ink = (knock > 0.8)
+    # Interior of the press, away from the gloss, should sit darker than the sheet.
+    open_ink = ink & (changed.max(axis=2) > 0.6)
+    if int(open_ink.sum()) < 80:
+        raise SystemExit("Knock Out is hidden behind the wordmark")
+    sample = front[open_ink]
+    fill = np.median(sample, axis=0)
+    print(
+        f"knock ink {left:.2f}–{right:.2f} x {top:.2f}–{bottom:.2f} mm "
+        f"fill {np.round(fill, 1)} {v1._hex(fill)}"
+    )
+    if left < 0.4 or top < 0.4 or right > 95.6 or bottom > 60.6:
+        raise SystemExit("Knock Out leaves the bleed")
+    if bottom > 45.2:
+        raise SystemExit("Knock Out runs into the tagline")
+    if float(fill[0]) > 100 or float(fill[1]) > 40:
+        raise SystemExit(f"Knock Out fill {v1._hex(fill)} is not a deboss")
+    bright = int(((sample[:, 0] > 150) & (sample[:, 1] > 70)).sum())
+    if bright > 0:
+        raise SystemExit(f"Knock Out has {bright} gloss pixels")
+
+
 def main():
     ASSETS.mkdir(parents=True, exist_ok=True)
     shape = canvas_size()
@@ -554,10 +665,14 @@ def main():
     else:
         masks = render_masks()
         np.savez(cache, **masks)
-    front = build_front(masks, shape)
+    if "knock" not in masks or os.environ.get("V2_REMASK") == "1":
+        masks["knock"] = render_knock_mask()
+        np.savez(cache, **masks)
+    front, before, knock = build_front(masks, shape)
     save_rgb(ASSETS / "front-bg.png", front)
     check_gloss(front, masks["mark"])
     check_tagline(front, masks["tag"])
+    check_knock(front, before, knock)
     print("wrote front")
 
 
