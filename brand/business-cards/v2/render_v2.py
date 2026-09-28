@@ -65,8 +65,8 @@ def split_pages(src, names):
 
 
 def render_all():
-    """Refresh the front. The two single-page B backs stay as they are."""
-    raw_path = Path("/tmp/v2B-print-raw.pdf")
+    """Front and both B backs, on the lighter grained sheet."""
+    raw_path = ROOT / "v2B-print.pdf"
     preview_path = Path("/tmp/v2-preview-b.pdf")
     with sync_playwright() as p:
         browser = p.chromium.launch(
@@ -78,25 +78,14 @@ def render_all():
         print("rendered", raw_path.name, preview_path.name)
         browser.close()
     set_boxes(raw_path)
-    raw = PdfReader(str(raw_path))
-    if len(raw.pages) != 3:
-        raise SystemExit(f"{raw_path.name} has {len(raw.pages)} pages, expected 3")
-
-    front_writer = PdfWriter()
-    front_writer.add_page(raw.pages[0])
-    front_path = ROOT / "v2B-front.pdf"
-    with front_path.open("wb") as handle:
-        front_writer.write(handle)
-    print("wrote", front_path.name)
-
-    print_writer = PdfWriter()
-    print_writer.add_page(raw.pages[0])
-    for name in ("v2B-back-lisa-maretti.pdf", "v2B-back-kristina-ostapenko.pdf"):
-        print_writer.add_page(PdfReader(str(ROOT / name)).pages[0])
-    print_path = ROOT / "v2B-print.pdf"
-    with print_path.open("wb") as handle:
-        print_writer.write(handle)
-    print("wrote", print_path.name)
+    split_pages(
+        raw_path,
+        [
+            ROOT / "v2B-front.pdf",
+            ROOT / "v2B-back-lisa-maretti.pdf",
+            ROOT / "v2B-back-kristina-ostapenko.pdf",
+        ],
+    )
 
 
 if __name__ == "__main__":

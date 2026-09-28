@@ -26,7 +26,7 @@ _spec.loader.exec_module(v1)
 
 DPI = v1.DPI
 px = v1.px
-INK = np.array([94.0, 20.0, 25.0], dtype=np.float32)  # #5E1419
+INK = np.array([108.0, 27.0, 33.0], dtype=np.float32)  # #6C1B21
 # Raised varnish. Darker than the paper, with a slight shift across the bead.
 BODY_DARK = np.array([42.0, 2.0, 6.0], dtype=np.float32)  # #2A0206
 BODY_LIGHT = np.array([50.0, 3.0, 8.0], dtype=np.float32)  # #320308
@@ -43,22 +43,22 @@ def canvas_size():
     return int(round(px(61))), int(round(px(96)))
 
 
-def paper(h, w, tooth=0.016, nap=0.0):
-    """Flat uncoated sheet. The mean stays on #5E1419; the grain is the tooth.
+def _unit(field):
+    return field / (float(field.std()) + 1e-6)
 
-    `nap` adds a fine luminance speckle so the grain stays visible on a dark red.
-    A purely multiplicative tooth barely moves the green channel, and luminance
-    is mostly green, so the sheet would look flat next to smooth ink.
+
+def paper(h, w):
+    """Uncoated sheet. The mean stays on #6C1B21.
+
+    Grain is monochrome: the same luminance offset on every channel, so the
+    hue does not wander. Fine tooth plus a softer fibre, visible at 100%.
     """
     rng = np.random.default_rng(11)
-    fine = rng.normal(0.0, 1.0, (h, w)).astype(np.float32)
-    fiber = gaussian_filter(rng.normal(0.0, 1.0, (h, w)).astype(np.float32), (0.55, 1.7))
-    grain = gaussian_filter(rng.normal(0.0, 1.0, (h, w)).astype(np.float32), 0.4)
-    amp = fine * 1.05 + fiber * 1.25 + grain * 0.40
-    img = INK * (1.0 + amp[..., None] * tooth)
-    if nap > 0:
-        speckle = gaussian_filter(rng.normal(0.0, 1.0, (h, w)).astype(np.float32), 0.42)
-        img += speckle[..., None] * (np.array([3.4, 1.45, 1.75], np.float32) * nap)
+    fine = gaussian_filter(rng.normal(0.0, 1.0, (h, w)).astype(np.float32), 0.42)
+    fibre_a = gaussian_filter(rng.normal(0.0, 1.0, (h, w)).astype(np.float32), (0.55, 2.8))
+    fibre_b = gaussian_filter(rng.normal(0.0, 1.0, (h, w)).astype(np.float32), (2.4, 0.5))
+    lump = _unit(fine) * 5.8 + _unit(fibre_a) * 2.6 + _unit(fibre_b) * 1.7
+    img = INK + lump[..., None]
     return np.clip(img, 0.0, 255.0)
 
 
@@ -355,8 +355,7 @@ def gloss_group(canvas, mask):
 
 
 def build_front(masks, shape):
-    # A little more tooth than the backs, so the smooth ink reads against the sheet.
-    img = paper(*shape, tooth=0.020, nap=1.35)
+    img = paper(*shape)
     word = paste_at(shape, masks["mark"], WORD_X, WORD_Y, WORD_W)
     # 32 pt shot scaled to the 8 pt tagline. 8/32 = 0.25 of the rendered CSS width.
     tag_w = masks["tag"].shape[1] / 2.0 * 25.4 / 96.0 * (8.0 / 32.0)
@@ -474,7 +473,10 @@ def main():
     front = build_front(masks, shape)
     save_rgb(ASSETS / "front-bg.png", front)
     check_gloss(front, masks["mark"])
-    print("wrote front; backs left as they are")
+    back = build_back_b(masks, shape)
+    save_rgb(ASSETS / "back-b-bg.png", back)
+    check_contrast("back-b", back)
+    print("wrote front and back B")
 
 
 if __name__ == "__main__":
