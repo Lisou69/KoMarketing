@@ -16,8 +16,11 @@ ASSETS = ROOT / "assets"
 DPI = int(os.environ.get("CARD_DPI", "600"))
 
 # Millimetres from the bleed origin. cards.html uses the same numbers.
-# The symbol includes a 4-module quiet zone. It sits on the satin ground.
+# The symbol includes a 4-module quiet zone. A white tile fills that zone;
+# the modules are logo burgundy. Bleed millimetres.
 QR_SYMBOL = (60.7, 18.465, 24.2, 24.2)
+QR_QUIET_MODULES = 4
+QR_TILE_RADIUS = 1.0
 # Front. Bleed coordinates. The wordmark is 56 mm wide and centered. The tagline stays lower left.
 FRONT_LOGO = (20.0, 23.94, 56.0, 13.13)
 FRONT_TAG = (13.0, 47.05, 17.6, 6.0)
@@ -618,8 +621,14 @@ def trace_wordmark():
 
 
 def build_qr_svg():
+    """Burgundy modules on an opaque white tile.
+
+    The tile is the symbol box. Its 4-module margin is the quiet zone, which
+    is more than the 2 modules required. The corner radius is 1 mm at the
+    placed size. Both fills are solid: no opacity, mask, or blend.
+    """
     qr = segno.make("https://komarketingagency.com", error="q")
-    modules = list(qr.matrix_iter(scale=1, border=4))
+    modules = list(qr.matrix_iter(scale=1, border=QR_QUIET_MODULES))
     n = len(modules)
     parts = []
     for yy, row in enumerate(modules):
@@ -633,11 +642,12 @@ def build_qr_svg():
                 x1 += 1
             parts.append(f"M{x} {yy}h{x1 - x}v1h-{x1 - x}z")
             x = x1
-    # Inverted: white modules, no plate. The 4-module border is the burgundy ground.
+    radius = QR_TILE_RADIUS / (QR_SYMBOL[2] / n)
     svg = (
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {n} {n}" '
         f'width="{n}" height="{n}">'
-        f'<path fill="#ffffff" d="{"".join(parts)}"/>'
+        f'<rect width="{n}" height="{n}" rx="{radius:.4f}" ry="{radius:.4f}" fill="#ffffff"/>'
+        f'<path fill="#4c050c" d="{"".join(parts)}"/>'
         f"</svg>"
     )
     (ASSETS / "qr.svg").write_text(svg)
@@ -740,12 +750,21 @@ def main():
     trace_wordmark()
     n = build_qr_svg()
     module = QR_SYMBOL[2] / n
-    quiet = 4 * module
+    quiet = QR_QUIET_MODULES * module
     sx, sy, ss, _ = QR_SYMBOL
     data_box = (sx + quiet, sy + quiet, ss - 2 * quiet, ss - 2 * quiet)
-    # White modules on burgundy. The worst pixel is the lightest ground under them.
-    contrast_in(back, data_box, "under the QR")
-    contrast_in(back, QR_SYMBOL, "QR quiet zone")
+    # Trim is 3 mm inside the bleed. The tile must stay 3 mm clear of that edge.
+    tile_right = sx + ss
+    trim_right = 93.0
+    clearance = trim_right - tile_right
+    print(
+        f"qr tile {ss:.2f}mm quiet {QR_QUIET_MODULES} modules ({quiet:.2f}mm) "
+        f"radius {QR_TILE_RADIUS:.2f}mm right clearance {clearance:.2f}mm"
+    )
+    if QR_QUIET_MODULES < 2:
+        raise SystemExit("QR quiet zone is under 2 modules")
+    if clearance < 3.0:
+        raise SystemExit(f"QR tile is {clearance:.2f}mm from the trim, under the 3 mm safe zone")
     measure_cloth(back)
     save_rgb(ASSETS / "back-bg.png", back)
     data_mm = data_box[2]
