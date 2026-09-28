@@ -16,7 +16,7 @@ ASSETS = ROOT / "assets"
 DPI = int(os.environ.get("CARD_DPI", "600"))
 
 # Millimetres from the bleed origin. cards.html uses the same numbers.
-# The symbol includes a 4-module quiet zone. Black modules sit on the satin;
+# The symbol includes a 4-module quiet zone. White modules sit on the satin;
 # the quiet zone and the gaps are the cloth itself. Bleed millimetres.
 QR_SYMBOL = (60.7, 18.400, 24.2, 24.2)
 QR_QUIET_MODULES = 4
@@ -622,7 +622,7 @@ def trace_wordmark():
 
 
 def build_qr_svg():
-    """Black modules only. The satin is the quiet zone and the gaps."""
+    """White modules only. The satin is the quiet zone and the gaps."""
     qr = segno.make("https://komarketingagency.com", error="q")
     modules = list(qr.matrix_iter(scale=1, border=QR_QUIET_MODULES))
     n = len(modules)
@@ -641,7 +641,7 @@ def build_qr_svg():
     svg = (
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {n} {n}" '
         f'width="{n}" height="{n}">'
-        f'<path fill="#000000" d="{"".join(parts)}"/>'
+        f'<path fill="#ffffff" d="{"".join(parts)}"/>'
         f"</svg>"
     )
     (ASSETS / "qr.svg").write_text(svg)
@@ -748,21 +748,21 @@ def main():
     quiet = QR_QUIET_MODULES * module
     sx, sy, ss, _ = QR_SYMBOL
     data_box = (sx + quiet, sy + quiet, ss - 2 * quiet, ss - 2 * quiet)
-    # Trim is 3 mm inside the bleed. The tile must stay 3 mm clear of that edge.
-    tile_right = sx + ss
+    # Trim is 3 mm inside the bleed. The symbol must stay 3 mm clear of that edge.
+    symbol_right = sx + ss
     trim_right = 93.0
-    clearance = trim_right - tile_right
+    clearance = trim_right - symbol_right
     qx0, qy0, qw, qh = (int(round(px(v))) for v in (sx, sy, ss, ss))
     ground = back[qy0:qy0 + qh, qx0:qx0 + qw].reshape(-1, 3)
     light = ground[int(np.argmax(np.apply_along_axis(rel_lum, 1, ground)))]
-    black_ratio = (rel_lum(light) + 0.05) / 0.05
+    white_ratio = 1.05 / (rel_lum(light) + 0.05)
     print(
         f"qr symbol {ss:.2f}mm quiet {QR_QUIET_MODULES} modules ({quiet:.2f}mm) "
         f"right clearance {clearance:.2f}mm"
     )
     print(
-        f"qr black vs lightest satin {light.round(1)} {_hex(light)} "
-        f"contrast {black_ratio:.2f}:1"
+        f"qr white vs lightest satin {light.round(1)} {_hex(light)} "
+        f"contrast {white_ratio:.2f}:1"
     )
     if QR_QUIET_MODULES < 2:
         raise SystemExit("QR quiet zone is under 2 modules")
