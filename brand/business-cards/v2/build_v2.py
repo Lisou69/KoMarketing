@@ -40,11 +40,11 @@ WORD_X, WORD_Y, WORD_W = 20.0, 23.94, 56.0
 TAG_INK_X, TAG_INK_BOTTOM = 13.0, 52.49
 TAG_SCALE = 1.18
 TAG_FILL = np.array([46.0, 2.0, 7.0], dtype=np.float32)  # #2E0207
-# "Knock" and "Out" frame the wordmark. Twenty percent taller than the
-# 18.92 mm lockup, with a fifth of each word past the trim. Tracking is
-# opened less than 0.16em so Knock only nicks the side trim and stays on the sheet.
-KNOCK_H = 18.92 * 1.20
-KNOCK_CROP = 0.20
+# "Knock" and "Out" frame the wordmark. About 23% taller than the previous
+# 22.70 mm lockup, with a third of each word past the trim. Tracking stays
+# at 0.09em, so Knock also runs off the side trim.
+KNOCK_H = 18.92 * 1.20 * 1.23
+KNOCK_CROP = 1.0 / 3.0
 KNOCK_CX = 48.0
 KNOCK_TRACK = "0.09em"
 TRIM_TOP, TRIM_BOT = 3.0, 58.0
@@ -680,13 +680,13 @@ def check_knock(front, before, knock):
         center = (left + right) / 2.0
         if abs(center - KNOCK_CX) > 0.8:
             raise SystemExit(f"{name} is not centered ({center:.2f})")
-    if not (0.15 <= knock_cut <= 0.25):
-        raise SystemExit(f"Knock crop {knock_cut:.0%} is outside 15–25%")
-    if upper[2] > 0.4 or upper[3] > 22.2 or upper[3] < 20.2:
+    if not (0.30 <= knock_cut <= 0.37):
+        raise SystemExit(f"Knock crop {knock_cut:.0%} is outside about a third")
+    if upper[2] > 0.35 or upper[3] > 21.96 or upper[3] < 21.1:
         raise SystemExit("Knock does not bleed off the top, or it meets the wordmark")
-    if upper[0] < 0.15 or upper[0] > 2.2 or upper[1] < 93.8 or upper[1] > 95.9:
-        raise SystemExit("Knock side bleed is missing or too deep")
-    if lower[2] < 39.6 or lower[3] < 60.4:
+    if upper[0] > 0.4 or upper[1] < 95.5:
+        raise SystemExit("Knock does not bleed off the side trim")
+    if lower[2] < 39.8 or lower[2] > 42.0 or lower[3] < 60.6:
         raise SystemExit("Out meets the wordmark, or it does not bleed off the bottom")
     if float(fill[0]) > 100 or float(fill[1]) > 40:
         raise SystemExit(f"Knock Out fill {v1._hex(fill)} is not a deboss")
