@@ -52,18 +52,6 @@ def set_boxes(path):
         writer.write(handle)
 
 
-def split_pages(src, names):
-    reader = PdfReader(str(src))
-    if len(reader.pages) != len(names):
-        raise SystemExit(f"{src.name} has {len(reader.pages)} pages, expected {len(names)}")
-    for page, name in zip(reader.pages, names):
-        writer = PdfWriter()
-        writer.add_page(page)
-        with name.open("wb") as handle:
-            writer.write(handle)
-        print("wrote", name.name)
-
-
 def stitch_print(front_src, print_path):
     """New front page plus the already-approved back pages."""
     front = PdfReader(str(front_src))
