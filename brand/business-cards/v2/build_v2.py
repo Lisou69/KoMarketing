@@ -40,13 +40,14 @@ WORD_X, WORD_Y, WORD_W = 20.0, 23.94, 56.0
 TAG_INK_X, TAG_INK_BOTTOM = 13.0, 52.49
 TAG_SCALE = 1.18
 TAG_FILL = np.array([46.0, 2.0, 7.0], dtype=np.float32)  # #2E0207
-# "Knock" and "Out" frame the wordmark. About 23% taller than the previous
-# 22.70 mm lockup, with a third of each word past the trim. Tracking stays
-# at 0.09em, so Knock also runs off the side trim.
-KNOCK_H = 18.92 * 1.20 * 1.23
-KNOCK_CROP = 1.0 / 3.0
+# About 10% smaller than the 27.93 mm lockup. Forty percent of Knock sits
+# above the top trim. Out keeps a third below the bottom trim. Tracking is
+# tightened to -0.02em so both K's sit on the side trim.
+KNOCK_H = 18.92 * 1.20 * 1.23 * 0.90
+KNOCK_CROP = 0.40
+OUT_CROP = 1.0 / 3.0
 KNOCK_CX = 48.0
-KNOCK_TRACK = "0.09em"
+KNOCK_TRACK = "-0.02em"
 TRIM_TOP, TRIM_BOT = 3.0, 58.0
 
 
@@ -447,7 +448,7 @@ def render_knock_masks():
         color: #000000;
         background: #ffffff;
         display: inline-block;
-        padding: 0.12em 0.2em 0.16em;
+        padding: 0.14em 0.28em 0.18em;
       }}
     </style></head><body>
       <p id="knock">Knock</p>
@@ -496,7 +497,7 @@ def build_front(masks, shape):
     _, oy0, _, oy1 = _ink_box(masks["out"])
     out_h = KNOCK_H * (oy1 - oy0) / (ky1 - ky0)
     knock_top = TRIM_TOP - KNOCK_CROP * KNOCK_H
-    out_bottom = TRIM_BOT + KNOCK_CROP * out_h
+    out_bottom = TRIM_BOT + OUT_CROP * out_h
     knock = _place_by_height(shape, masks["knock"], masks["knock"], KNOCK_H, KNOCK_CX, top=knock_top)
     out = _place_by_height(shape, masks["out"], masks["knock"], KNOCK_H, KNOCK_CX, bottom=out_bottom)
     knock = np.maximum(knock, out)
@@ -680,13 +681,13 @@ def check_knock(front, before, knock):
         center = (left + right) / 2.0
         if abs(center - KNOCK_CX) > 0.8:
             raise SystemExit(f"{name} is not centered ({center:.2f})")
-    if not (0.30 <= knock_cut <= 0.37):
-        raise SystemExit(f"Knock crop {knock_cut:.0%} is outside about a third")
-    if upper[2] > 0.35 or upper[3] > 21.96 or upper[3] < 21.1:
-        raise SystemExit("Knock does not bleed off the top, or it meets the wordmark")
-    if upper[0] > 0.4 or upper[1] < 95.5:
-        raise SystemExit("Knock does not bleed off the side trim")
-    if lower[2] < 39.8 or lower[2] > 42.0 or lower[3] < 60.6:
+    if not (0.37 <= knock_cut <= 0.44):
+        raise SystemExit(f"Knock crop {knock_cut:.0%} is outside about 40%")
+    if upper[2] > 0.35 or upper[3] > 19.2 or upper[3] < 17.4:
+        raise SystemExit("Knock is not high enough, or it meets the wordmark")
+    if upper[0] < 2.3 or upper[0] > 4.2 or upper[1] < 91.8 or upper[1] > 93.8:
+        raise SystemExit("Knock's K's are not on the side trim")
+    if lower[2] < 41.0 or lower[2] > 44.0 or lower[3] < 60.5:
         raise SystemExit("Out meets the wordmark, or it does not bleed off the bottom")
     if float(fill[0]) > 100 or float(fill[1]) > 40:
         raise SystemExit(f"Knock Out fill {v1._hex(fill)} is not a deboss")
