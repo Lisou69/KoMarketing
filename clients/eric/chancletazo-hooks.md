@@ -28,6 +28,20 @@
 9. Chancletazo so hard I nearly took out the mic.
 10. Chancletazo so hard my mic tapped out.
 
+## Captions
+
+### Type A – Normal
+
+1. High, floating ball at the net? That's my cue. Short swing, flat face, contact in front, point over. #padel #chancletazo #padellife #padeltraining
+2. The chancletazo: a flat forehand at the net that punishes any ball left between net and shoulder height. No slice, no spin, straight at the body or the gap. #padel #chancletazo #padeltips #padelplayer
+3. Moving forward, weight in front, ball sitting high. When those line up, I don't play the safe volley, I go chancletazo. #padel #chancletazo #padelcoaching #padelclub
+
+### Type B – Funny (mic falling)
+
+1. Hit the chancletazo. Watched the mic fall. Honestly not sure which one was louder. #padel #chancletazo #padelfunny #micdrop
+2. Nobody told me the mic was standing that close. It knows now. #padel #chancletazo #micdrop #padellife
+3. I came for the point and took the mic down with it. Sorry to whoever set that up. #padel #chancletazo #padelhumor #micdrop
+
 ## Sources
 
 - Padel Magazine (ES), "Técnica pádel: el chancletazo": https://padel-magazine.es/la-t%C3%A9cnica-padel-el-chancletazo/
