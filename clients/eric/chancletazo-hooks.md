@@ -17,16 +17,16 @@
 
 ## Part 2 – Exaggerated first-person hooks
 
-1. Chancletazo so hard the glass filed a complaint.
-2. Chancletazo so hard I owe the club glass.
-3. Chancletazo so hard my rival is still blocking.
-4. Chancletazo so hard my partner apologized to them.
-5. Chancletazo so hard they switched to pickleball.
-6. Chancletazo so hard my mom felt it.
-7. Chancletazo so hard the camera lost the ball.
-8. Chancletazo so hard the net needs a break.
-9. Chancletazo so hard my flip-flops flew off.
-10. Chancletazo so hard the ball needs therapy.
+1. Chancletazo so hard I knocked the mic over.
+2. Chancletazo so hard I sent the mic flying.
+3. Chancletazo so hard I dropped the mic. Literally.
+4. Chancletazo so hard my mic hit the floor.
+5. Chancletazo so hard my mic took a dive.
+6. Chancletazo so hard I need a new mic stand.
+7. Chancletazo so hard I floored the mic too.
+8. Chancletazo so hard my mic couldn't stay up.
+9. Chancletazo so hard I nearly took out the mic.
+10. Chancletazo so hard my mic tapped out.
 
 ## Sources
 
