@@ -90,6 +90,42 @@ Third party tools:
 
 **Why this order:** it opens on the sharpest pain right after the hook, slips the two trusted outside tools into the first half so the Reel reads as honest advice, then closes with three DinDesk points in a row that grow from one agent to a whole team, handing straight into the Founding partner CTA. Five of seven point to DinDesk, and at roughly 3 to 4 seconds per point plus hook and CTA it sits comfortably inside 30 to 45 seconds.
 
+## Other apps
+
+Same format: short need, colon, use AppName. Every app below is real, currently available and genuinely used for that job. These are not DinDesk features and should never be shown as integrations.
+
+### Options
+
+1. Listing photos too dark: use Lightroom.
+2. Quick photo fixes, free: use Snapseed.
+3. Reels that look pro: use CapCut.
+4. Auto captions on your reels: use CapCut.
+5. Branded listing posters: use Canva.
+6. Empty unit, no furniture: use REimagineHome.
+7. Grey sky ruining the shot: use BoxBrownie.
+8. Schedule posts ahead: use Meta Business Suite.
+9. Floor plan from your phone: use magicplan.
+10. Contract signed remotely: use DocuSign.
+11. Owner speaks only Thai: use Google Translate.
+12. Can't read Thai paperwork: use Google Translate.
+13. Nearest BTS and malls: use Google Maps.
+
+Why each fits: Lightroom (Adobe) and Snapseed (Google, free) are the go to mobile photo editors for brightening interiors; CapCut is the standard Reels editor with auto captions; Canva has ready real estate templates; REimagineHome is a leading AI virtual staging app; BoxBrownie is a long established real estate photo editing service that includes sky replacement; Meta Business Suite is Meta's free scheduler for Facebook and Instagram; magicplan draws floor plans from a phone scan; DocuSign is the best known e signature app; Google Translate handles conversation and camera translation of Thai; Google Maps shows transit and amenities around a unit.
+
+### Updated best 9, in order
+
+1. Leads going cold: use DinDesk.
+2. Listing photos too dark: use Lightroom.
+3. Empty unit, no furniture: use REimagineHome.
+4. Portals and socials, fast: use DinDesk.
+5. Reels that look pro: use CapCut.
+6. Every client in one place: use DinDesk.
+7. Owner speaks only Thai: use Google Translate.
+8. Never miss a viewing: use DinDesk.
+9. Have a team schedule: use DinDesk.
+
+**Why this order:** it opens on the sharpest pain, then follows a listing from photo to staging to publishing to Reel, alternating outside apps with DinDesk so the Reel feels like a genuine toolkit. DinDesk takes five of nine points, including the first and the last two, so the brand frames the list and hands straight into the Founding partner CTA. At roughly 3 seconds per point plus hook and CTA it lands inside 30 to 45 seconds; drop point 7 if the edit runs long. Meta Business Suite is left out of the best 9 so it does not compete with DinDesk's publishing point.
+
 ## Sources
 
 1. clients/dindesk/BRIEF.md (content ideas: register, fast publish, fast add listing, "if you're an agent" tips; KPI of Founding partner members). No carousel lessons skill for DinDesk exists in the repo yet.
@@ -97,3 +133,7 @@ Third party tools:
 3. Vurel, "Thai property portals compared 2026" (vurel.io)
 4. Online Marketplaces, "The ultimate visual guide to real estate portals in Thailand" (onlinemarketplaces.com)
 5. VRTwins3D, official Matterport reseller in Thailand (vrtwins3d.com)
+6. Adobe Lightroom mobile release notes, 2026 (lightroom.adobe.com); Snapseed on Google Play, 2026 (play.google.com); CapCut release history, September 2026 (apkmirror.com)
+7. HousingWire, "Virtual staging: the best apps for 2026" (housingwire.com); PhotoFounder, "BoxBrownie vs Virtual Staging AI" (photofounder.com)
+8. Meta Business Help Center, "Save, schedule and reschedule posts in Meta Business Suite" (facebook.com/business/help)
+9. magicplan product page (magicplan.app)
