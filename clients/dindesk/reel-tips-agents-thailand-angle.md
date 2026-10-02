@@ -51,6 +51,45 @@ Do not imply DinDesk publishes to any specific portal named above unless the Din
 
 Spoken version of the URL: "dindesk dot com slash founding partner." Keep the URL on screen for the full CTA.
 
+## Key points
+
+Shorter, punchier format from Lisa's example: a short need, a colon, then the tool. On screen can read "use this" over a DinDesk screen recording; the voice always says the name ("use DinDesk") so the brand is heard, not just seen.
+
+### Options
+
+DinDesk:
+
+1. Leads going cold: use DinDesk.
+2. Lost track of a lead: use DinDesk.
+3. Know where every lead stands: use DinDesk.
+4. Stop chasing leads in spreadsheets: use DinDesk.
+5. Every client in one place: use DinDesk.
+6. Portals and socials, fast: use DinDesk.
+7. Posting listings by hand: use DinDesk.
+8. Never miss a viewing: use DinDesk.
+9. Your week, one calendar: use DinDesk.
+10. Have a team schedule: use DinDesk.
+11. Whole team, one calendar: use DinDesk.
+
+Third party tools:
+
+12. Foreign buyers searching in English: use DDproperty.
+13. Hunting owner listings: use Livinginsider.
+14. Buyer abroad wants a tour: use Matterport.
+15. Renters searching in Bangkok: use PropertyHub.
+
+### Best 7, in order
+
+1. Leads going cold: use DinDesk.
+2. Foreign buyers searching in English: use DDproperty.
+3. Portals and socials, fast: use DinDesk.
+4. Buyer abroad wants a tour: use Matterport.
+5. Every client in one place: use DinDesk.
+6. Never miss a viewing: use DinDesk.
+7. Have a team schedule: use DinDesk.
+
+**Why this order:** it opens on the sharpest pain right after the hook, slips the two trusted outside tools into the first half so the Reel reads as honest advice, then closes with three DinDesk points in a row that grow from one agent to a whole team, handing straight into the Founding partner CTA. Five of seven point to DinDesk, and at roughly 3 to 4 seconds per point plus hook and CTA it sits comfortably inside 30 to 45 seconds.
+
 ## Sources
 
 1. clients/dindesk/BRIEF.md (content ideas: register, fast publish, fast add listing, "if you're an agent" tips; KPI of Founding partner members). No carousel lessons skill for DinDesk exists in the repo yet.
