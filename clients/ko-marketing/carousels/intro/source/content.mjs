@@ -1,11 +1,11 @@
 // Every line below is taken from komarketingagency.com (home, services, plans, contact).
-// Accent words are wrapped in <em> and rendered in Playfair Display Italic.
-// tones: one per slide, 'b' = KO burgundy ground, 'c' = cream paper sheet.
+// Titles are set in Source Serif 4 Italic; the word in <em> takes the KO dusty blue accent, as on the site.
+// tones: one per slide, 'b' = KO burgundy business-card paper, 'c' = KO site white.
 
 export const carousels = [
   {
     id: '01-we-are-open',
-    tones: ['b', 'c', 'b', 'c', 'b', 'c'],
+    tones: ['b', 'c', 'b', 'c', 'c', 'b'],
     cover: {
       chip: 'Now open in Bangkok',
       title: 'We are<br><em>open.</em>',
@@ -47,7 +47,7 @@ export const carousels = [
   },
   {
     id: '02-who-we-are',
-    tones: ['c', 'b', 'c', 'b', 'c', 'b'],
+    tones: ['c', 'b', 'c', 'b', 'b', 'c'],
     cover: {
       chip: 'Small team. All in.',
       title: 'Who we<br><em>are.</em>',
@@ -89,7 +89,7 @@ export const carousels = [
   },
   {
     id: '03-what-we-do',
-    tones: ['b', 'c', 'b', 'c', 'b', 'c'],
+    tones: ['b', 'c', 'b', 'c', 'c', 'b'],
     cover: {
       chip: 'Strategy, content, ads',
       title: 'What we<br><em>do.</em>',
