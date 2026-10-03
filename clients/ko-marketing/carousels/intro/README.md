@@ -7,7 +7,8 @@ Three intro carousels: We are open, Who we are, What we do.
 | [v3/](./v3/) | v3, kept as delivered: burgundy covers, 6 slides each. |
 | [options/](./options/) | Options A, B and C after Lisa's v3 feedback: light covers, more text on every slide, and every KO service. Includes the full service list and its source pages. |
 | [v4/](./v4/) | v4, approved direction: option B's site-section structure mixed with v3's layered visuals. Light covers, a short paragraph on every slide, and every KO service. |
-| [v9/](./v9/) | v9, the current proposal: v8 with a full layout rework. Every slide has its own composition, and the text is set off-centre with staggered, indented lines. |
+| [v10/](./v10/) | v10, final export: v9 as approved, with the bottom progress line removed. The 22 named slides are in `v10/export/`. |
+| [v9/](./v9/) | v9, approved by Lisa: v8 with a full layout rework. Every slide has its own composition, and the text is set off-centre with staggered, indented lines. |
 | [v8/](./v8/) | v8: no silk, and two background phrases per carousel, one debossed into the paper and one glossy and raised. |
 | [v7/](./v7/) | v7: v6 with the per-slide silk replaced by one rendered silk ribbon per carousel that ends on free paper (slide 3, or slide 2 in What we do). |
 | [v6/](./v6/) | v6: v5 plus one continuous line of giant debossed KO text pressed into the paper behind every slide. |
