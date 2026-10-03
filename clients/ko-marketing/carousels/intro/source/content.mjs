@@ -1,14 +1,11 @@
 // Every line below is taken from komarketingagency.com (home, services, plans, contact).
 // Accent words are wrapped in <em> and rendered in Playfair Display Italic.
+// tones: one per slide, 'b' = KO burgundy ground, 'c' = cream paper sheet.
 
 export const carousels = [
   {
     id: '01-we-are-open',
-    bgWords: [
-      { t: 'OPEN', x: 520, y: 120 },
-      { t: 'BANGKOK', x: 2280, y: 120 },
-      { t: 'GROWTH', x: 4520, y: 120 },
-    ],
+    tones: ['b', 'c', 'b', 'c', 'b', 'c'],
     cover: {
       chip: 'Now open in Bangkok',
       title: 'We are<br><em>open.</em>',
@@ -50,11 +47,7 @@ export const carousels = [
   },
   {
     id: '02-who-we-are',
-    bgWords: [
-      { t: 'WHO', x: 560, y: 120 },
-      { t: 'IN HOUSE', x: 2240, y: 120 },
-      { t: 'ALL IN', x: 4640, y: 120 },
-    ],
+    tones: ['c', 'b', 'c', 'b', 'c', 'b'],
     cover: {
       chip: 'Small team. All in.',
       title: 'Who we<br><em>are.</em>',
@@ -96,11 +89,7 @@ export const carousels = [
   },
   {
     id: '03-what-we-do',
-    bgWords: [
-      { t: 'WHAT', x: 520, y: 120 },
-      { t: 'SERVICES', x: 2200, y: 120 },
-      { t: 'GROWTH', x: 4520, y: 120 },
-    ],
+    tones: ['b', 'c', 'b', 'c', 'b', 'c'],
     cover: {
       chip: 'Strategy, content, ads',
       title: 'What we<br><em>do.</em>',
@@ -118,14 +107,10 @@ export const carousels = [
       body: 'Pick one service, or hand us the whole thing.',
       hero: {
         type: 'wall',
-        rows: [
-          ['Branding & Creatives', 'Audits'],
-          ['Social Media Management'],
-          ['Marketing Strategy', 'Shoots'],
-          ['UGC & Creators', 'Content Manager'],
-          ['Paid Ads', 'Website & SEO'],
-          ['Email & Retention', 'Monthly Reporting'],
-          ['Consulting & Coaching'],
+        items: [
+          'Branding & Creatives', 'Social Media Management', 'Marketing Strategy', 'Shoots',
+          'UGC & Creators', 'Content Manager', 'Paid Ads', 'Website & SEO',
+          'Email & Retention', 'Monthly Reporting', 'Audits', 'Consulting & Coaching',
         ],
       },
     },
